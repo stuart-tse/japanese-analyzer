@@ -3,8 +3,9 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](#📄-许可证)
 [![Demo](https://img.shields.io/badge/demo-online-blue.svg)](https://japanese-analyzer-demo.vercel.app/)
 
-> **AI 驱动的日语句子深度解析工具**  
+> **使用 AI大模型 驱动的日语句子深度解析工具**  
 > 面向中文学习者，拆解句法结构、标注词性、呈现发音与释义，让读懂日语不再困难。
+> 使用Gemini 2.5 Flash模型
 ---
 
 ## ✨ 主要特性
@@ -22,14 +23,25 @@
 
 ## 🚀 在线体验
 立即在浏览器中试用 👉 **[Demo](https://japanese-analyzer-demo.vercel.app/)**
+国内访问地址 👉 **[国内访问](https://nihongodemo.howen.ink/)**
+> 注意：当前 Demo 网站使用的是免费的 API Key，可能存在不稳定情况。请勿滥用，如有大量使用需求，建议根据下方教程申请您自己的 API Key（完全免费）。
 
-或查看演示视频
+## 📺 演示视频
 
 
 https://github.com/user-attachments/assets/5039cb62-135e-48e1-971d-960d6b82cacf
 
 
 ---
+## 🛠️ 在线部署指南
+
+1. 访问 Google Aistudio 官网 👉 **[aistudio](https://aistudio.google.com/)**
+2. 点击页面右上角的 **“Get API Key”** 按钮
+3. 在弹出窗口中选择已有项目，或点击创建新项目（完全免费）
+4. 创建后复制生成的 API Key，并妥善保存
+5. 您可以将该 API Key 应用于：
+   - 自行部署完整项目
+   - 或在 Demo 网站右上角“设置”中自定义使用您的 API Key
 
 ### 一键部署到 Vercel（推荐）
 1. **Fork** 本仓库到自己的 GitHub 账户  
@@ -38,7 +50,7 @@ https://github.com/user-attachments/assets/5039cb62-135e-48e1-971d-960d6b82cacf
 4. 目前仅支持gemini模型，后续可能会加新模型
    | 变量名 | 必填 | 说明 |
    | :--- | :---: | :--- |
-   | `API_KEY` | ✅ | 你的 Gemini API 密钥 |
+   | `API_KEY` | ✅ | 你的 Gemini API 密钥（前文获取的） |
    | `API_URL` | ❌ | 自定义接口地址（留空使用默认） |
 
 4. 点击 **Deploy**，几秒后即可访问专属域名 ✨
