@@ -35,7 +35,7 @@ https://github.com/user-attachments/assets/5039cb62-135e-48e1-971d-960d6b82cacf
 1. **Fork** 本仓库到自己的 GitHub 账户  
 2. 在 [Vercel](https://vercel.com/) 中 **Import** 该仓库  
 3. 在 *Project Settings › Environment Variables* 添加：  
-
+4. 目前仅支持gemini模型，后续可能会加新模型
    | 变量名 | 必填 | 说明 |
    | :--- | :---: | :--- |
    | `API_KEY` | ✅ | 你的 Gemini API 密钥 |
