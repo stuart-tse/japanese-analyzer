@@ -468,6 +468,25 @@ rb {
   transition: all 0.2s ease;
 }
 
+#githubButton {
+  position: fixed;
+  top: 1.5rem;
+  right: 5rem;
+  z-index: 1000;
+  background-color: white;
+  color: #333;
+  border: 1px solid #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
 @media (max-width: 640px) {
   #settingsButton {
     top: 1rem;
@@ -475,9 +494,20 @@ rb {
     width: 36px;
     height: 36px;
   }
+  #githubButton {
+    top: 1rem;
+    right: 4rem;
+    width: 36px;
+    height: 36px;
+  }
 }
 
 #settingsButton:hover {
+  background-color: #f0f2f5;
+  transform: scale(1.1);
+}
+
+#githubButton:hover {
   background-color: #f0f2f5;
   transform: scale(1.1);
 }
