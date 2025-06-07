@@ -60,14 +60,25 @@ export default function SettingsModal({
 
   return (
     <>
-      <button 
-        id="settingsButton" 
+      <button
+        id="settingsButton"
         title="API 设置"
         onClick={onModalClose}
         className="fixed top-6 right-6 z-1000 bg-white text-[#007AFF] border border-[#007AFF] rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-50 transition-all"
       >
         <i className="fas fa-cog"></i>
       </button>
+
+      <a
+        id="githubButton"
+        href="https://github.com/cokice/japanese-analyzer"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="GitHub 仓库"
+        className="fixed top-6 right-20 z-1000 bg-white text-gray-800 border border-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-50 transition-all"
+      >
+        <i className="fab fa-github"></i>
+      </a>
 
       <div 
         id="settingsModal" 
@@ -115,7 +126,10 @@ export default function SettingsModal({
               value={apiUrl}
               onChange={(e) => setApiUrl(e.target.value)}
             />
-            <p className="text-xs text-gray-500 mt-1">留空则使用默认端点。</p>
+            <p className="text-xs text-gray-500 mt-1">
+              留空则使用默认端点。若使用自定义域名，请在域名后加
+              <code className="px-1 py-0.5 bg-gray-100 rounded">v1/chat/completions</code>
+            </p>
           </div>
           
           <div className="mb-4">
