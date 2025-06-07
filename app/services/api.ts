@@ -22,10 +22,8 @@ export const DEFAULT_API_URL = "/api";
 export const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
 
 // 获取API请求URL
-function getApiEndpoint(endpoint: string, userApiUrl?: string): string {
-  // 如果用户提供了自定义API URL，则使用它，否则使用默认API URL
-  const baseUrl = userApiUrl && userApiUrl !== DEFAULT_API_URL ? userApiUrl : DEFAULT_API_URL;
-  return `${baseUrl}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+export function getApiEndpoint(endpoint: string): string {
+  return `${DEFAULT_API_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
 }
 
 // 构建请求头
@@ -51,7 +49,7 @@ export async function analyzeSentence(
   }
 
   try {
-    const apiUrl = getApiEndpoint('/analyze', userApiUrl);
+    const apiUrl = getApiEndpoint('/analyze');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
@@ -119,7 +117,7 @@ export async function streamAnalyzeSentence(
   }
 
   try {
-    const apiUrl = getApiEndpoint('/analyze', userApiUrl);
+    const apiUrl = getApiEndpoint('/analyze');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
@@ -264,7 +262,7 @@ export async function streamTranslateText(
   userApiUrl?: string
 ): Promise<void> {
   try {
-    const apiUrl = getApiEndpoint('/translate', userApiUrl);
+    const apiUrl = getApiEndpoint('/translate');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
@@ -400,7 +398,7 @@ export async function getWordDetails(
   userApiUrl?: string
 ): Promise<WordDetail> {
   try {
-    const apiUrl = getApiEndpoint('/word-detail', userApiUrl);
+    const apiUrl = getApiEndpoint('/word-detail');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
@@ -454,7 +452,7 @@ export async function translateText(
   userApiUrl?: string
 ): Promise<string> {
   try {
-    const apiUrl = getApiEndpoint('/translate', userApiUrl);
+    const apiUrl = getApiEndpoint('/translate');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
@@ -495,7 +493,7 @@ export async function extractTextFromImage(
   userApiUrl?: string
 ): Promise<string> {
   try {
-    const apiUrl = getApiEndpoint('/image-to-text', userApiUrl);
+    const apiUrl = getApiEndpoint('/image-to-text');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
@@ -539,7 +537,7 @@ export async function streamExtractTextFromImage(
   userApiUrl?: string
 ): Promise<void> {
   try {
-    const apiUrl = getApiEndpoint('/image-to-text', userApiUrl);
+    const apiUrl = getApiEndpoint('/image-to-text');
     const headers = getHeaders(userApiKey);
     
     const response = await fetch(apiUrl, {
