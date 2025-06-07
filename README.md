@@ -1,6 +1,6 @@
 # Japanese Sentence Analyzer (日本語文章解析器) 🈁
 
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](#-许可证)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](#📄-许可证)
 [![Demo](https://img.shields.io/badge/demo-online-blue.svg)](https://japanese-analyzer-demo.vercel.app/)
 
 > **AI 驱动的日语句子深度解析工具**  
