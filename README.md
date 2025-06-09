@@ -73,3 +73,7 @@ https://github.com/user-attachments/assets/5039cb62-135e-48e1-971d-960d6b82cacf
 
 ## 📬 联系方式
 如有问题，请开一个 Issue 交流
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=cokice/japanese-analyzer&type=Date)](https://www.star-history.com/#cokice/japanese-analyzer&Date)
