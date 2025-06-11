@@ -45,7 +45,7 @@ export default function InputSection({
   const handleSpeak = async () => {
     if (!inputText.trim()) return;
     try {
-      await speakJapaneseWithTTS(inputText, userApiKey, userApiUrl);
+      await speakJapaneseWithTTS(inputText, userApiKey);
     } catch (e) {
       console.error('TTS error:', e);
     }
