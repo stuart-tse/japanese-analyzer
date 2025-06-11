@@ -44,14 +44,19 @@ export function speakJapanese(text: string): void {
 // 使用Gemini TTS朗读文本
 export async function speakJapaneseWithTTS(text: string, apiKey?: string): Promise<void> {
   try {
-    const { audio, mimeType } = await synthesizeSpeech(text, 'Kore', apiKey);
-    const url = createPlayableUrlFromPcm(audio, mimeType);
+    const url = await getJapaneseTtsAudioUrl(text, apiKey);
     const audioElement = new Audio(url);
     audioElement.play();
   } catch (error) {
     console.warn('Gemini TTS 播放失败，尝试使用系统朗读', error);
     speakJapanese(text);
   }
+}
+
+// 获取 Gemini TTS 音频 URL
+export async function getJapaneseTtsAudioUrl(text: string, apiKey?: string): Promise<string> {
+  const { audio, mimeType } = await synthesizeSpeech(text, 'Kore', apiKey);
+  return createPlayableUrlFromPcm(audio, mimeType);
 }
 
 // 将 Base64 PCM 数据转换为可播放的 WAV URL

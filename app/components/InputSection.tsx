@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { extractTextFromImage, streamExtractTextFromImage } from '../services/api';
-import { speakJapaneseWithTTS } from '../utils/helpers';
+import { getJapaneseTtsAudioUrl, speakJapanese } from '../utils/helpers';
 
 // 添加内联样式
 const placeholderStyle = `
@@ -27,7 +27,9 @@ export default function InputSection({
 }: InputSectionProps) {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isImageUploading, setIsImageUploading] = useState(false); 
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsAudioUrl, setTtsAudioUrl] = useState<string | null>(null);
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
   const [uploadStatusClass, setUploadStatusClass] = useState('');
 
@@ -44,10 +46,16 @@ export default function InputSection({
 
   const handleSpeak = async () => {
     if (!inputText.trim()) return;
+    setIsSpeaking(true);
     try {
-      await speakJapaneseWithTTS(inputText, userApiKey);
+      const url = await getJapaneseTtsAudioUrl(inputText, userApiKey);
+      setTtsAudioUrl(url);
     } catch (e) {
       console.error('TTS error:', e);
+      setTtsAudioUrl(null);
+      speakJapanese(inputText);
+    } finally {
+      setIsSpeaking(false);
     }
   };
 
@@ -223,11 +231,20 @@ export default function InputSection({
           id="speakButton"
           className="premium-button premium-button-secondary w-full sm:w-auto sm:order-2 text-sm sm:text-base py-2 sm:py-3"
           onClick={handleSpeak}
-          disabled={!inputText.trim() || isLoading}
+          disabled={!inputText.trim() || isLoading || isSpeaking}
         >
           <i className="fas fa-volume-up mr-2"></i>
-          <span className="button-text">朗读文本</span>
+          {!isSpeaking && <span className="button-text">朗读文本</span>}
+          <div
+            className="loading-spinner"
+            style={{ display: isSpeaking ? 'inline-block' : 'none', width: '18px', height: '18px' }}
+          ></div>
+          {isSpeaking && <span className="button-text">生成中...</span>}
         </button>
+
+        {ttsAudioUrl && (
+          <audio key={ttsAudioUrl} src={ttsAudioUrl} controls autoPlay className="w-full mt-2" />
+        )}
 
         <button
           id="analyzeButton"
