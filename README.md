@@ -44,6 +44,8 @@ https://github.com/user-attachments/assets/5039cb62-135e-48e1-971d-960d6b82cacf
    - 或在 Demo 网站右上角“设置”中自定义使用您的 API Key
 
 ### 一键部署到 Vercel（推荐）
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/cokice/japanese-analyzer&env=API_KEY)
+
 1. **Fork** 本仓库到自己的 GitHub 账户  
 2. 在 [Vercel](https://vercel.com/) 中 **Import** 该仓库  
 3. 在 *Project Settings › Environment Variables* 添加：  
