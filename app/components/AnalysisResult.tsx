@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { containsKanji, getPosClass, posChineseMap, speakJapanese } from '../utils/helpers';
+import { containsKanji, getPosClass, posChineseMap, speakJapaneseWithTTS } from '../utils/helpers';
 import { getWordDetails, WordDetail } from '../services/api';
 
 interface TokenData {
@@ -142,7 +142,7 @@ export default function AnalysisResult({
         <button 
           className="read-aloud-button" 
           title="朗读此词汇"
-          onClick={() => speakJapanese(wordDetail?.originalWord || '')}
+          onClick={() => speakJapaneseWithTTS(wordDetail?.originalWord || '')}
         >
           <i className="fas fa-volume-up"></i>
         </button>

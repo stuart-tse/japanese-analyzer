@@ -1,4 +1,5 @@
 // 工具函数
+import { synthesizeSpeech } from '../services/api';
 
 // 检查字符串是否包含汉字
 export function containsKanji(text: string): boolean {
@@ -37,6 +38,26 @@ export function speakJapanese(text: string): void {
     window.speechSynthesis.speak(utterance);
   } else {
     console.warn('浏览器不支持语音朗读功能');
+  }
+}
+
+// 使用Gemini TTS朗读文本
+export async function speakJapaneseWithTTS(text: string, apiKey?: string): Promise<void> {
+  try {
+    const { audio, mimeType } = await synthesizeSpeech(text, 'Kore', apiKey);
+
+    const byteString = atob(audio);
+    const byteArray = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i++) {
+      byteArray[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([byteArray], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const audioElement = new Audio(url);
+    audioElement.play();
+  } catch (error) {
+    console.warn('Gemini TTS 播放失败，尝试使用系统朗读', error);
+    speakJapanese(text);
   }
 }
 

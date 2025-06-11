@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { extractTextFromImage, streamExtractTextFromImage } from '../services/api';
+import { speakJapaneseWithTTS } from '../utils/helpers';
 
 // 添加内联样式
 const placeholderStyle = `
@@ -39,6 +40,15 @@ export default function InputSection({
     setIsLoading(true);
     onAnalyze(inputText);
     setTimeout(() => setIsLoading(false), 300); // 简化示例，实际应在分析完成后设置
+  };
+
+  const handleSpeak = async () => {
+    if (!inputText.trim()) return;
+    try {
+      await speakJapaneseWithTTS(inputText, userApiKey, userApiUrl);
+    } catch (e) {
+      console.error('TTS error:', e);
+    }
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,8 +207,8 @@ export default function InputSection({
           className="hidden" 
           onChange={handleImageUpload}
         />
-        <button 
-          id="uploadImageButton" 
+        <button
+          id="uploadImageButton"
           className="premium-button premium-button-secondary w-full sm:w-auto mb-2 sm:mb-0 sm:order-1 text-sm sm:text-base py-2 sm:py-3"
           onClick={() => document.getElementById('imageUploadInput')?.click()}
           disabled={isImageUploading}
@@ -208,9 +218,19 @@ export default function InputSection({
           <div className="loading-spinner" style={{ display: isImageUploading ? 'inline-block' : 'none', width: '18px', height: '18px' }}></div>
           {isImageUploading && <span className="button-text">提取中...</span>}
         </button>
-        
-        <button 
-          id="analyzeButton" 
+
+        <button
+          id="speakButton"
+          className="premium-button premium-button-secondary w-full sm:w-auto sm:order-2 text-sm sm:text-base py-2 sm:py-3"
+          onClick={handleSpeak}
+          disabled={!inputText.trim() || isLoading}
+        >
+          <i className="fas fa-volume-up mr-2"></i>
+          <span className="button-text">朗读文本</span>
+        </button>
+
+        <button
+          id="analyzeButton"
           className="premium-button premium-button-primary w-full sm:w-auto sm:order-2 text-sm sm:text-base py-2 sm:py-3"
           onClick={handleAnalyze}
           disabled={isLoading}

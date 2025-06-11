@@ -661,4 +661,27 @@ export async function streamExtractTextFromImage(
     console.error('Error in stream extracting text from image:', error);
     onError(error instanceof Error ? error : new Error('未知错误'));
   }
-} 
+}
+
+// 使用Gemini TTS合成语音
+export async function synthesizeSpeech(
+  text: string,
+  voice = 'Kore',
+  userApiKey?: string
+): Promise<{ audio: string; mimeType: string }> {
+  const apiUrl = getApiEndpoint('/tts');
+  const headers = getHeaders(userApiKey);
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ text, voice })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error?.message || 'TTS 请求失败');
+  }
+
+  return response.json();
+}
