@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { translateText, streamTranslateText } from '../services/api';
 
 interface TranslationSectionProps {
@@ -8,13 +8,15 @@ interface TranslationSectionProps {
   userApiKey?: string;
   userApiUrl?: string;
   useStream?: boolean;
+  trigger?: number;
 }
 
-export default function TranslationSection({ 
+export default function TranslationSection({
   japaneseText,
   userApiKey,
   userApiUrl,
-  useStream = true // 默认为true，保持向后兼容
+  useStream = true, // 默认为true，保持向后兼容
+  trigger
 }: TranslationSectionProps) {
   const [translation, setTranslation] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +67,14 @@ export default function TranslationSection({
   const toggleVisibility = () => {
     setIsVisible(!isVisible);
   };
+
+  // 当trigger变化时自动开始翻译
+  useEffect(() => {
+    if (trigger && japaneseText) {
+      handleTranslate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trigger]);
 
   return (
     <>

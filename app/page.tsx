@@ -15,6 +15,7 @@ export default function Home() {
   const [useStream, setUseStream] = useState<boolean>(true);
   const [streamContent, setStreamContent] = useState('');
   const [isJsonParseError, setIsJsonParseError] = useState(false);
+  const [translationTrigger, setTranslationTrigger] = useState(0);
   
   // API设置相关状态
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -163,10 +164,11 @@ export default function Home() {
 
   const handleAnalyze = async (text: string) => {
     if (!text) return;
-    
+
     setIsAnalyzing(true);
     setAnalysisError('');
     setCurrentSentence(text);
+    setTranslationTrigger(Date.now());
     setStreamContent('');
     setAnalyzedTokens([]);
     setIsJsonParseError(false);
@@ -284,12 +286,13 @@ export default function Home() {
             />
           )}
 
-          {!isAnalyzing && currentSentence && (
-            <TranslationSection 
+          {currentSentence && (
+            <TranslationSection
               japaneseText={currentSentence}
               userApiKey={userApiKey}
               userApiUrl={userApiUrl}
               useStream={useStream}
+              trigger={translationTrigger}
             />
           )}
         </main>
