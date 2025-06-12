@@ -2,14 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { containsKanji, getPosClass, posChineseMap, speakJapanese } from '../utils/helpers';
-import { getWordDetails, WordDetail } from '../services/api';
-
-interface TokenData {
-  word: string;
-  pos: string;
-  furigana?: string;
-  romaji?: string;
-}
+import { getWordDetails, TokenData, WordDetail } from '../services/api';
 
 interface AnalysisResultProps {
   tokens: TokenData[];
@@ -24,8 +17,8 @@ export default function AnalysisResult({
   userApiKey,
   userApiUrl
 }: AnalysisResultProps) {
-  const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
   const [wordDetail, setWordDetail] = useState<WordDetail | null>(null);
+  const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,10 +75,10 @@ export default function AnalysisResult({
   const fetchWordDetails = async (word: string, pos: string, sentence: string, furigana?: string, romaji?: string) => {
     setIsLoading(true);
 
-    try {
-      // 使用服务端API获取词汇详情，传递用户API设置
-      const details = await getWordDetails(word, pos, sentence, furigana, romaji, userApiKey, userApiUrl);
-      setWordDetail(details);
+          try {
+        // 使用服务端API获取词汇详情，传递用户API设置
+        const details = await getWordDetails(word, pos, sentence, furigana, romaji, userApiKey, userApiUrl);
+        setWordDetail(details);
     } catch (error) {
       console.error('Error fetching word details:', error);
       setWordDetail({ 
@@ -132,6 +125,16 @@ export default function AnalysisResult({
     };
   }, [activeWordToken, wordDetail, handleCloseWordDetail]);
 
+  // 朗读单词的函数
+  const handleWordSpeak = async (word: string) => {
+    try {
+      // 词汇详解中统一使用系统TTS，速度更快
+      speakJapanese(word);
+    } catch (error) {
+      console.error('朗读失败:', error);
+    }
+  };
+
   // 词语详情内容组件
   const WordDetailContent = () => (
     <>
@@ -142,7 +145,7 @@ export default function AnalysisResult({
         <button 
           className="read-aloud-button" 
           title="朗读此词汇"
-          onClick={() => speakJapanese(wordDetail?.originalWord || '')}
+          onClick={() => handleWordSpeak(wordDetail?.originalWord || '')}
         >
           <i className="fas fa-volume-up"></i>
         </button>

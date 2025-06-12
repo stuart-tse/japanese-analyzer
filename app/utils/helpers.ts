@@ -1,4 +1,5 @@
 // 工具函数
+import { synthesizeSpeech } from '../services/api';
 
 // 检查字符串是否包含汉字
 export function containsKanji(text: string): boolean {
@@ -38,6 +39,69 @@ export function speakJapanese(text: string): void {
   } else {
     console.warn('浏览器不支持语音朗读功能');
   }
+}
+
+// 使用Gemini TTS朗读文本
+export async function speakJapaneseWithTTS(text: string, apiKey?: string, voice?: string): Promise<void> {
+  try {
+    const url = await getJapaneseTtsAudioUrl(text, apiKey, voice);
+    const audioElement = new Audio(url);
+    audioElement.play();
+  } catch (error) {
+    console.warn('Gemini TTS 播放失败，尝试使用系统朗读', error);
+    speakJapanese(text);
+  }
+}
+
+// 获取 Gemini TTS 音频 URL
+export async function getJapaneseTtsAudioUrl(text: string, apiKey?: string, voice: string = 'Kore'): Promise<string> {
+  const { audio, mimeType } = await synthesizeSpeech(text, voice, apiKey);
+  return createPlayableUrlFromPcm(audio, mimeType);
+}
+
+// 将 Base64 PCM 数据转换为可播放的 WAV URL
+function createPlayableUrlFromPcm(base64: string, mimeType: string): string {
+  const byteString = atob(base64);
+  const pcmData = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i++) {
+    pcmData[i] = byteString.charCodeAt(i);
+  }
+
+  const match = /rate=(\d+)/.exec(mimeType);
+  const sampleRate = match ? parseInt(match[1], 10) : 24000;
+  const numChannels = 1;
+  const byteRate = sampleRate * numChannels * 2;
+  const blockAlign = numChannels * 2;
+
+  const buffer = new ArrayBuffer(44 + pcmData.length);
+  const view = new DataView(buffer);
+
+  function writeString(off: number, str: string) {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(off + i, str.charCodeAt(i));
+    }
+  }
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + pcmData.length, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true);
+  writeString(36, 'data');
+  view.setUint32(40, pcmData.length, true);
+
+  for (let i = 0; i < pcmData.length; i++) {
+    view.setUint8(44 + i, pcmData[i]);
+  }
+
+  const wavBlob = new Blob([view], { type: 'audio/wav' });
+  return URL.createObjectURL(wavBlob);
 }
 
 // 默认API URL
