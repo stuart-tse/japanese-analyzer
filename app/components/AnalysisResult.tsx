@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { containsKanji, getPosClass, posChineseMap, speakJapaneseWithTTS, speakJapanese } from '../utils/helpers';
+import { containsKanji, getPosClass, posChineseMap, speakJapanese } from '../utils/helpers';
 import { getWordDetails, TokenData, WordDetail } from '../services/api';
 
 interface AnalysisResultProps {
