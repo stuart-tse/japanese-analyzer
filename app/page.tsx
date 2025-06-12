@@ -21,15 +21,18 @@ export default function Home() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [userApiKey, setUserApiKey] = useState('');
   const [userApiUrl, setUserApiUrl] = useState(DEFAULT_API_URL);
+  const [ttsProvider, setTtsProvider] = useState<'system' | 'gemini'>('gemini');
 
   // 从本地存储加载用户API设置
   useEffect(() => {
     const storedApiKey = localStorage.getItem('userApiKey') || '';
     const storedApiUrl = localStorage.getItem('userApiUrl') || DEFAULT_API_URL;
     const storedUseStream = localStorage.getItem('useStream');
+    const storedTtsProvider = localStorage.getItem('ttsProvider') as 'system' | 'gemini' || 'gemini';
     
     setUserApiKey(storedApiKey);
     setUserApiUrl(storedApiUrl);
+    setTtsProvider(storedTtsProvider);
     
     // 只有当明确设置了值时才更新，否则保持默认值
     if (storedUseStream !== null) {
@@ -46,6 +49,12 @@ export default function Home() {
     setUserApiKey(apiKey);
     setUserApiUrl(apiUrl);
     setUseStream(streamEnabled);
+  };
+
+  // 处理TTS提供商变更
+  const handleTtsProviderChange = (provider: 'system' | 'gemini') => {
+    setTtsProvider(provider);
+    localStorage.setItem('ttsProvider', provider);
   };
 
   // 解析流式内容中的JSON数据
@@ -229,6 +238,8 @@ export default function Home() {
             userApiKey={userApiKey}
             userApiUrl={userApiUrl}
             useStream={useStream}
+            ttsProvider={ttsProvider}
+            onTtsProviderChange={handleTtsProviderChange}
           />
 
           {isAnalyzing && (!analyzedTokens.length || !useStream) && (
@@ -283,6 +294,7 @@ export default function Home() {
               originalSentence={currentSentence}
               userApiKey={userApiKey}
               userApiUrl={userApiUrl}
+              ttsProvider={ttsProvider}
             />
           )}
 

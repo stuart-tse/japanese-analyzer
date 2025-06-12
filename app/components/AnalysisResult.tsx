@@ -1,31 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { containsKanji, getPosClass, posChineseMap, speakJapaneseWithTTS } from '../utils/helpers';
-import { getWordDetails, WordDetail } from '../services/api';
-
-interface TokenData {
-  word: string;
-  pos: string;
-  furigana?: string;
-  romaji?: string;
-}
+import { containsKanji, getPosClass, posChineseMap, speakJapaneseWithTTS, speakJapanese } from '../utils/helpers';
+import { getWordDetails, TokenData, WordDetail } from '../services/api';
 
 interface AnalysisResultProps {
   tokens: TokenData[];
   originalSentence: string;
   userApiKey?: string;
   userApiUrl?: string;
+  ttsProvider: 'system' | 'gemini';
 }
 
 export default function AnalysisResult({ 
   tokens, 
   originalSentence,
   userApiKey,
-  userApiUrl
+  userApiUrl,
+  ttsProvider
 }: AnalysisResultProps) {
-  const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
   const [wordDetail, setWordDetail] = useState<WordDetail | null>(null);
+  const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,10 +77,10 @@ export default function AnalysisResult({
   const fetchWordDetails = async (word: string, pos: string, sentence: string, furigana?: string, romaji?: string) => {
     setIsLoading(true);
 
-    try {
-      // 使用服务端API获取词汇详情，传递用户API设置
-      const details = await getWordDetails(word, pos, sentence, furigana, romaji, userApiKey, userApiUrl);
-      setWordDetail(details);
+          try {
+        // 使用服务端API获取词汇详情，传递用户API设置
+        const details = await getWordDetails(word, pos, sentence, furigana, romaji, userApiKey, userApiUrl);
+        setWordDetail(details);
     } catch (error) {
       console.error('Error fetching word details:', error);
       setWordDetail({ 
@@ -132,6 +127,26 @@ export default function AnalysisResult({
     };
   }, [activeWordToken, wordDetail, handleCloseWordDetail]);
 
+  // 朗读单词的函数
+  const handleWordSpeak = async (word: string) => {
+    try {
+      if (ttsProvider === 'gemini') {
+        // 从本地存储获取语音设置
+        const storedVoice = localStorage.getItem('ttsVoice') || 'Kore';
+        const storedStyle = localStorage.getItem('ttsStyle') || '';
+        const stylePrompt = storedStyle ? `Say ${storedStyle}: ` : '';
+        const textToSpeak = stylePrompt + word;
+        await speakJapaneseWithTTS(textToSpeak, userApiKey, storedVoice);
+      } else {
+        speakJapanese(word);
+      }
+    } catch (error) {
+      console.error('朗读失败:', error);
+      // 如果选择的TTS失败，回退到系统TTS
+      speakJapanese(word);
+    }
+  };
+
   // 词语详情内容组件
   const WordDetailContent = () => (
     <>
@@ -142,7 +157,7 @@ export default function AnalysisResult({
         <button 
           className="read-aloud-button" 
           title="朗读此词汇"
-          onClick={() => speakJapaneseWithTTS(wordDetail?.originalWord || '')}
+          onClick={() => handleWordSpeak(wordDetail?.originalWord || '')}
         >
           <i className="fas fa-volume-up"></i>
         </button>
