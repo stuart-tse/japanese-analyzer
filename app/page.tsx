@@ -294,7 +294,6 @@ export default function Home() {
               originalSentence={currentSentence}
               userApiKey={userApiKey}
               userApiUrl={userApiUrl}
-              ttsProvider={ttsProvider}
             />
           )}
 

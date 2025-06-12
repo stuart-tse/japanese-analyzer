@@ -9,15 +9,13 @@ interface AnalysisResultProps {
   originalSentence: string;
   userApiKey?: string;
   userApiUrl?: string;
-  ttsProvider: 'system' | 'gemini';
 }
 
 export default function AnalysisResult({ 
   tokens, 
   originalSentence,
   userApiKey,
-  userApiUrl,
-  ttsProvider
+  userApiUrl
 }: AnalysisResultProps) {
   const [wordDetail, setWordDetail] = useState<WordDetail | null>(null);
   const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
@@ -130,20 +128,10 @@ export default function AnalysisResult({
   // 朗读单词的函数
   const handleWordSpeak = async (word: string) => {
     try {
-      if (ttsProvider === 'gemini') {
-        // 从本地存储获取语音设置
-        const storedVoice = localStorage.getItem('ttsVoice') || 'Kore';
-        const storedStyle = localStorage.getItem('ttsStyle') || '';
-        const stylePrompt = storedStyle ? `Say ${storedStyle}: ` : '';
-        const textToSpeak = stylePrompt + word;
-        await speakJapaneseWithTTS(textToSpeak, userApiKey, storedVoice);
-      } else {
-        speakJapanese(word);
-      }
+      // 词汇详解中统一使用系统TTS，速度更快
+      speakJapanese(word);
     } catch (error) {
       console.error('朗读失败:', error);
-      // 如果选择的TTS失败，回退到系统TTS
-      speakJapanese(word);
     }
   };
 
