@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FaCog, FaGithub, FaSave } from 'react-icons/fa';
 
 interface SettingsModalProps {
   userApiKey: string;
@@ -66,7 +67,7 @@ export default function SettingsModal({
         onClick={onModalClose}
         className="fixed top-6 right-6 z-1000 bg-white text-[#007AFF] border border-[#007AFF] rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-50 transition-all"
       >
-        <i className="fas fa-cog"></i>
+        <FaCog />
       </button>
 
       <a
@@ -77,7 +78,7 @@ export default function SettingsModal({
         title="GitHub 仓库"
         className="fixed top-6 right-20 z-1000 bg-white text-gray-800 border border-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-50 transition-all"
       >
-        <i className="fab fa-github"></i>
+        <FaGithub />
       </a>
 
       <div 
@@ -158,7 +159,7 @@ export default function SettingsModal({
             className="premium-button premium-button-success w-full"
             onClick={handleSaveSettings}
           >
-            <i className="fas fa-save mr-2"></i>保存设置
+            <FaSave className="mr-2" />保存设置
           </button>
           {status && <div id="settingsStatus" className={statusClass}>{status}</div>}
           
