@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { containsKanji, getPosClass, posChineseMap, speakJapanese } from '../utils/helpers';
 import { getWordDetails, TokenData, WordDetail } from '../services/api';
+import { FaVolumeUp } from 'react-icons/fa';
 
 interface AnalysisResultProps {
   tokens: TokenData[];
@@ -147,7 +148,7 @@ export default function AnalysisResult({
           title="朗读此词汇"
           onClick={() => handleWordSpeak(wordDetail?.originalWord || '')}
         >
-          <i className="fas fa-volume-up"></i>
+          <FaVolumeUp />
         </button>
       </p>
       

@@ -6,6 +6,7 @@ import AnalysisResult from './components/AnalysisResult';
 import TranslationSection from './components/TranslationSection';
 import SettingsModal from './components/SettingsModal';
 import { analyzeSentence, TokenData, DEFAULT_API_URL, streamAnalyzeSentence } from './services/api';
+import { FaExclamationTriangle, FaExclamationCircle } from 'react-icons/fa';
 
 export default function Home() {
   const [currentSentence, setCurrentSentence] = useState('');
@@ -256,7 +257,7 @@ export default function Home() {
               <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <i className="fas fa-exclamation-triangle text-yellow-500"></i>
+                    <FaExclamationTriangle className="text-yellow-500" />
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-yellow-700">
@@ -276,7 +277,7 @@ export default function Home() {
               <div className="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <i className="fas fa-exclamation-circle text-red-500"></i>
+                    <FaExclamationCircle className="text-red-500" />
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-red-700">

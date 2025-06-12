@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { extractTextFromImage, streamExtractTextFromImage } from '../services/api';
 import { getJapaneseTtsAudioUrl, speakJapanese } from '../utils/helpers';
+import { FaCamera, FaVolumeUp, FaChevronDown, FaDesktop, FaRobot, FaInfoCircle } from 'react-icons/fa';
 
 // 添加内联样式
 const placeholderStyle = `
@@ -310,7 +311,7 @@ export default function InputSection({
             disabled={isImageUploading}
             title="上传图片提取文字"
           >
-            <i className="fas fa-camera"></i>
+            <FaCamera />
             {isImageUploading && <div className="loading-spinner ml-2" style={{ width: '18px', height: '18px' }}></div>}
           </button>
 
@@ -330,7 +331,7 @@ export default function InputSection({
                   '请先输入文本'
                 }
               >
-                <i className="fas fa-volume-up"></i>
+                <FaVolumeUp />
                 {isSpeaking && <div className="loading-spinner ml-2" style={{ width: '18px', height: '18px' }}></div>}
               </button>
               
@@ -340,7 +341,7 @@ export default function InputSection({
                 disabled={isLoading || isSpeaking}
                 title="选择语音合成方式"
               >
-                <i className="fas fa-chevron-down text-xs"></i>
+                <FaChevronDown className="text-xs" />
               </button>
             </div>
             
@@ -357,7 +358,7 @@ export default function InputSection({
                       }`}
                       onClick={() => handleTtsProviderSelect('system')}
                     >
-                      <i className="fas fa-desktop mr-2"></i>
+                      <FaDesktop className="mr-2 inline" />
                       系统 TTS
                       <div className="text-xs text-gray-500 mt-1">浏览器内置，速度快</div>
                     </button>
@@ -367,7 +368,7 @@ export default function InputSection({
                       }`}
                       onClick={() => handleTtsProviderSelect('gemini')}
                     >
-                      <i className="fas fa-robot mr-2"></i>
+                      <FaRobot className="mr-2 inline" />
                       Gemini TTS
                       <div className="text-xs text-gray-500 mt-1">AI语音，音质自然，速度慢</div>
                     </button>
@@ -460,7 +461,7 @@ export default function InputSection({
         <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <i className="fas fa-info-circle text-blue-500 mt-0.5"></i>
+              <FaInfoCircle className="text-blue-500 mt-0.5" />
             </div>
             <div className="ml-3">
               <p className="text-sm text-blue-700">
