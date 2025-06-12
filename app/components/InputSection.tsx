@@ -59,6 +59,17 @@ export default function InputSection({
     }
   };
 
+  // 根据文本长度估算合成时间
+  const getEstimatedTime = (text: string): string => {
+    const length = text.length;
+    if (length <= 20) return '5-10秒';
+    if (length <= 50) return '10-20秒';
+    if (length <= 100) return '20-30秒';
+    return '30-60秒';
+  };
+
+
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -215,36 +226,29 @@ export default function InputSection({
           className="hidden" 
           onChange={handleImageUpload}
         />
-        <button
-          id="uploadImageButton"
-          className="premium-button premium-button-secondary w-full sm:w-auto mb-2 sm:mb-0 sm:order-1 text-sm sm:text-base py-2 sm:py-3"
-          onClick={() => document.getElementById('imageUploadInput')?.click()}
-          disabled={isImageUploading}
-        >
-          <i className="fas fa-camera mr-2"></i>
-          {!isImageUploading && <span className="button-text">上传图片提取文字</span>}
-          <div className="loading-spinner" style={{ display: isImageUploading ? 'inline-block' : 'none', width: '18px', height: '18px' }}></div>
-          {isImageUploading && <span className="button-text">提取中...</span>}
-        </button>
+        <div className="flex gap-2 w-full sm:w-auto mb-2 sm:mb-0 sm:order-1">
+          <button
+            id="uploadImageButton"
+            className="premium-button premium-button-secondary flex-1 sm:w-auto text-sm sm:text-base py-2 sm:py-3"
+            onClick={() => document.getElementById('imageUploadInput')?.click()}
+            disabled={isImageUploading}
+            title="上传图片提取文字"
+          >
+            <i className="fas fa-camera"></i>
+            {isImageUploading && <div className="loading-spinner ml-2" style={{ width: '18px', height: '18px' }}></div>}
+          </button>
 
-        <button
-          id="speakButton"
-          className="premium-button premium-button-secondary w-full sm:w-auto sm:order-2 text-sm sm:text-base py-2 sm:py-3"
-          onClick={handleSpeak}
-          disabled={!inputText.trim() || isLoading || isSpeaking}
-        >
-          <i className="fas fa-volume-up mr-2"></i>
-          {!isSpeaking && <span className="button-text">朗读文本</span>}
-          <div
-            className="loading-spinner"
-            style={{ display: isSpeaking ? 'inline-block' : 'none', width: '18px', height: '18px' }}
-          ></div>
-          {isSpeaking && <span className="button-text">生成中...</span>}
-        </button>
-
-        {ttsAudioUrl && (
-          <audio key={ttsAudioUrl} src={ttsAudioUrl} controls autoPlay className="w-full mt-2" />
-        )}
+          <button
+            id="speakButton"
+            className="premium-button premium-button-secondary flex-1 sm:w-auto text-sm sm:text-base py-2 sm:py-3"
+            onClick={handleSpeak}
+            disabled={!inputText.trim() || isLoading || isSpeaking}
+            title={inputText.trim() ? `朗读文本 (预计需要 ${getEstimatedTime(inputText)})` : '请先输入文本'}
+          >
+            <i className="fas fa-volume-up"></i>
+            {isSpeaking && <div className="loading-spinner ml-2" style={{ width: '18px', height: '18px' }}></div>}
+          </button>
+        </div>
 
         <button
           id="analyzeButton"
@@ -259,6 +263,39 @@ export default function InputSection({
       </div>
       
       <div id="imageUploadStatus" className={uploadStatusClass}>{uploadStatus}</div>
+      
+      {ttsAudioUrl && (
+        <div className="mt-3">
+          <audio 
+            key={ttsAudioUrl} 
+            src={ttsAudioUrl} 
+            controls 
+            autoPlay 
+            className="w-full"
+            style={{ height: '40px' }}
+          />
+        </div>
+      )}
+
+      {isSpeaking && (
+        <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <i className="fas fa-info-circle text-blue-500 mt-0.5"></i>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-blue-700">
+                <strong>正在进行高质量语音合成，请稍候...</strong>
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                • 使用 Gemini TTS 技术，音质更自然<br/>
+                • 当前文本预计需要：{getEstimatedTime(inputText)}<br/>
+                • 请保持页面打开，不要离开或刷新
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
