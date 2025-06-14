@@ -76,11 +76,16 @@ export default function RootLayout({
           })();
         `}} />
       </head>
+<<<<<<< HEAD
       <body className={`${inter.className} antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-200`}>
         <ThemeProvider>
           {children}
         </ThemeProvider>
         <Script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" strategy="afterInteractive" />
+=======
+      <body className={`${inter.className} antialiased`}>
+        {children}
+>>>>>>> d8eedcb986221b89f71220b66f86873fc9358dd4
       </body>
     </html>
   );
