@@ -76,7 +76,7 @@ export default function SettingsModal({
         target="_blank"
         rel="noopener noreferrer"
         title="GitHub 仓库"
-        className="fixed top-6 right-20 z-1000 bg-white text-gray-800 border border-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-50 transition-all"
+        className="fixed top-6 right-20 z-1000 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-800 dark:border-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
       >
         <FaGithub />
       </a>

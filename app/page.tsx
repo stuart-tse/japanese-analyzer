@@ -5,6 +5,8 @@ import InputSection from './components/InputSection';
 import AnalysisResult from './components/AnalysisResult';
 import TranslationSection from './components/TranslationSection';
 import SettingsModal from './components/SettingsModal';
+import ThemeToggle from './components/ThemeToggle';
+import LoginModal from './components/LoginModal';
 import { analyzeSentence, TokenData, DEFAULT_API_URL, streamAnalyzeSentence } from './services/api';
 import { FaExclamationTriangle, FaExclamationCircle } from 'react-icons/fa';
 
@@ -22,14 +24,48 @@ export default function Home() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [userApiKey, setUserApiKey] = useState('');
   const [userApiUrl, setUserApiUrl] = useState(DEFAULT_API_URL);
-  const [ttsProvider, setTtsProvider] = useState<'system' | 'gemini'>('system');
+  const [ttsProvider, setTtsProvider] = useState<'system' | 'gemini'>('gemini');
+  
+  // 密码验证相关状态
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [requiresAuth, setRequiresAuth] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  // 检查是否需要密码验证
+  useEffect(() => {
+    const checkAuthRequirement = async () => {
+      try {
+        const response = await fetch('/api/auth');
+        const data = await response.json();
+        setRequiresAuth(data.requiresAuth);
+        
+        // 如果不需要验证，直接设置为已认证
+        if (!data.requiresAuth) {
+          setIsAuthenticated(true);
+        } else {
+          // 检查是否已经有有效的认证状态
+          const authStatus = localStorage.getItem('isAuthenticated');
+          if (authStatus === 'true') {
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        console.error('检查认证状态失败:', error);
+        // 出错时默认不需要认证
+        setRequiresAuth(false);
+        setIsAuthenticated(true);
+      }
+    };
+    
+    checkAuthRequirement();
+  }, []);
 
   // 从本地存储加载用户API设置
   useEffect(() => {
     const storedApiKey = localStorage.getItem('userApiKey') || '';
     const storedApiUrl = localStorage.getItem('userApiUrl') || DEFAULT_API_URL;
     const storedUseStream = localStorage.getItem('useStream');
-    const storedTtsProvider = localStorage.getItem('ttsProvider') as 'system' | 'gemini' || 'system';
+    const storedTtsProvider = localStorage.getItem('ttsProvider') as 'system' | 'gemini' || 'gemini';
     
     setUserApiKey(storedApiKey);
     setUserApiUrl(storedApiUrl);
@@ -56,6 +92,32 @@ export default function Home() {
   const handleTtsProviderChange = (provider: 'system' | 'gemini') => {
     setTtsProvider(provider);
     localStorage.setItem('ttsProvider', provider);
+  };
+
+  // 处理密码验证
+  const handleLogin = async (password: string) => {
+    try {
+      setAuthError('');
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsAuthenticated(true);
+        localStorage.setItem('isAuthenticated', 'true');
+      } else {
+        setAuthError(data.message || '验证失败');
+      }
+    } catch (error) {
+      console.error('验证过程中出错:', error);
+      setAuthError('验证过程中发生错误，请重试');
+    }
   };
 
   // 解析流式内容中的JSON数据
@@ -225,12 +287,42 @@ export default function Home() {
     }
   };
 
+  // 如果需要认证但未认证，只显示登录界面
+  if (requiresAuth && !isAuthenticated) {
+    return (
+      <>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 transition-colors duration-200">
+              日本語<span className="text-[#007AFF] dark:text-blue-400">文章</span>解析器
+            </h1>
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mt-2 transition-colors duration-200">
+              AI驱动・深入理解日语句子结构与词义
+            </p>
+          </div>
+        </div>
+        <LoginModal
+          isOpen={true}
+          onLogin={handleLogin}
+          error={authError}
+        />
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-4 sm:pt-8 lg:pt-16 p-3 sm:p-4">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-4 sm:pt-8 lg:pt-16 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <div className="w-full max-w-3xl">
+        {/* 主题切换按钮 - 固定在右上角 */}
+        <ThemeToggle />
+        
         <header className="text-center mb-6 sm:mb-8 mt-12 sm:mt-16">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">日本語<span className="text-[#007AFF]">文章</span>解析器</h1>
-          <p className="text-base sm:text-lg text-gray-600 mt-2">AI驱动・深入理解日语句子结构与词义</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 transition-colors duration-200">
+            日本語<span className="text-[#007AFF] dark:text-blue-400">文章</span>解析器
+          </h1>
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mt-2 transition-colors duration-200">
+            AI驱动・深入理解日语句子结构与词义
+          </p>
         </header>
 
         <main>
@@ -247,26 +339,26 @@ export default function Home() {
             <div className="premium-card">
               <div className="flex items-center justify-center py-6">
                 <div className="loading-spinner"></div>
-                <span className="ml-3 text-gray-600">正在解析中，请稍候...</span>
+                <span className="ml-3 text-gray-600 dark:text-gray-400 transition-colors duration-200">正在解析中，请稍候...</span>
               </div>
             </div>
           )}
 
           {isJsonParseError && streamContent && (
             <div className="premium-card">
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4 transition-colors duration-200">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <FaExclamationTriangle className="text-yellow-500" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-yellow-700">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300 transition-colors duration-200">
                       解析中，已经收到部分内容，但尚未形成完整的结果。
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-96 text-xs font-mono whitespace-pre-wrap">
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md overflow-auto max-h-96 text-xs font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-200 transition-colors duration-200">
                 {streamContent}
               </div>
             </div>
@@ -274,13 +366,13 @@ export default function Home() {
 
           {analysisError && (
             <div className="premium-card">
-              <div className="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4">
+              <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 sm:p-4 transition-colors duration-200">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <FaExclamationCircle className="text-red-500" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-red-700">
+                    <p className="text-sm text-red-700 dark:text-red-300 transition-colors duration-200">
                       解析错误：{analysisError}
                     </p>
                   </div>
@@ -309,8 +401,8 @@ export default function Home() {
           )}
         </main>
 
-        <footer className="text-center mt-8 sm:mt-12 py-4 sm:py-6 border-t border-gray-200">
-          <p className="text-gray-500 text-xs sm:text-sm">&copy; 2025 高级日语解析工具 by Howen. All rights reserved.</p>
+        <footer className="text-center mt-8 sm:mt-12 py-4 sm:py-6 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm transition-colors duration-200">&copy; 2025 高级日语解析工具 by Howen. All rights reserved.</p>
           
         </footer>
       </div>
