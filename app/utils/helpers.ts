@@ -113,15 +113,15 @@ const DEFAULT_API_URL =
 export function saveApiSettings(apiKey: string, apiUrl: string): void {
   if (typeof window !== 'undefined') {
     if (apiKey) {
-      localStorage.setItem('userGeminiApiKey', apiKey);
+      localStorage.setItem('userApiKey', apiKey);
     } else {
-      localStorage.removeItem('userGeminiApiKey');
+      localStorage.removeItem('userApiKey');
     }
     
     if (apiUrl && apiUrl !== DEFAULT_API_URL) {
-      localStorage.setItem('userGeminiApiUrl', apiUrl);
+      localStorage.setItem('userApiUrl', apiUrl);
     } else {
-      localStorage.removeItem('userGeminiApiUrl');
+      localStorage.removeItem('userApiUrl');
     }
   }
 }
@@ -130,8 +130,8 @@ export function saveApiSettings(apiKey: string, apiUrl: string): void {
 export function getApiSettings(): { apiKey: string, apiUrl: string } {
   if (typeof window !== 'undefined') {
     // 尝试从localStorage读取
-    const savedApiKey = localStorage.getItem('userGeminiApiKey') || '';
-    const savedApiUrl = localStorage.getItem('userGeminiApiUrl') || DEFAULT_API_URL;
+    const savedApiKey = localStorage.getItem('userApiKey') || '';
+    const savedApiUrl = localStorage.getItem('userApiUrl') || DEFAULT_API_URL;
     
     // 尝试从环境变量读取默认值（如果本地没有值）
     const apiKey = savedApiKey || process.env.API_KEY || '';
