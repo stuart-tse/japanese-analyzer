@@ -147,10 +147,8 @@ export default function InputSection({
     return '30-60秒';
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    
+  // 处理图片识别的通用函数
+  const processImageFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setUploadStatus('请上传图片文件！');
       setUploadStatusClass('mt-2 text-sm text-red-600');
@@ -204,9 +202,39 @@ export default function InputSection({
       setUploadStatus(`提取时发生错误: ${error instanceof Error ? error.message : '未知错误'}。`);
       setUploadStatusClass('mt-2 text-sm text-red-600');
       setIsImageUploading(false);
-    } finally {
-      // 清理file input
-      event.target.value = '';
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    await processImageFile(file);
+    
+    // 清理file input
+    event.target.value = '';
+  };
+
+  // 处理粘贴事件
+  const handlePaste = async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    // 检查粘贴的内容中是否有图片
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        // 阻止默认粘贴行为
+        event.preventDefault();
+        
+        const file = item.getAsFile();
+        if (file) {
+          setUploadStatus('检测到粘贴的图片，正在识别...');
+          setUploadStatusClass('mt-2 text-sm text-blue-600');
+          await processImageFile(file);
+        }
+        break;
+      }
     }
   };
 
@@ -268,9 +296,10 @@ export default function InputSection({
           id="japaneseInput" 
           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#007AFF] focus:border-[#007AFF] transition duration-150 ease-in-out resize-none japanese-text" 
           rows={4} 
-          placeholder="例：今日はいい天気ですね。或上传图片识别文字。"
+          placeholder="例：今日はいい天気ですね。或上传图片识别文字，也可直接粘贴图片。"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
+          onPaste={handlePaste}
           style={{ 
             fontSize: '16px', // 防止移动设备缩放
             WebkitTextFillColor: 'black', // Safari特定修复
