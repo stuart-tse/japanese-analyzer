@@ -5,13 +5,6 @@ const API_KEY = process.env.API_KEY || '';
 const API_URL = process.env.API_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
 const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
 
-// 临时调试信息 - 生产环境请删除
-console.log('=== 环境变量调试信息 ===');
-console.log('API_KEY存在:', !!process.env.API_KEY);
-console.log('API_KEY长度:', process.env.API_KEY ? process.env.API_KEY.length : 0);
-console.log('API_URL:', process.env.API_URL || '使用默认URL');
-console.log('CODE环境变量:', process.env.CODE || '未设置');
-console.log('========================');
 
 export async function POST(req: NextRequest) {
   try {
