@@ -4,8 +4,7 @@
 [![Demo](https://img.shields.io/badge/demo-online-blue.svg)](https://japanese-analyzer-demo.vercel.app/)
 
 > **使用 AI大模型 驱动的日语句子深度解析工具**  
-> 面向中文学习者，拆解句法结构、标注词性、呈现发音与释义，让读懂日语不再困难。
-> 使用Gemini 2.5 Flash模型分析
+>面向中文学习者， 使用Gemini 2.5 Flash模型分析、拆解句法结构、标注词性、呈现发音与释义，让读懂日语不再困难。
 ---
 
 ## ✨ 主要特性
