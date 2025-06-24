@@ -5,20 +5,20 @@
 
 > **使用 AI大模型 驱动的日语句子深度解析工具**  
 > 面向中文学习者，拆解句法结构、标注词性、呈现发音与释义，让读懂日语不再困难。
-> 使用Gemini 2.5 Flash模型
+> 使用Gemini 2.5 Flash模型分析
 ---
 
 ## ✨ 主要特性
 | 功能 | 描述 |
 | :-- | :-- |
 | 🔍 **智能句法标注** | 一键输出词性、假名、罗马音与语法成分 |
-| 📚 **多维词义解释** | 集合权威词典，提供精准中文释义 |
+| 📚 **多维词义解释** | 使用Gemini大模型提供精准中文释义 |
 | 🖼️ **OCR 图像识别** | 从截图或照片中提取日语文本并立即解析 |
 | 🔈 **原声 TTS 朗读** | 集成 Gemini TTS, 朗读整段日语 |
 | 🔄 **整句翻译** | 双语对照，迅速把握整体含义 |
 | 🌐 **流式响应** | 基于流式 API，交互更丝滑 |
 | 🌙 **暗黑模式** | 支持亮色/暗色/跟随系统三种主题模式 |
-| 🔐 **访问控制** | 可选的密码保护功能，保护私有部署 |
+| 🔐 **访问控制** | 可选的密码保护功能，保护私有部署，不被盗刷 |
 | ⚙️ **高度可配置** | 支持自定义 Gemini API Key / Endpoint |
 
 ---
@@ -58,22 +58,7 @@ https://github.com/user-attachments/assets/5039cb62-135e-48e1-971d-960d6b82cacf
    | `API_URL` | ❌ | 自定义接口地址（留空使用默认） |
    | `CODE` | ❌ | 访问密码（设置后需要密码才能使用应用） |
 
-### 本地 TTS 测试
 
-确认 `API_KEY` 已配置后，可在命令行运行：
-
-```bash
-curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${API_KEY}" \
-  -X POST -H "Content-Type: application/json" \
-  -d '{"contents":[{"parts":[{"text":"こんにちは"}]}],"generationConfig":{"responseModalities":["AUDIO"],"speechConfig":{"voiceConfig":{"prebuiltVoiceConfig":{"voiceName":"Kore"}}}},"model":"gemini-2.5-flash-preview-tts"}' \
-  | jq -r '.candidates[0].content.parts[0].inlineData.data' | base64 --decode >out.pcm
-ffmpeg -f s16le -ar 24000 -ac 1 -i out.pcm out.wav
-```
-
-即可得到 `out.wav` 音频文件。
-
-4. 点击 **Deploy**，几秒后即可访问专属域名 ✨
----
 
 ## 🤝 如何贡献
 我们热忱欢迎任何形式的贡献！
