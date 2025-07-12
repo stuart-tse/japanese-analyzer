@@ -141,8 +141,8 @@ export default function AnalysisResult({
   };
 
   // 格式化解释文本，支持换行和高亮
-  const formatExplanation = (text: string) => {
-    if (!text) return null;
+  const formatExplanation = (text: string): { __html: string } | undefined => {
+    if (!text) return undefined;
     
     const formattedText = text
       .replace(/\n/g, '<br />')
