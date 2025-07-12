@@ -19,6 +19,7 @@ export default function Home() {
   const [streamContent, setStreamContent] = useState('');
   const [isJsonParseError, setIsJsonParseError] = useState(false);
   const [translationTrigger, setTranslationTrigger] = useState(0);
+  const [showFurigana, setShowFurigana] = useState(true);
   
   // API设置相关状态
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -387,6 +388,8 @@ export default function Home() {
               originalSentence={currentSentence}
               userApiKey={userApiKey}
               userApiUrl={userApiUrl}
+              showFurigana={showFurigana}
+              onShowFuriganaChange={setShowFurigana}
             />
           )}
 
