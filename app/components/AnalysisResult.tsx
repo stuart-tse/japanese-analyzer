@@ -10,13 +10,17 @@ interface AnalysisResultProps {
   originalSentence: string;
   userApiKey?: string;
   userApiUrl?: string;
+  showFurigana: boolean;
+  onShowFuriganaChange: (show: boolean) => void;
 }
 
 export default function AnalysisResult({ 
   tokens, 
   originalSentence,
   userApiKey,
-  userApiUrl
+  userApiUrl,
+  showFurigana,
+  onShowFuriganaChange
 }: AnalysisResultProps) {
   const [wordDetail, setWordDetail] = useState<WordDetail | null>(null);
   const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
@@ -24,7 +28,7 @@ export default function AnalysisResult({
   const [isMobile, setIsMobile] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 检测设备是否为移动端
+  // 检测设备是���为移动端
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -198,7 +202,22 @@ export default function AnalysisResult({
 
   return (
     <div className="premium-card">
-      <h2 className="text-2xl font-semibold text-gray-700 mb-4">解析结果</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold text-gray-700">解析结果</h2>
+        <div className="flex items-center">
+          <label htmlFor="furiganaToggle" className="text-sm font-medium text-gray-700 mr-2">显示假名:</label>
+          <label className="inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              id="furiganaToggle"
+              className="sr-only peer"
+              checked={showFurigana}
+              onChange={(e) => onShowFuriganaChange(e.target.checked)}
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+      </div>
       <div id="analyzedSentenceOutput" className="text-gray-800 mb-2 p-3 bg-gray-50 rounded-lg min-h-[70px]">
         {tokens.map((token, index) => (
           <span key={index} className="word-unit-wrapper tooltip">
@@ -206,7 +225,7 @@ export default function AnalysisResult({
               className={`word-token ${getPosClass(token.pos)}`}
               onClick={(e) => handleWordClick(e, token)}
             >
-              {token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号'
+              {showFurigana && token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号'
                 ? generateFuriganaParts(token.word, token.furigana).map((part, i) =>
                     part.ruby ? (
                       <ruby key={i}>
@@ -282,4 +301,4 @@ export default function AnalysisResult({
       <p className="text-sm text-gray-500 italic mt-3">点击词汇查看详细释义。悬停词汇可查看词性。</p>
     </div>
   );
-} 
+}
