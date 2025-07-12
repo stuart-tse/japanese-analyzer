@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { containsKanji, getPosClass, posChineseMap, speakJapanese } from '../utils/helpers';
+import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts } from '../utils/helpers';
 import { getWordDetails, TokenData, WordDetail } from '../services/api';
 import { FaVolumeUp } from 'react-icons/fa';
 
@@ -206,12 +206,18 @@ export default function AnalysisResult({
               className={`word-token ${getPosClass(token.pos)}`}
               onClick={(e) => handleWordClick(e, token)}
             >
-              <span className="ruby-container">
-                <span className="ruby-base">{token.word}</span>
-                {token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号' && (
-                  <span className="ruby-text">{token.furigana}</span>
-                )}
-              </span>
+              {token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号'
+                ? generateFuriganaParts(token.word, token.furigana).map((part, i) =>
+                    part.ruby ? (
+                      <ruby key={i}>
+                        {part.base}
+                        <rt>{part.ruby}</rt>
+                      </ruby>
+                    ) : (
+                      <span key={i}>{part.base}</span>
+                    )
+                  )
+                : token.word}
             </span>
             
             {token.romaji && token.pos !== '記号' && (
