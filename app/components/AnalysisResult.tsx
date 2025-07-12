@@ -232,35 +232,41 @@ export default function AnalysisResult({
         </div>
       </div>
       <div id="analyzedSentenceOutput" className="text-gray-800 mb-2 p-3 bg-gray-50 rounded-lg min-h-[70px]">
-        {tokens.map((token, index) => (
-          <span key={index} className="word-unit-wrapper tooltip">
-            <span 
-              className={`word-token ${getPosClass(token.pos)}`}
-              onClick={(e) => handleWordClick(e, token)}
-            >
-              {showFurigana && token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号'
-                ? generateFuriganaParts(token.word, token.furigana).map((part, i) =>
-                    part.ruby ? (
-                      <ruby key={i}>
-                        {part.base}
-                        <rt>{part.ruby}</rt>
-                      </ruby>
-                    ) : (
-                      <span key={i}>{part.base}</span>
+        {tokens.map((token, index) => {
+          if (token.pos === '改行') {
+            return <br key={index} />;
+          }
+          
+          return (
+            <span key={index} className="word-unit-wrapper tooltip">
+              <span 
+                className={`word-token ${getPosClass(token.pos)}`}
+                onClick={(e) => handleWordClick(e, token)}
+              >
+                {showFurigana && token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号'
+                  ? generateFuriganaParts(token.word, token.furigana).map((part, i) =>
+                      part.ruby ? (
+                        <ruby key={i}>
+                          {part.base}
+                          <rt>{part.ruby}</rt>
+                        </ruby>
+                      ) : (
+                        <span key={i}>{part.base}</span>
+                      )
                     )
-                  )
-                : token.word}
+                  : token.word}
+              </span>
+              
+              {token.romaji && token.pos !== '記号' && (
+                <span className="romaji-text">{token.romaji}</span>
+              )}
+              
+              <span className="tooltiptext">
+                {posChineseMap[token.pos.split('-')[0]] || posChineseMap['default']}
+              </span>
             </span>
-            
-            {token.romaji && token.pos !== '記号' && (
-              <span className="romaji-text">{token.romaji}</span>
-            )}
-            
-            <span className="tooltiptext">
-              {posChineseMap[token.pos.split('-')[0]] || posChineseMap['default']}
-            </span>
-          </span>
-        ))}
+          );
+        })}
       </div>
       
       {/* 非移动端的内嵌详情展示 */}

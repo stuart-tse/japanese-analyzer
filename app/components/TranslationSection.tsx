@@ -105,7 +105,7 @@ export default function TranslationSection({
           </div>
           
           {isVisible && (
-            <div id="fullTranslationOutput" className="text-gray-800 p-3 bg-gray-50 rounded-lg min-h-[50px]">
+            <div id="fullTranslationOutput" className="text-gray-800 p-3 bg-gray-50 rounded-lg min-h-[50px] whitespace-pre-wrap">
               {isLoading && !translation ? (
                 <div className="flex items-center justify-center py-4">
                   <div className="loading-spinner"></div>
