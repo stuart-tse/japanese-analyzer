@@ -35,7 +35,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 构建翻译请求
-    const translationPrompt = `请将以下日语句子翻译成简体中文：\n\n"${text}"\n\n请仅返回翻译后的中文文本。`;
+    const translationPrompt = `请将以下日文文本翻译成简体中文。重要：请务必保持与原文完全相同的段落和换行结构。
+
+原文：
+${text}
+
+请仅返回翻译后的中文文本。`;
     const payload = {
       model: model,
       reasoning_effort: "none",

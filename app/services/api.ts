@@ -64,10 +64,11 @@ export async function analyzeSentence(
 3. 合理处理助词，应当与前后词汇适当分离。
 4. 避免过度分词，特别是对于构成一个语法或语义单位的组合。
 5. 对于复合词，如"持って行く"，根据语义和使用习惯确定是作为一个词还是分开处理。
+6. 重要：如果待解析的句子中包含换行符，请在对应的位置输出一个JSON对象：{"word": "\n", "pos": "改行", "furigana": "", "romaji": ""}.
 
 确保输出是严格的JSON格式，不包含任何markdown或其他非JSON字符。
 
-待解析句子： "${sentence}"`,
+待解析句子： "${sentence}"`, 
         model: MODEL_NAME,
         apiUrl: userApiUrl !== DEFAULT_API_URL ? userApiUrl : undefined
       })
@@ -132,10 +133,11 @@ export async function streamAnalyzeSentence(
 3. 合理处理助词，应当与前后词汇适当分离。
 4. 避免过度分词，特别是对于构成一个语法或语义单位的组合。
 5. 对于复合词，如"持って行く"，根据语义和使用习惯确定是作为一个词还是分开处理。
+6. 重要：如果待解析的句子中包含换行符，请在对应的位置输出一个JSON对象：{"word": "\n", "pos": "改行", "furigana": "", "romaji": ""}.
 
 确保输出是严格的JSON格式，不包含任何markdown或其他非JSON字符。
 
-待解析句子： "${sentence}"`,
+待解析句子： "${sentence}"`, 
         model: MODEL_NAME,
         apiUrl: userApiUrl !== DEFAULT_API_URL ? userApiUrl : undefined,
         stream: true
@@ -439,7 +441,8 @@ export async function getWordDetails(
       console.error('Unexpected API response structure (Word Detail):', result);
       throw new Error('释义结果格式错误');
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Error fetching word details:', error);
     throw error;
   }
