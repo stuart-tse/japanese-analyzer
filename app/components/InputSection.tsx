@@ -376,7 +376,7 @@ export default function InputSection({
             
             {/* TTS选择下拉菜单 */}
             {showTtsDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-3 min-w-80">
+              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-3 w-72">
                 {/* TTS提供商选择 */}
                 <div className="mb-3">
                   <label className="block text-xs font-medium text-gray-700 mb-2">语音合成方式</label>
