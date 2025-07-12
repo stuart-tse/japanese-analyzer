@@ -140,6 +140,18 @@ export default function AnalysisResult({
     }
   };
 
+  // 格式化解释文本，支持换行和高亮
+  const formatExplanation = (text: string) => {
+    if (!text) return null;
+    
+    const formattedText = text
+      .replace(/\n/g, '<br />')
+      .replace(/【([^】]+)】/g, '<strong class="text-indigo-600">$1</strong>')
+      .replace(/「([^」]+)」/g, '<strong class="text-indigo-600">$1</strong>');
+
+    return { __html: formattedText };
+  };
+
   // 词语详情内容组件
   const WordDetailContent = () => (
     <>
@@ -190,9 +202,10 @@ export default function AnalysisResult({
       </p>
       
       <div className="mb-1"><strong>解释:</strong></div>
-      <p className="text-gray-700 bg-gray-50 p-3 rounded-md text-base leading-relaxed">
-        {wordDetail?.explanation}
-      </p>
+      <div 
+        className="text-gray-700 bg-gray-50 p-3 rounded-md text-base leading-relaxed"
+        dangerouslySetInnerHTML={formatExplanation(wordDetail?.explanation || '')}
+      />
     </>
   );
 
