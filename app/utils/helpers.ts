@@ -7,6 +7,94 @@ export function containsKanji(text: string): boolean {
   return kanjiRegex.test(text);
 }
 
+export interface FuriganaPart {
+  base: string;
+  ruby?: string;
+}
+
+// 智能解析单词和读音，生成用于Ruby标签渲染的结构
+export function generateFuriganaParts(word: string, reading: string): FuriganaPart[] {
+  // 如果没有读音，或者读���与单词相同，则直接返回原单词
+  if (!reading || word === reading) {
+    return [{ base: word }];
+  }
+
+  const KANJI_REGEX = /[\u4e00-\u9faf\u3005-\u3007]/;
+  const KANA_REGEX = /[\u3041-\u3096\u30A1-\u30FA]/;
+
+  const result: FuriganaPart[] = [];
+  let wordIdx = 0;
+  let readingIdx = 0;
+
+  while (wordIdx < word.length) {
+    const wordChar = word[wordIdx];
+
+    // 如果是假名，则它是一个“锚点”，读音和写法应该一致
+    if (KANA_REGEX.test(wordChar)) {
+      result.push({ base: wordChar });
+      wordIdx++;
+      readingIdx++;
+      continue;
+    }
+
+    // 如果是汉字
+    if (KANJI_REGEX.test(wordChar)) {
+      // 找到连续的汉字块
+      let kanjiBlockEnd = wordIdx;
+      while (
+        kanjiBlockEnd + 1 < word.length &&
+        KANJI_REGEX.test(word[kanjiBlockEnd + 1])
+      ) {
+        kanjiBlockEnd++;
+      }
+      const kanjiBlock = word.substring(wordIdx, kanjiBlockEnd + 1);
+
+      // 找到这个汉字块后面的第一个假名块（作为下一个锚点）
+      let nextKanaBlock = '';
+      if (kanjiBlockEnd + 1 < word.length) {
+        const nextKanaBlockStart = kanjiBlockEnd + 1;
+        // 确保我们只匹配假名作为锚点
+        if (KANA_REGEX.test(word[nextKanaBlockStart])) {
+            let nextKanaBlockEnd = nextKanaBlockStart;
+            while (
+              nextKanaBlockEnd < word.length &&
+              KANA_REGEX.test(word[nextKanaBlockEnd])
+            ) {
+              nextKanaBlockEnd++;
+            }
+            nextKanaBlock = word.substring(nextKanaBlockStart, nextKanaBlockEnd);
+        }
+      }
+
+      // 根据下一个假名锚点在读音中的位置，来切分当前汉字块的读音
+      let readingBlockEnd = reading.length;
+      if (nextKanaBlock) {
+        const nextKanaIdx = reading.indexOf(nextKanaBlock, readingIdx);
+        if (nextKanaIdx !== -1) {
+          readingBlockEnd = nextKanaIdx;
+        }
+      }
+
+      const readingBlock = reading.substring(readingIdx, readingBlockEnd);
+      result.push({ base: kanjiBlock, ruby: readingBlock });
+
+      wordIdx = kanjiBlockEnd + 1;
+      readingIdx = readingBlockEnd;
+      continue;
+    }
+    
+    // 如果不是汉字也不是假名（例如符号），直接添加
+    result.push({ base: wordChar });
+    wordIdx++;
+    // 假设符号不影响读音指针
+    if (reading[readingIdx] === wordChar) {
+      readingIdx++;
+    }
+  }
+  return result;
+}
+
+
 // 获取词性对应的CSS类名
 export function getPosClass(pos: string): string {
   const basePos = pos.split('-')[0];
@@ -22,7 +110,7 @@ export const posChineseMap: Record<string, string> = {
   "名詞": "名词", "動詞": "动词", "形容詞": "形容词", "副詞": "副词",
   "助詞": "助词", "助動詞": "助动词", "接続詞": "接续词", "感動詞": "感动词",
   "連体詞": "连体词", "代名詞": "代名词", "形状詞": "形容动词", "記号": "符号",
-  "接頭辞": "接头辞", "接尾辞": "接尾辞", "フィラー": "填充词", "その他": "其他",
+  "接頭辞": "接头辞", "接尾辞": "接尾辞", "フィラー": "填充词", "その���": "其他",
   "default": "未知词性"
 };
 
