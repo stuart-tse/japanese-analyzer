@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { extractTextFromImage, streamExtractTextFromImage } from '../services/api';
 import { getJapaneseTtsAudioUrl, speakJapanese } from '../utils/helpers';
-import { FaCamera, FaVolumeUp, FaChevronDown, FaDesktop, FaRobot, FaInfoCircle } from 'react-icons/fa';
+import { FaCamera, FaVolumeUp, FaChevronDown, FaRobot, FaInfoCircle } from 'react-icons/fa';
 
 // 添加内联样式
 const placeholderStyle = `
@@ -18,12 +18,26 @@ interface InputSectionProps {
   userApiKey?: string;
   userApiUrl?: string;
   useStream?: boolean;
-  ttsProvider: 'system' | 'gemini';
-  onTtsProviderChange: (provider: 'system' | 'gemini') => void;
+  ttsProvider: 'edge' | 'gemini';
+  onTtsProviderChange: (provider: 'edge' | 'gemini') => void;
 }
 
 // TTS配置选项
-const TTS_VOICES = [
+const TTS_GENDERS = [
+  { value: 'female', label: '女声 (Nanami)' },
+  { value: 'male', label: '男声 (Masaru)' }
+];
+
+// 语速标签函数
+const getRateLabel = (value: number) => {
+  if (value <= -50) return '很慢';
+  if (value <= -20) return '慢';
+  if (value >= 50) return '很快';
+  if (value >= 20) return '快';
+  return '正常';
+};
+
+const GEMINI_VOICES = [
   { value: 'Kore', label: 'Kore (坚定)', style: 'Firm' },
   { value: 'Puck', label: 'Puck (乐观)', style: 'Upbeat' },
   { value: 'Zephyr', label: 'Zephyr (明亮)', style: 'Bright' },
@@ -34,11 +48,8 @@ const TTS_VOICES = [
 
 const TTS_STYLES = [
   { value: '', label: '自然朗读', prompt: '' },
-  { value: 'cheerfully', label: '愉快地说', prompt: 'Say cheerfully: ' },
-  { value: 'calmly', label: '平静地说', prompt: 'Say calmly: ' },
   { value: 'slowly', label: '慢速朗读', prompt: 'Say slowly: ' },
   { value: 'clearly', label: '清晰朗读', prompt: 'Say clearly: ' },
-  { value: 'gently', label: '温和地说', prompt: 'Say gently: ' }
 ];
 
 export default function InputSection({ 
@@ -57,14 +68,20 @@ export default function InputSection({
   const [uploadStatus, setUploadStatus] = useState('');
   const [uploadStatusClass, setUploadStatusClass] = useState('');
   const [showTtsDropdown, setShowTtsDropdown] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('female');
+  const [selectedRate, setSelectedRate] = useState(0);
   const [selectedVoice, setSelectedVoice] = useState('Kore');
   const [selectedStyle, setSelectedStyle] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 从本地存储加载TTS设置
   useEffect(() => {
+    const storedGender = localStorage.getItem('ttsGender') as 'male' | 'female' || 'female';
+    const storedRate = parseInt(localStorage.getItem('ttsRate') || '0');
     const storedVoice = localStorage.getItem('ttsVoice') || 'Kore';
     const storedStyle = localStorage.getItem('ttsStyle') || '';
+    setSelectedGender(storedGender);
+    setSelectedRate(storedRate);
     setSelectedVoice(storedVoice);
     setSelectedStyle(storedStyle);
   }, []);
@@ -102,28 +119,32 @@ export default function InputSection({
     setIsSpeaking(true);
     
     try {
-      if (ttsProvider === 'gemini') {
+      if (ttsProvider === 'edge') {
+        // 使用 Edge TTS
+                const url = await getJapaneseTtsAudioUrl(inputText, userApiKey, 'edge', { 
+          gender: selectedGender,
+          rate: selectedRate,
+          pitch: 0
+        });
+        setTtsAudioUrl(url);
+      } else if (ttsProvider === 'gemini') {
         // 使用 Gemini TTS，添加风格控制
         const stylePrompt = TTS_STYLES.find(s => s.value === selectedStyle)?.prompt || '';
         const textToSpeak = stylePrompt + inputText;
-        const url = await getJapaneseTtsAudioUrl(textToSpeak, userApiKey, selectedVoice);
+        const url = await getJapaneseTtsAudioUrl(textToSpeak, userApiKey, 'gemini', { voice: selectedVoice, pitch: 0 });
         setTtsAudioUrl(url);
-      } else {
-        // 使用系统 TTS
-        setTtsAudioUrl(null);
-        speakJapanese(inputText);
       }
     } catch (e) {
       console.error('TTS error:', e);
       setTtsAudioUrl(null);
-      // 如果 Gemini TTS 失败，回退到系统 TTS
+      // 如果失败，回退到系统 TTS
       speakJapanese(inputText);
     } finally {
       setIsSpeaking(false);
     }
   };
 
-  const handleTtsProviderSelect = (provider: 'system' | 'gemini') => {
+  const handleTtsProviderSelect = (provider: 'edge' | 'gemini') => {
     onTtsProviderChange(provider);
     setShowTtsDropdown(false);
   };
@@ -131,6 +152,16 @@ export default function InputSection({
   const handleVoiceChange = (voice: string) => {
     setSelectedVoice(voice);
     localStorage.setItem('ttsVoice', voice);
+  };
+
+  const handleGenderChange = (gender: 'male' | 'female') => {
+    setSelectedGender(gender);
+    localStorage.setItem('ttsGender', gender);
+  };
+
+  const handleRateChange = (rate: number) => {
+    setSelectedRate(rate);
+    localStorage.setItem('ttsRate', rate.toString());
   };
 
   const handleStyleChange = (style: string) => {
@@ -296,7 +327,7 @@ export default function InputSection({
           id="japaneseInput" 
           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#007AFF] focus:border-[#007AFF] transition duration-150 ease-in-out resize-none japanese-text" 
           rows={4} 
-          placeholder="例：今日はいい天気ですね。或上传图片识别文字，也可直接粘贴图片。"
+          placeholder="例：天気がいいから、散歩しましょう。或上传图片识别文字，也可直接粘贴图片。"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onPaste={handlePaste}
@@ -353,9 +384,9 @@ export default function InputSection({
                 onClick={handleSpeak}
                 disabled={!inputText.trim() || isLoading || isSpeaking}
                 title={inputText.trim() ? 
-                  (ttsProvider === 'gemini' ? 
-                    `朗读文本 (Gemini TTS，预计需要 ${getEstimatedTime(inputText)})` : 
-                    '朗读文本 (系统 TTS，即时播放)'
+                  (ttsProvider === 'edge' ? 
+                    `朗读文本 (Edge TTS，预计需要 ${getEstimatedTime(inputText)})` : 
+                    `朗读文本 (Gemini TTS，预计需要 ${getEstimatedTime(inputText)})`
                   ) : 
                   '请先输入文本'
                 }
@@ -383,13 +414,13 @@ export default function InputSection({
                   <div className="space-y-1">
                     <button
                       className={`w-full px-3 py-2 text-left text-sm rounded-md transition-colors ${
-                        ttsProvider === 'system' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        ttsProvider === 'edge' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'text-gray-700 hover:bg-gray-50 border border-gray-200'
                       }`}
-                      onClick={() => handleTtsProviderSelect('system')}
+                      onClick={() => handleTtsProviderSelect('edge')}
                     >
-                      <FaDesktop className="mr-2 inline" />
-                      系统 TTS
-                      <div className="text-xs text-gray-500 mt-1">浏览器内置，速度快</div>
+                      <FaVolumeUp className="mr-2 inline" />
+                      Edge TTS (默认)
+                      <div className="text-xs text-gray-500 mt-1">高质量日语语音，速度快</div>
                     </button>
                     <button
                       className={`w-full px-3 py-2 text-left text-sm rounded-md transition-colors ${
@@ -403,6 +434,77 @@ export default function InputSection({
                     </button>
                   </div>
                 </div>
+
+                {/* Edge TTS 专用设置 */}
+                {ttsProvider === 'edge' && (
+                  <>
+                    {/* 性别选择 */}
+                    <div className="mb-3">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">语音性别</label>
+                      <select
+                        value={selectedGender}
+                        onChange={(e) => handleGenderChange(e.target.value as 'male' | 'female')}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                          backgroundPosition: 'right 0.5rem center',
+                          backgroundRepeat: 'no-repeat',
+                          backgroundSize: '1.5em 1.5em',
+                          paddingRight: '2.5rem'
+                        }}
+                      >
+                        {TTS_GENDERS.map((gender) => (
+                          <option key={gender.value} value={gender.value}>
+                            {gender.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* 语速滑块 */}
+                    <div className="mb-3">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">
+                        语速: {getRateLabel(selectedRate)} ({selectedRate})
+                      </label>
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="10"
+                        value={selectedRate}
+                        onChange={(e) => handleRateChange(parseInt(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>-100</span>
+                        <span>0</span>
+                        <span>100</span>
+                      </div>
+                    </div>
+
+                    {/* 语调暂时禁用
+                    <div className="mb-3">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">
+                        语调: {getPitchLabel(selectedPitch)} ({selectedPitch})
+                      </label>
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="10"
+                        value={selectedPitch}
+                        onChange={(e) => handlePitchChange(parseInt(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>-100</span>
+                        <span>0</span>
+                        <span>100</span>
+                      </div>
+                    </div>
+                    */}
+                  </>
+                )}
 
                 {/* Gemini TTS 专用设置 */}
                 {ttsProvider === 'gemini' && (
@@ -422,7 +524,7 @@ export default function InputSection({
                           paddingRight: '2.5rem'
                         }}
                       >
-                        {TTS_VOICES.map((voice) => (
+                        {GEMINI_VOICES.map((voice) => (
                           <option key={voice.value} value={voice.value}>
                             {voice.label}
                           </option>
@@ -486,7 +588,7 @@ export default function InputSection({
         </div>
       )}
 
-      {isSpeaking && ttsProvider === 'gemini' && (
+      {isSpeaking && (
         <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
           <div className="flex items-start">
             <div className="flex-shrink-0">
@@ -497,7 +599,7 @@ export default function InputSection({
                 <strong>正在进行高质量语音合成，请稍候...</strong>
               </p>
               <p className="text-xs text-blue-600 mt-1">
-                • 使用 Gemini TTS 技术，音质更自然<br/>
+                • 使用 {ttsProvider === 'edge' ? 'Edge' : 'Gemini'} TTS 技术，音质更自然<br/>
                 • 当前文本预计需要：{getEstimatedTime(inputText)}<br/>
                 • 请保持页面打开，不要离开或刷新
               </p>

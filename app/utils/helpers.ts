@@ -129,25 +129,52 @@ export function speakJapanese(text: string): void {
   }
 }
 
-// 使用Gemini TTS朗读文本
-export async function speakJapaneseWithTTS(text: string, apiKey?: string, voice?: string): Promise<void> {
+// 使用Edge/Gemini TTS朗读文本
+export async function speakJapaneseWithTTS(
+  text: string, 
+  apiKey?: string, 
+  provider: 'edge' | 'gemini' = 'edge',
+  options: { gender?: 'male' | 'female'; voice?: string; rate?: number; pitch?: number } = {}
+): Promise<void> {
   try {
-    const url = await getJapaneseTtsAudioUrl(text, apiKey, voice);
+    const url = await getJapaneseTtsAudioUrl(text, apiKey, provider, options);
     const audioElement = new Audio(url);
     audioElement.play();
   } catch (error) {
-    console.warn('Gemini TTS 播放失败，尝试使用系统朗读', error);
+    console.warn(`${provider} TTS 播放失败`, error);
+    // 回退到系统朗读（如果需要的话）
     speakJapanese(text);
   }
 }
 
-// 获取 Gemini TTS 音频 URL
-export async function getJapaneseTtsAudioUrl(text: string, apiKey?: string, voice: string = 'Kore'): Promise<string> {
-  const { audio, mimeType } = await synthesizeSpeech(text, voice, apiKey);
-  return createPlayableUrlFromPcm(audio, mimeType);
+// 获取 TTS 音频 URL
+export async function getJapaneseTtsAudioUrl(
+  text: string, 
+  apiKey?: string, 
+  provider: 'edge' | 'gemini' = 'edge',
+  options: { gender?: 'male' | 'female'; voice?: string; rate?: number; pitch?: number } = {}
+): Promise<string> {
+  const { audio, mimeType } = await synthesizeSpeech(text, provider, options, apiKey);
+  return provider === 'edge' ? 
+    createPlayableUrlFromAudio(audio, mimeType) : 
+    createPlayableUrlFromPcm(audio, mimeType);
 }
 
-// 将 Base64 PCM 数据转换为可播放的 WAV URL
+// 将 Base64 音频数据转换为可播放的 URL (Edge TTS用)
+function createPlayableUrlFromAudio(base64: string, mimeType: string): string {
+  const byteString = atob(base64);
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const uint8Array = new Uint8Array(arrayBuffer);
+  
+  for (let i = 0; i < byteString.length; i++) {
+    uint8Array[i] = byteString.charCodeAt(i);
+  }
+  
+  const blob = new Blob([arrayBuffer], { type: mimeType });
+  return URL.createObjectURL(blob);
+}
+
+// 将 Base64 PCM 数据转换为可播放的 WAV URL (Gemini TTS用)
 function createPlayableUrlFromPcm(base64: string, mimeType: string): string {
   const byteString = atob(base64);
   const pcmData = new Uint8Array(byteString.length);

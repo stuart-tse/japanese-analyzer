@@ -25,7 +25,7 @@ export default function Home() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [userApiKey, setUserApiKey] = useState('');
   const [userApiUrl, setUserApiUrl] = useState(DEFAULT_API_URL);
-  const [ttsProvider, setTtsProvider] = useState<'system' | 'gemini'>('gemini');
+  const [ttsProvider, setTtsProvider] = useState<'edge' | 'gemini'>('edge');
   
   // 密码验证相关状态
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -66,7 +66,7 @@ export default function Home() {
     const storedApiKey = localStorage.getItem('userApiKey') || '';
     const storedApiUrl = localStorage.getItem('userApiUrl') || DEFAULT_API_URL;
     const storedUseStream = localStorage.getItem('useStream');
-    const storedTtsProvider = localStorage.getItem('ttsProvider') as 'system' | 'gemini' || 'gemini';
+    const storedTtsProvider = localStorage.getItem('ttsProvider') as 'edge' | 'gemini' || 'edge';
     
     setUserApiKey(storedApiKey);
     setUserApiUrl(storedApiUrl);
@@ -89,8 +89,7 @@ export default function Home() {
     setUseStream(streamEnabled);
   };
 
-  // 处理TTS提供商变更
-  const handleTtsProviderChange = (provider: 'system' | 'gemini') => {
+  const handleTtsProviderChange = (provider: 'edge' | 'gemini') => {
     setTtsProvider(provider);
     localStorage.setItem('ttsProvider', provider);
   };

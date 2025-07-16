@@ -669,16 +669,26 @@ export async function streamExtractTextFromImage(
 // 使用Gemini TTS合成语音
 export async function synthesizeSpeech(
   text: string,
-  voice = 'Kore',
+  provider: 'edge' | 'gemini' = 'edge',
+  options: { gender?: 'male' | 'female'; voice?: string; rate?: number; pitch?: number } = {},
   userApiKey?: string
 ): Promise<{ audio: string; mimeType: string }> {
   const apiUrl = getApiEndpoint('/tts');
   const headers = getHeaders(userApiKey);
 
+  const { gender = 'female', voice = 'Kore', rate = 0, pitch = 0 } = options;
+
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ text, voice })
+    body: JSON.stringify({ 
+      text, 
+      provider,
+      gender,
+      voice,
+      rate,
+      pitch
+    })
   });
 
   if (!response.ok) {

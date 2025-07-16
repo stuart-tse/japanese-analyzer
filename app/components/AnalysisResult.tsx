@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts } from '../utils/helpers';
+import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts, getJapaneseTtsAudioUrl } from '../utils/helpers';
 import { getWordDetails, TokenData, WordDetail } from '../services/api';
 import { FaVolumeUp } from 'react-icons/fa';
 
@@ -133,10 +133,14 @@ export default function AnalysisResult({
   // 朗读单词的函数
   const handleWordSpeak = async (word: string) => {
     try {
-      // 词汇详解中统一使用系统TTS，速度更快
-      speakJapanese(word);
+      // 词汇详解中统一使用 Edge TTS，音质更好
+      const url = await getJapaneseTtsAudioUrl(word, undefined, 'edge', { gender: 'female' });
+      const audio = new Audio(url);
+      audio.play();
     } catch (error) {
-      console.error('朗读失败:', error);
+      console.error('Edge TTS 朗读失败，回退到系统朗读:', error);
+      // 如果 Edge TTS 失败，回退到系统 TTS
+      speakJapanese(word);
     }
   };
 
