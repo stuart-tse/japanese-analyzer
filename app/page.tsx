@@ -5,8 +5,9 @@ import InputSection from './components/InputSection';
 import AnalysisResult from './components/AnalysisResult';
 import TranslationSection from './components/TranslationSection';
 import SettingsModal from './components/SettingsModal';
-import ThemeToggle from './components/ThemeToggle';
+import TopToolbar from './components/TopToolbar';
 import LoginModal from './components/LoginModal';
+import AIChat from './components/AIChat';
 import { analyzeSentence, TokenData, DEFAULT_API_URL, streamAnalyzeSentence } from './services/api';
 import { FaExclamationTriangle, FaExclamationCircle } from 'react-icons/fa';
 
@@ -311,12 +312,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-4 sm:pt-8 lg:pt-16 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-16 sm:pt-20 lg:pt-24 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      {/* 顶部工具栏 */}
+      <TopToolbar onSettingsClick={() => setIsSettingsModalOpen(true)} />
+      
       <div className="w-full max-w-3xl">
-        {/* 主题切换按钮 - 固定在右上角 */}
-        <ThemeToggle />
-        
-        <header className="text-center mb-6 sm:mb-8 mt-12 sm:mt-16">
+        <header className="text-center mb-6 sm:mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 transition-colors duration-200">
             日本語<span className="text-[#007AFF] dark:text-blue-400">文章</span>解析器
           </h1>
@@ -389,6 +390,7 @@ export default function Home() {
               userApiUrl={userApiUrl}
               showFurigana={showFurigana}
               onShowFuriganaChange={setShowFurigana}
+              useStream={useStream}
             />
           )}
 
@@ -418,6 +420,12 @@ export default function Home() {
         onSaveSettings={handleSaveSettings}
         isModalOpen={isSettingsModalOpen}
         onModalClose={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
+      />
+      
+      {/* AI聊天助手 */}
+      <AIChat 
+        userApiKey={userApiKey}
+        currentSentence={currentSentence}
       />
     </div>
   );

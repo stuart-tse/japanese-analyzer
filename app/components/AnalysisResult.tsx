@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts, getJapaneseTtsAudioUrl } from '../utils/helpers';
-import { getWordDetails, TokenData, WordDetail } from '../services/api';
+import { getWordDetails, streamWordDetails, TokenData, WordDetail } from '../services/api';
 import { FaVolumeUp } from 'react-icons/fa';
 
 interface AnalysisResultProps {
@@ -12,6 +12,7 @@ interface AnalysisResultProps {
   userApiUrl?: string;
   showFurigana: boolean;
   onShowFuriganaChange: (show: boolean) => void;
+  useStream?: boolean; // 添加流式支持参数
 }
 
 export default function AnalysisResult({ 
@@ -20,13 +21,19 @@ export default function AnalysisResult({
   userApiKey,
   userApiUrl,
   showFurigana,
-  onShowFuriganaChange
+  onShowFuriganaChange,
+  useStream = true // 默认启用流式
 }: AnalysisResultProps) {
   const [wordDetail, setWordDetail] = useState<WordDetail | null>(null);
   const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // 流式相关状态
+  const [streamContent, setStreamContent] = useState('');
+  const [isStreamLoading, setIsStreamLoading] = useState(false);
+  const [streamError, setStreamError] = useState('');
 
   // 检测设备是���为移动端
   useEffect(() => {
@@ -77,26 +84,158 @@ export default function AnalysisResult({
     }
   };
 
-  const fetchWordDetails = async (word: string, pos: string, sentence: string, furigana?: string, romaji?: string) => {
-    setIsLoading(true);
+  // 实时解析流式内容的部分字段
+  const parseStreamContentRealtime = (content: string) => {
+    const result = {
+      originalWord: '',
+      chineseTranslation: '',
+      pos: '',
+      furigana: '',
+      romaji: '',
+      dictionaryForm: '',
+      explanation: '',
+      rawContent: content // 保存原始内容用于调试
+    };
 
-          try {
+    try {
+      // 提取各个字段的实时内容
+      const extractField = (fieldName: string): string => {
+        const regex = new RegExp(`"${fieldName}"\\s*:\\s*"([^"]*(?:\\\\.[^"]*)*)"`, 'i');
+        const match = content.match(regex);
+        return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : '';
+      };
+
+      // 提取部分完成的字段值
+      result.originalWord = extractField('originalWord');
+      result.chineseTranslation = extractField('chineseTranslation');
+      result.pos = extractField('pos');
+      result.furigana = extractField('furigana');
+      result.romaji = extractField('romaji');
+      result.dictionaryForm = extractField('dictionaryForm');
+      result.explanation = extractField('explanation');
+
+      // 如果explanation字段正在生成中但还没有结束引号，尝试提取部分内容
+      if (!result.explanation && content.includes('"explanation"')) {
+        const explanationMatch = content.match(/"explanation"\s*:\s*"([^"]*)$/);
+        if (explanationMatch) {
+          result.explanation = explanationMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') + '...';
+        }
+      }
+
+      return result;
+    } catch (e) {
+      console.warn('实时解析出错:', e);
+      return result;
+    }
+  };
+
+  const fetchWordDetails = async (word: string, pos: string, sentence: string, furigana?: string, romaji?: string) => {
+    // 重置状态
+    setWordDetail(null);
+    setStreamContent('');
+    setStreamError('');
+    
+    if (useStream) {
+      // 使用流式查询
+      setIsStreamLoading(true);
+      setIsLoading(false);
+      
+      streamWordDetails(
+        word,
+        pos,
+        sentence,
+        (chunk, isDone) => {
+          setStreamContent(chunk);
+          
+          // 实时解析并更新显示
+          const realtimeData = parseStreamContentRealtime(chunk);
+          if (realtimeData.originalWord || realtimeData.chineseTranslation || realtimeData.explanation) {
+            // 创建一个临时的 WordDetail 对象用于实时显示
+            const tempWordDetail: WordDetail = {
+              originalWord: realtimeData.originalWord || word,
+              chineseTranslation: realtimeData.chineseTranslation || '加载中...',
+              pos: realtimeData.pos || pos,
+              furigana: realtimeData.furigana || furigana || '',
+              romaji: realtimeData.romaji || romaji || '',
+              dictionaryForm: realtimeData.dictionaryForm || '',
+              explanation: realtimeData.explanation || '正在生成解释...'
+            };
+            setWordDetail(tempWordDetail);
+          }
+          
+          if (isDone) {
+            setIsStreamLoading(false);
+            // 最终尝试完整解析
+            try {
+              let processedContent = chunk;
+              
+              // 如果内容包含markdown代码块，尝试提取
+              const jsonMatch = chunk.match(/```json\n([\s\S]*?)(\n```|$)/);
+              if (jsonMatch && jsonMatch[1]) {
+                processedContent = jsonMatch[1].trim();
+              } else {
+                // 直接查找JSON对象
+                const objectStart = processedContent.indexOf('{');
+                const objectEnd = processedContent.lastIndexOf('}');
+                
+                if (objectStart !== -1 && objectEnd !== -1 && objectEnd > objectStart) {
+                  processedContent = processedContent.substring(objectStart, objectEnd + 1);
+                }
+              }
+              
+              const finalDetails = JSON.parse(processedContent) as WordDetail;
+              if (finalDetails && typeof finalDetails === 'object' && 'originalWord' in finalDetails) {
+                setWordDetail(finalDetails);
+              }
+            } catch (e) {
+              // 最终解析失败，保持实时解析的结果
+              console.warn('最终JSON解析失败，保持实时解析结果:', e);
+            }
+          }
+        },
+        (error) => {
+          console.error('Stream word detail error:', error);
+          setStreamError(error.message || '流式查询词汇详情出错');
+          setIsStreamLoading(false);
+          // 设置错误状态的词汇详情
+          setWordDetail({ 
+            originalWord: word, 
+            pos: pos, 
+            furigana: (furigana && furigana !== word && containsKanji(word)) ? furigana : '', 
+            romaji: romaji || '', 
+            dictionaryForm: '', 
+            chineseTranslation: '错误', 
+            explanation: `流式查询释义时发生错误: ${error.message || '未知错误'}。`
+          });
+        },
+        furigana,
+        romaji,
+        userApiKey,
+        userApiUrl
+      );
+    } else {
+      // 使用传统查询
+      setIsLoading(true);
+      setIsStreamLoading(false);
+      
+      try {
         // 使用服务端API获取词汇详情，传递用户API设置
         const details = await getWordDetails(word, pos, sentence, furigana, romaji, userApiKey, userApiUrl);
         setWordDetail(details);
-    } catch (error) {
-      console.error('Error fetching word details:', error);
-      setWordDetail({ 
-        originalWord: word, 
-        pos: pos, 
-        furigana: (furigana && furigana !== word && containsKanji(word)) ? furigana : '', 
-        romaji: romaji || '', 
-        dictionaryForm: '', 
-        chineseTranslation: '错误', 
-        explanation: `查询释义时发生错误: ${error instanceof Error ? error.message : '未知错误'}。`
-      });
-    } finally {
-      setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching word details:', error);
+        setWordDetail({ 
+          originalWord: word, 
+          pos: pos, 
+          furigana: (furigana && furigana !== word && containsKanji(word)) ? furigana : '', 
+          romaji: romaji || '', 
+          dictionaryForm: '', 
+          chineseTranslation: '错误', 
+          explanation: `查询释义时发生错误: ${error instanceof Error ? error.message : '未知错误'}。`
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -157,61 +296,104 @@ export default function AnalysisResult({
   };
 
   // 词语详情内容组件
-  const WordDetailContent = () => (
-    <>
-      <h3 className="text-xl font-semibold text-[#007AFF] mb-3">词汇详解</h3>
-      <p className="mb-1">
-        <strong>原文:</strong> 
-        <span className="font-mono text-lg text-gray-800">{wordDetail?.originalWord}</span> 
-        <button 
-          className="read-aloud-button" 
-          title="朗读此词汇"
-          onClick={() => handleWordSpeak(wordDetail?.originalWord || '')}
-        >
-          <FaVolumeUp />
-        </button>
-      </p>
-      
-      {wordDetail?.furigana && (
+  const WordDetailContent = () => {
+    // 如果有流式错误，显示错误信息
+    if (streamError) {
+      return (
+        <>
+          <h3 className="text-xl font-semibold text-red-600 mb-3">词汇详解 (出错)</h3>
+          <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 mb-4">
+            <p className="text-sm text-red-700 dark:text-red-300">
+              {streamError}
+            </p>
+          </div>
+          {streamContent && (
+            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md overflow-auto max-h-96 text-xs font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-200">
+              {streamContent}
+            </div>
+          )}
+        </>
+      );
+    }
+    
+    // 显示词汇详情（包括实时更新的内容）
+    const titleSuffix = isStreamLoading ? ' (实时加载中...)' : '';
+    
+    return (
+      <>
+        <h3 className="text-xl font-semibold text-[#007AFF] mb-3">
+          词汇详解{titleSuffix}
+          {isStreamLoading && (
+            <div className="inline-block ml-2">
+              <div className="loading-spinner w-4 h-4"></div>
+            </div>
+          )}
+        </h3>
+        
         <p className="mb-1">
-          <strong>读音 (Furigana):</strong> 
-          <span className="text-sm text-purple-700">{wordDetail.furigana}</span>
+          <strong>原文:</strong> 
+          <span className="font-mono text-lg text-gray-800">{wordDetail?.originalWord}</span> 
+          <button 
+            className="read-aloud-button" 
+            title="朗读此词汇"
+            onClick={() => handleWordSpeak(wordDetail?.originalWord || '')}
+          >
+            <FaVolumeUp />
+          </button>
         </p>
-      )}
-      
-      {wordDetail?.romaji && (
-        <p className="mb-1">
-          <strong>罗马音 (Romaji):</strong> 
-          <span className="text-sm text-cyan-700">{wordDetail.romaji}</span>
-        </p>
-      )}
-      
-      {wordDetail?.dictionaryForm && wordDetail.dictionaryForm !== wordDetail.originalWord && (
+        
+        {wordDetail?.furigana && (
+          <p className="mb-1">
+            <strong>读音 (Furigana):</strong> 
+            <span className="text-sm text-purple-700">{wordDetail.furigana}</span>
+          </p>
+        )}
+        
+        {wordDetail?.romaji && (
+          <p className="mb-1">
+            <strong>罗马音 (Romaji):</strong> 
+            <span className="text-sm text-cyan-700">{wordDetail.romaji}</span>
+          </p>
+        )}
+        
+        {wordDetail?.dictionaryForm && wordDetail.dictionaryForm !== wordDetail.originalWord && (
+          <p className="mb-2">
+            <strong>辞书形:</strong> 
+            <span className="text-md text-blue-700 font-medium">{wordDetail.dictionaryForm}</span>
+          </p>
+        )}
+        
         <p className="mb-2">
-          <strong>辞书形:</strong> 
-          <span className="text-md text-blue-700 font-medium">{wordDetail.dictionaryForm}</span>
+          <strong>词性:</strong> 
+          <span className={`detail-pos-tag ${getPosClass(wordDetail?.pos || '')}`}>
+            {wordDetail?.pos} ({posChineseMap[wordDetail?.pos.split('-')[0] || ''] || posChineseMap['default']})
+          </span>
         </p>
-      )}
-      
-      <p className="mb-2">
-        <strong>词性:</strong> 
-        <span className={`detail-pos-tag ${getPosClass(wordDetail?.pos || '')}`}>
-          {wordDetail?.pos} ({posChineseMap[wordDetail?.pos.split('-')[0] || ''] || posChineseMap['default']})
-        </span>
-      </p>
-      
-      <p className="mb-2">
-        <strong>中文译文:</strong> 
-        <span className="text-lg text-green-700 font-medium">{wordDetail?.chineseTranslation}</span>
-      </p>
-      
-      <div className="mb-1"><strong>解释:</strong></div>
-      <div 
-        className="text-gray-700 bg-gray-50 p-3 rounded-md text-base leading-relaxed"
-        dangerouslySetInnerHTML={formatExplanation(wordDetail?.explanation || '')}
-      />
-    </>
-  );
+        
+        <p className="mb-2">
+          <strong>中文译文:</strong> 
+          <span className={`text-lg font-medium ${wordDetail?.chineseTranslation === '加载中...' ? 'text-gray-500 animate-pulse' : 'text-green-700'}`}>
+            {wordDetail?.chineseTranslation}
+          </span>
+        </p>
+        
+        <div className="mb-1"><strong>解释:</strong></div>
+        <div className={`p-3 rounded-md text-base leading-relaxed ${
+          wordDetail?.explanation === '正在生成解释...' 
+            ? 'text-gray-600 bg-gray-100 animate-pulse' 
+            : 'text-gray-700 bg-gray-50'
+        }`}>
+          {wordDetail?.explanation?.endsWith('...') ? (
+            // 正在生成中的内容，显示原始文本
+            <div className="whitespace-pre-wrap">{wordDetail.explanation}</div>
+          ) : (
+            // 完整内容，应用格式化
+            <div dangerouslySetInnerHTML={formatExplanation(wordDetail?.explanation || '')} />
+          )}
+        </div>
+      </>
+    );
+  };
 
   if (!tokens || tokens.length === 0) {
     return null;
@@ -274,7 +456,7 @@ export default function AnalysisResult({
       </div>
       
       {/* 非移动端的内嵌详情展示 */}
-      {!isMobile && (isLoading || wordDetail) && (
+      {!isMobile && (isLoading || isStreamLoading || wordDetail || streamError) && (
         <div id="wordDetailInlineContainer" style={{ display: 'block' }}>
           <button 
             className="detail-close-button" 

@@ -8,7 +8,7 @@ const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
 export async function POST(req: NextRequest) {
   try {
     // 解析请求体
-    const { word, pos, sentence, furigana, romaji, model = MODEL_NAME, apiUrl } = await req.json();
+    const { word, pos, sentence, furigana, romaji, model = MODEL_NAME, apiUrl, useStream = false } = await req.json();
     
     // 从请求头中获取用户提供的API密钥（如果有）
     const authHeader = req.headers.get('Authorization');
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       model: model,
       reasoning_effort: "none",
       messages: [{ role: "user", content: detailPrompt }],
+      stream: useStream
     };
 
     // 发送到实际的AI API
@@ -59,10 +60,8 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(payload)
     });
 
-    // 获取AI API的响应
-    const data = await response.json();
-
     if (!response.ok) {
+      const data = await response.json();
       console.error('AI API error (Word Detail):', data);
       return NextResponse.json(
         { error: data.error || { message: '获取词汇详情时出错' } },
@@ -70,7 +69,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 将AI API的响应传回给客户端
+    // 如果是流式请求，直接返回流式响应
+    if (useStream && response.body) {
+      return new NextResponse(response.body, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
+    }
+
+    // 非流式请求，返回完整响应
+    const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Server error (Word Detail):', error);

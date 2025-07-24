@@ -37,24 +37,24 @@ export default function ThemeToggle() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        id="themeToggleButton"
         onClick={() => setIsOpen(!isOpen)}
         title={`切换主题 - ${getThemeLabel()}`}
+        className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-white/90 dark:bg-gray-800/90 text-on-surface-variant dark:text-on-surface-variant-dark border border-outline dark:border-outline-dark rounded-full shadow-sm backdrop-blur-sm hover:bg-surface-variant hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-600/30 active:scale-95 transition-all duration-200 ease-out"
       >
-        <i className={`fas ${actualTheme === 'dark' ? 'fa-moon' : 'fa-sun'} text-lg`}></i>
+        <i className={`fas ${actualTheme === 'dark' ? 'fa-moon' : 'fa-sun'} text-base sm:text-lg`}></i>
       </button>
 
       {isOpen && (
-        <div id="themeToggleDropdown" className="w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1">
+        <div className="absolute top-full right-0 mt-2 w-40 bg-surface dark:bg-surface-dark border border-outline dark:border-outline-dark rounded-xl shadow-lg py-1 z-10 backdrop-blur-sm">
           <button
             onClick={() => {
               setTheme('light');
               setIsOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 ${
+            className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-variant dark:hover:bg-surface-variant-dark focus:outline-none focus:bg-surface-variant focus:dark:bg-surface-variant-dark rounded-lg mx-1 transition-all duration-200 ${
               theme === 'light' 
-                ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
-                : 'text-gray-700 dark:text-gray-300'
+                ? 'text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/20' 
+                : 'text-on-surface dark:text-on-surface-dark'
             }`}
           >
             <i className="fas fa-sun text-base"></i>
@@ -66,10 +66,10 @@ export default function ThemeToggle() {
               setTheme('dark');
               setIsOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 ${
+            className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-variant dark:hover:bg-surface-variant-dark focus:outline-none focus:bg-surface-variant focus:dark:bg-surface-variant-dark rounded-lg mx-1 transition-all duration-200 ${
               theme === 'dark' 
-                ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
-                : 'text-gray-700 dark:text-gray-300'
+                ? 'text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/20' 
+                : 'text-on-surface dark:text-on-surface-dark'
             }`}
           >
             <i className="fas fa-moon text-base"></i>
@@ -81,10 +81,10 @@ export default function ThemeToggle() {
               setTheme('system');
               setIsOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 ${
+            className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-variant dark:hover:bg-surface-variant-dark focus:outline-none focus:bg-surface-variant focus:dark:bg-surface-variant-dark rounded-lg mx-1 transition-all duration-200 ${
               theme === 'system' 
-                ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
-                : 'text-gray-700 dark:text-gray-300'
+                ? 'text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/20' 
+                : 'text-on-surface dark:text-on-surface-dark'
             }`}
           >
             <i className="fas fa-desktop text-base"></i>
@@ -92,7 +92,7 @@ export default function ThemeToggle() {
           </button>
           
           {theme === 'system' && (
-            <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 mt-1">
+            <div className="px-4 py-2 text-xs text-on-surface-variant dark:text-on-surface-variant-dark border-t border-outline dark:border-outline-dark mt-1">
               当前: {actualTheme === 'dark' ? '暗色' : '亮色'}模式
             </div>
           )}

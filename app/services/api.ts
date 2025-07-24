@@ -17,6 +17,11 @@ export interface WordDetail {
   explanation: string;
 }
 
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 // 默认API地址 - 使用本地API路由
 export const DEFAULT_API_URL = "/api";
 export const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
@@ -448,6 +453,130 @@ export async function getWordDetails(
   }
 }
 
+// 流式词汇详情查询函数
+export async function streamWordDetails(
+  word: string,
+  pos: string,
+  sentence: string,
+  onChunk: (chunk: string, isDone: boolean) => void,
+  onError: (error: Error) => void,
+  furigana?: string,
+  romaji?: string,
+  userApiKey?: string,
+  userApiUrl?: string
+): Promise<void> {
+  try {
+    const apiUrl = getApiEndpoint('/word-detail');
+    const headers = getHeaders(userApiKey);
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ 
+        word, 
+        pos, 
+        sentence, 
+        furigana, 
+        romaji,
+        model: MODEL_NAME,
+        apiUrl: userApiUrl !== DEFAULT_API_URL ? userApiUrl : undefined,
+        useStream: true
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('API Error (Stream Word Detail):', errorData);
+      onError(new Error(`流式查询释义失败：${errorData.error?.message || response.statusText || '未知错误'}`));
+      return;
+    }
+    
+    // 处理流式响应
+    const reader = response.body?.getReader();
+    if (!reader) {
+      onError(new Error('无法创建流式读取器'));
+      return;
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let rawContent = '';
+    let done = false;
+    
+    // 添加防抖，减少UI更新频率
+    let updateTimeout: NodeJS.Timeout | null = null;
+    const updateDebounceTime = 30; // 30ms - 更快的响应
+    
+    const debouncedUpdate = (content: string, isComplete: boolean) => {
+      if (updateTimeout) {
+        clearTimeout(updateTimeout);
+      }
+      
+      if (isComplete) {
+        // 最终结果不需要防抖
+        onChunk(content, true);
+        return;
+      }
+      
+      updateTimeout = setTimeout(() => {
+        onChunk(content, false);
+      }, updateDebounceTime);
+    };
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      
+      if (value) {
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        
+        // 处理buffer中所有完整的行
+        const lines = buffer.split('\n');
+        // 最后一行可能不完整，保留到下一次处理
+        buffer = lines.pop() || '';
+        
+        let hasNewContent = false;
+        
+        for (const line of lines) {
+          if (line.trim() === '') continue;
+          
+          if (line.startsWith('data: ')) {
+            const data = line.substring(6);
+            
+            if (data === '[DONE]') {
+              done = true;
+              break;
+            }
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                rawContent += parsed.choices[0].delta.content;
+                hasNewContent = true;
+              }
+            } catch (e) {
+              // 忽略解析错误，继续处理下一行
+              console.warn('解析流式数据时出错:', e, data);
+            }
+          }
+        }
+        
+        if (hasNewContent) {
+          debouncedUpdate(rawContent, false);
+        }
+      }
+    }
+    
+    // 发送最终内容
+    debouncedUpdate(rawContent, true);
+    
+  } catch (error) {
+    console.error('Stream Word Detail error:', error);
+    onError(error instanceof Error ? error : new Error('流式查询词汇详情时出错'));
+  }
+}
+
 // 翻译文本
 export async function translateText(
   japaneseText: string,
@@ -697,4 +826,160 @@ export async function synthesizeSpeech(
   }
 
   return response.json();
+}
+
+// 聊天API - 流式版本
+export async function streamChat(
+  messages: ChatMessage[],
+  onChunk: (chunk: string, isDone: boolean) => void,
+  onError: (error: Error) => void,
+  userApiKey?: string
+): Promise<void> {
+  try {
+    const apiUrl = getApiEndpoint('/chat');
+    const headers = getHeaders(userApiKey);
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ 
+        messages,
+        useStream: true
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('API Error (Stream Chat):', errorData);
+      onError(new Error(`聊天失败：${errorData.error?.message || response.statusText || '未知错误'}`));
+      return;
+    }
+    
+    // 处理流式响应
+    const reader = response.body?.getReader();
+    if (!reader) {
+      onError(new Error('无法创建流式读取器'));
+      return;
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let rawContent = '';
+    let done = false;
+    
+    // 添加防抖，减少UI更新频率
+    let updateTimeout: NodeJS.Timeout | null = null;
+    const updateDebounceTime = 30; // 30ms - 更快的响应
+    
+    const debouncedUpdate = (content: string, isComplete: boolean) => {
+      if (updateTimeout) {
+        clearTimeout(updateTimeout);
+      }
+      
+      if (isComplete) {
+        // 最终结果不需要防抖
+        onChunk(content, true);
+        return;
+      }
+      
+      updateTimeout = setTimeout(() => {
+        onChunk(content, false);
+      }, updateDebounceTime);
+    };
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      
+      if (value) {
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+        
+        // 处理buffer中所有完整的行
+        const lines = buffer.split('\n');
+        // 最后一行可能不完整，保留到下一次处理
+        buffer = lines.pop() || '';
+        
+        let hasNewContent = false;
+        
+        for (const line of lines) {
+          if (line.trim() === '') continue;
+          
+          if (line.startsWith('data: ')) {
+            const data = line.substring(6);
+            
+            if (data === '[DONE]') {
+              done = true;
+              break;
+            }
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta) {
+                const delta = parsed.choices[0].delta;
+                
+                // 处理常规内容
+                if (delta.content) {
+                  rawContent += delta.content;
+                  hasNewContent = true;
+                }
+              }
+            } catch (e) {
+              // 忽略解析错误，继续处理下一行
+              console.warn('解析聊天流式数据时出错:', e, data);
+            }
+          }
+        }
+        
+        if (hasNewContent) {
+          debouncedUpdate(rawContent, false);
+        }
+      }
+    }
+    
+    // 发送最终内容
+    debouncedUpdate(rawContent, true);
+    
+  } catch (error) {
+    console.error('Stream Chat error:', error);
+    onError(error instanceof Error ? error : new Error('聊天时出错'));
+  }
+}
+
+// 聊天API - 非流式版本
+export async function sendChat(
+  messages: ChatMessage[],
+  userApiKey?: string
+): Promise<string> {
+  try {
+    const apiUrl = getApiEndpoint('/chat');
+    const headers = getHeaders(userApiKey);
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ 
+        messages,
+        useStream: false
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('API Error (Chat):', errorData);
+      throw new Error(`聊天失败：${errorData.error?.message || response.statusText || '未知错误'}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.choices && result.choices[0] && result.choices[0].message && result.choices[0].message.content) {
+      return result.choices[0].message.content.trim();
+    } else {
+      console.error('Unexpected API response structure (Chat):', result);
+      throw new Error('聊天结果格式错误');
+    }
+  } catch (error) {
+    console.error('Error sending chat:', error);
+    throw error;
+  }
 }

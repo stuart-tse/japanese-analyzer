@@ -2,6 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========== Material 3 Design Tokens ========== */
+:root {
+  /* Primary colors */
+  --primary-50: #f3f0ff;
+  --primary-100: #e8def8;
+  --primary-200: #d2c4df;
+  --primary-300: #b69df8;
+  --primary-400: #9777ff;
+  --primary-500: #6750a4;
+  --primary-600: #5d4e8b;
+  --primary-700: #4f3e73;
+  --primary-800: #423459;
+  --primary-900: #362a41;
+  
+  /* Surface colors */
+  --surface: #fef7ff;
+  --surface-variant: #e7e0ec;
+  --on-surface: #1d1b20;
+  --on-surface-variant: #49454f;
+  
+  /* Outline colors */
+  --outline: #79747e;
+  --outline-variant: #cac4d0;
+  
+  /* Error colors */
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #410002;
+}
+
+.dark {
+  /* Primary colors - dark */
+  --primary-50: #2b1d33;
+  --primary-100: #413347;
+  --primary-200: #56485c;
+  --primary-300: #6d5e72;
+  --primary-400: #847489;
+  --primary-500: #9c8ba1;
+  --primary-600: #b4a2ba;
+  --primary-700: #cdb9d3;
+  --primary-800: #e6d0ed;
+  --primary-900: #f8e8ff;
+  
+  /* Surface colors - dark */
+  --surface: #141218;
+  --surface-variant: #49454f;
+  --on-surface: #e6e0e9;
+  --on-surface-variant: #cac4d0;
+  
+  /* Outline colors - dark */
+  --outline: #938f99;
+  --outline-variant: #49454f;
+  
+  /* Error colors - dark */
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+}
+
+/* Material 3 utility classes */
+.text-primary-600 { color: var(--primary-600); }
+.text-primary-400 { color: var(--primary-400); }
+.text-on-surface { color: var(--on-surface); }
+.text-on-surface-dark { color: var(--on-surface); }
+.text-on-surface-variant { color: var(--on-surface-variant); }
+.text-on-surface-variant-dark { color: var(--on-surface-variant); }
+
+.bg-surface { background-color: var(--surface); }
+.bg-surface-dark { background-color: var(--surface); }
+.bg-surface-variant { background-color: var(--surface-variant); }
+.bg-surface-variant-dark { background-color: var(--surface-variant); }
+.bg-primary-100 { background-color: var(--primary-100); }
+.bg-primary-900\/20 { background-color: rgba(54, 42, 65, 0.2); }
+
+.border-outline { border-color: var(--outline); }
+.border-outline-dark { border-color: var(--outline); }
+
+.ring-primary-600\/30 { --tw-ring-color: rgba(103, 80, 164, 0.3); }
+
+/* Focus and interaction states */
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 /* 重置Safari特定的输入样式 */
 input, textarea {
   -webkit-appearance: none !important;
@@ -80,49 +168,178 @@ body {
 
 .premium-button {
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 20px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+  text-transform: none;
+  letter-spacing: 0.0178571429em;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .premium-button-primary {
-  background-color: #007AFF; /* Apple Blue */
-  color: white;
+  background-color: #6750a4;
+  color: #ffffff;
+  border: none;
 }
 
 .premium-button-primary:hover {
-  background-color: #005ecb;
+  background-color: #7c4dff;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
 }
 
-.premium-button-secondary { 
-  background-color: #5856D6; /* Apple Indigo */
-  color: white;
+.premium-button-primary:focus {
+  outline: none;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 0 0 3px rgba(103, 80, 164, 0.3);
+}
+
+.premium-button-primary:active {
+  background-color: #5a3d8a;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.premium-button-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.premium-button-primary:hover::before {
+  opacity: 0.08;
+}
+
+.premium-button-primary:focus::before {
+  opacity: 0.12;
+}
+
+.premium-button-primary:active::before {
+  opacity: 0.16;
+}
+
+.premium-button-secondary {
+  background-color: #e8def8;
+  color: #1d192b;
+  border: none;
 }
 
 .premium-button-secondary:hover {
-  background-color: #3938AC;
+  background-color: #ddd2ea;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+}
+
+.premium-button-secondary:focus {
+  outline: none;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 0 0 3px rgba(103, 80, 164, 0.3);
+}
+
+.premium-button-secondary:active {
+  background-color: #d0c4df;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.premium-button-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.premium-button-secondary:hover::before {
+  opacity: 0.08;
+}
+
+.premium-button-secondary:focus::before {
+  opacity: 0.12;
+}
+
+.premium-button-secondary:active::before {
+  opacity: 0.16;
 }
 
 .premium-button-outlined {
   background-color: transparent;
-  color: #007AFF;
-  border: 1px solid #007AFF;
+  color: #6750a4;
+  border: 1px solid #79747e;
+  box-shadow: none;
 }
 
 .premium-button-outlined:hover {
-  background-color: rgba(0, 122, 255, 0.1);
+  background-color: rgba(103, 80, 164, 0.08);
+  border-color: #6750a4;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.premium-button-outlined:focus {
+  outline: none;
+  background-color: rgba(103, 80, 164, 0.12);
+  border-color: #6750a4;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15), 0 0 0 3px rgba(103, 80, 164, 0.3);
+}
+
+.premium-button-outlined:active {
+  background-color: rgba(103, 80, 164, 0.16);
+  border-color: #6750a4;
 }
 
 .premium-button-success {
-  background-color: #34C759; /* Apple Green */
-  color: white;
+  background-color: #006c4e;
+  color: #ffffff;
+  border: none;
 }
 
 .premium-button-success:hover {
-  background-color: #2ea14a;
+  background-color: #008159;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+}
+
+.premium-button-success:focus {
+  outline: none;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15), 0 0 0 3px rgba(0, 108, 78, 0.3);
+}
+
+.premium-button-success:active {
+  background-color: #005640;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.premium-button-success::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.premium-button-success:hover::before {
+  opacity: 0.08;
+}
+
+.premium-button-success:focus::before {
+  opacity: 0.12;
+}
+
+.premium-button-success:active::before {
+  opacity: 0.16;
 }
 
 #analyzedSentenceOutput {
@@ -448,98 +665,7 @@ rb {
   color: black;
   text-decoration: none;
 }
-#settingsButton {
-  position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
-  z-index: 1000;
-  background-color: white;
-  color: #007AFF;
-  border: 1px solid #007AFF;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#githubButton {
-  position: fixed;
-  top: 1.5rem;
-  right: 5rem;
-  z-index: 1000;
-  background-color: white;
-  color: #333;
-  border: 1px solid #333;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-@media (max-width: 640px) {
-  #settingsButton {
-    top: 1rem;
-    right: 1rem;
-    width: 36px;
-    height: 36px;
-  }
-  #githubButton {
-    top: 1rem;
-    right: 4rem;
-    width: 36px;
-    height: 36px;
-  }
-  #themeToggleButton {
-    top: 1rem;
-    right: 7rem;
-    width: 36px;
-    height: 36px;
-  }
-}
-
-#settingsButton:hover {
-  background-color: #f0f2f5;
-  transform: scale(1.1);
-}
-
-#githubButton:hover {
-  background-color: #f0f2f5;
-  transform: scale(1.1);
-}
-
-#themeToggleButton {
-  position: fixed;
-  top: 1.5rem;
-  right: 8.5rem;
-  z-index: 1000;
-  background-color: white;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#themeToggleButton:hover {
-  background-color: #f0f2f5;
-  transform: scale(1.1);
-}
+/* 移除不再需要的固定定位按钮样式，现在使用 TopToolbar 组件 */
 
 /* Ruby代替样式 */
 .ruby-container {
@@ -753,33 +879,33 @@ html.safari #japaneseInput {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
-/* 暗色模式下的按钮 - 优化色彩对比 */
+/* ========== 暗色模式下的Material 3按钮样式 ========== */
 .dark .premium-button-primary {
-  background-color: #3b82f6;
+  background-color: var(--primary-500);
   color: #ffffff;
 }
 
 .dark .premium-button-primary:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-600);
 }
 
 .dark .premium-button-secondary {
-  background-color: #7c3aed;
-  color: #ffffff;
+  background-color: var(--surface-variant);
+  color: var(--on-surface-variant);
 }
 
 .dark .premium-button-secondary:hover {
-  background-color: #6d28d9;
+  background-color: rgba(var(--surface-variant), 0.8);
 }
 
 .dark .premium-button-outlined {
-  color: #60a5fa;
-  border-color: #60a5fa;
+  color: var(--primary-400);
+  border-color: var(--outline);
   background-color: transparent;
 }
 
 .dark .premium-button-outlined:hover {
-  background-color: rgba(96, 165, 250, 0.1);
+  background-color: rgba(var(--primary-400), 0.1);
 }
 
 /* 暗色模式下的文本优化 */
@@ -997,56 +1123,8 @@ html.safari #japaneseInput {
   border-color: #4b5563 !important;
 }
 
-.dark #themeToggleButton {
-  background-color: #1f2937;
-  color: #d1d5db;
-  border-color: #4b5563;
-}
+/* 清理不再需要的暗色模式按钮样式 */
 
-.dark #themeToggleButton:hover {
-  background-color: #374151;
-}
+/* 移除固定定位的主题切换下拉菜单样式，现在使用相对定位 */
 
-.dark #githubButton {
-  background-color: #1f2937;
-  color: #d1d5db;
-  border-color: #4b5563;
-}
-
-.dark #githubButton:hover {
-  background-color: #374151;
-}
-
-/* 主题切换下拉菜单定位 */
-#themeToggleDropdown {
-  position: fixed;
-  top: 4rem;
-  right: 6rem;
-  z-index: 1001;
-}
-
-@media (max-width: 640px) {
-  #themeToggleDropdown {
-    top: 3.5rem;
-    right: 4.5rem;
-  }
-}
-
-/* 暗色模式下的主题切换下拉菜单 */
-.dark #themeToggleDropdown {
-  background-color: #1f2937 !important;
-  border-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-.dark #themeToggleDropdown button {
-  color: #f9fafb !important;
-}
-
-.dark #themeToggleDropdown button:hover {
-  background-color: #374151 !important;
-}
-
-.dark #themeToggleDropdown .border-t {
-  border-color: #374151 !important;
-}
+/* 清理不再需要的主题切换下拉菜单样式 */
