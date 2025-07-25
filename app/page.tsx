@@ -335,6 +335,7 @@ export default function Home() {
               useStream={useStream}
               ttsProvider={ttsProvider}
               onTtsProviderChange={handleTtsProviderChange}
+              isAnalyzing={isAnalyzing}
             />
 
             {isAnalyzing && (!analyzedTokens.length || !useStream) && (

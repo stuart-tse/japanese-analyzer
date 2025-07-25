@@ -49,7 +49,7 @@ export default function AnalysisResult({
     debounceTimeoutRef.current = setTimeout(() => {
       setWordDetail(newDetail);
       lastUpdateTimeRef.current = Date.now();
-    }, 200); // 200ms防抖
+    }, 50); // 50ms防抖 - 更快响应
   }, [wordDetail]);
   
   // 清理防抖定时器

@@ -20,6 +20,7 @@ interface InputSectionProps {
   useStream?: boolean;
   ttsProvider: 'edge' | 'gemini';
   onTtsProviderChange: (provider: 'edge' | 'gemini') => void;
+  isAnalyzing?: boolean;
 }
 
 // TTS配置选项
@@ -58,7 +59,8 @@ export default function InputSection({
   userApiUrl,
   useStream = true, // 默认启用流式输出
   ttsProvider,
-  onTtsProviderChange
+  onTtsProviderChange,
+  isAnalyzing = false
 }: InputSectionProps) {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +75,11 @@ export default function InputSection({
   const [selectedVoice, setSelectedVoice] = useState('Kore');
   const [selectedStyle, setSelectedStyle] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 监听外部分析状态，同步内部loading状态
+  useEffect(() => {
+    setIsLoading(isAnalyzing);
+  }, [isAnalyzing]);
 
   // 从本地存储加载TTS设置
   useEffect(() => {
@@ -109,9 +116,7 @@ export default function InputSection({
       return;
     }
 
-    setIsLoading(true);
     onAnalyze(inputText);
-    setTimeout(() => setIsLoading(false), 300); // 简化示例，实际应在分析完成后设置
   };
 
   const handleSpeak = async () => {

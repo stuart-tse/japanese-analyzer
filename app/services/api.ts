@@ -170,7 +170,7 @@ export async function streamAnalyzeSentence(
     
     // 添加防抖，减少UI更新频率，提高性能
     let updateTimeout: NodeJS.Timeout | null = null;
-    const updateDebounceTime = 100; // 100ms
+    const updateDebounceTime = 16; // 16ms - 1帧更新，更流畅
     
     const debouncedUpdate = (content: string, isComplete: boolean) => {
       if (updateTimeout) {
@@ -304,7 +304,7 @@ export async function streamTranslateText(
     
     // 添加防抖，减少UI更新频率，提高性能
     let updateTimeout: NodeJS.Timeout | null = null;
-    const updateDebounceTime = 100; // 100ms
+    const updateDebounceTime = 16; // 16ms - 1帧更新，更流畅
     
     const debouncedUpdate = (content: string, isComplete: boolean) => {
       if (updateTimeout) {
@@ -705,7 +705,7 @@ export async function streamExtractTextFromImage(
     
     // 添加防抖，减少UI更新频率，提高性能
     let updateTimeout: NodeJS.Timeout | null = null;
-    const updateDebounceTime = 100; // 100ms
+    const updateDebounceTime = 16; // 16ms - 1帧更新，更流畅
     
     const debouncedUpdate = (content: string, isComplete: boolean) => {
       if (updateTimeout) {
