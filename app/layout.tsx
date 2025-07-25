@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "./styles/material-theme.css";
 import Script from "next/script";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
@@ -27,12 +28,30 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
-        {/* 预连接谷歌字体CDN以提高加载速度 */}
+        {/* 预连接字体CDN以提高加载速度 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* 使用CDN直接加载Noto Sans JP字体，避免Vercel构建问题 */}
+        
+        {/* CJK优化字体 - Noto Sans CJK SC */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+CJK+SC:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+        
+        {/* 日文字体支持 */}
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+        
+        {/* Material Design Roboto字体作为后备 */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
+        {/* Material Icons */}
+        <link
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet"
         />
         {/* 主题初始化脚本 - 防止闪烁 */}

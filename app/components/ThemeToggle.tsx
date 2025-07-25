@@ -39,7 +39,7 @@ export default function ThemeToggle() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         title={`切换主题 - ${getThemeLabel()}`}
-        className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-white/90 dark:bg-gray-800/90 text-on-surface-variant dark:text-on-surface-variant-dark border border-outline dark:border-outline-dark rounded-full shadow-sm backdrop-blur-sm hover:bg-surface-variant hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-600/30 active:scale-95 transition-all duration-200 ease-out"
+        className="material-icon-button material-ripple flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-white/90 dark:bg-gray-800/90 text-on-surface-variant dark:text-on-surface-variant-dark border border-outline dark:border-outline-dark rounded-full shadow-sm backdrop-blur-sm hover:bg-surface-variant hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-600/30 active:scale-95 transition-all duration-200 ease-out"
       >
         <i className={`fas ${actualTheme === 'dark' ? 'fa-moon' : 'fa-sun'} text-base sm:text-lg`}></i>
       </button>

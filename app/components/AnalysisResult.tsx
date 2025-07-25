@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts, getJapaneseTtsAudioUrl } from '../utils/helpers';
 import { getWordDetails, streamWordDetails, TokenData, WordDetail } from '../services/api';
 import { FaVolumeUp } from 'react-icons/fa';
@@ -25,6 +25,55 @@ export default function AnalysisResult({
   useStream = true // 默认启用流式
 }: AnalysisResultProps) {
   const [wordDetail, setWordDetail] = useState<WordDetail | null>(null);
+  
+  // 防抖更新状态，避免频繁渲染
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
+  
+  const updateWordDetailThrottled = useCallback((newDetail: WordDetail) => {
+    const now = Date.now();
+    const timeSinceLastUpdate = now - lastUpdateTimeRef.current;
+    
+    // 立即更新关键字段或者距离上次更新超过1秒
+    if (!wordDetail || timeSinceLastUpdate > 1000 || newDetail.originalWord !== wordDetail.originalWord) {
+      setWordDetail(newDetail);
+      lastUpdateTimeRef.current = now;
+      return;
+    }
+    
+    // 对于频繁的explanation更新，使用防抖
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    debounceTimeoutRef.current = setTimeout(() => {
+      setWordDetail(newDetail);
+      lastUpdateTimeRef.current = Date.now();
+    }, 200); // 200ms防抖
+  }, [wordDetail]);
+  
+  // 清理防抖定时器
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+  
+  // 文本展开/收起状态
+  const [isExplanationExpanded, setIsExplanationExpanded] = useState(false);
+  const [showExpandButton, setShowExpandButton] = useState(false);
+  
+  // 检查是否需要显示展开按钮
+  useEffect(() => {
+    if (wordDetail?.explanation && wordDetail.explanation.length > 5000) {
+      setShowExpandButton(true);
+    } else {
+      setShowExpandButton(false);
+      setIsExplanationExpanded(false);
+    }
+  }, [wordDetail?.explanation]);
   const [activeWordToken, setActiveWordToken] = useState<HTMLElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -84,8 +133,8 @@ export default function AnalysisResult({
     }
   };
 
-  // 实时解析流式内容的部分字段
-  const parseStreamContentRealtime = (content: string) => {
+  // 实时解析流式内容的部分字段 - 优化性能
+  const parseStreamContentRealtime = useCallback((content: string) => {
     const result = {
       originalWord: '',
       chineseTranslation: '',
@@ -94,40 +143,58 @@ export default function AnalysisResult({
       romaji: '',
       dictionaryForm: '',
       explanation: '',
-      rawContent: content // 保存原始内容用于调试
+      rawContent: content
     };
 
     try {
-      // 提取各个字段的实时内容
-      const extractField = (fieldName: string): string => {
-        const regex = new RegExp(`"${fieldName}"\\s*:\\s*"([^"]*(?:\\\\.[^"]*)*)"`, 'i');
-        const match = content.match(regex);
-        return match ? match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : '';
+      // 使用更高效的字符串查找而不是正则
+      const extractFieldEfficient = (fieldName: string): string => {
+        const searchStr = `"${fieldName}":`;
+        const startIndex = content.indexOf(searchStr);
+        if (startIndex === -1) return '';
+        
+        const valueStart = content.indexOf('"', startIndex + searchStr.length);
+        if (valueStart === -1) return '';
+        
+        let valueEnd = valueStart + 1;
+        let escapeNext = false;
+        
+        // 找到字符串结束位置，处理转义字符
+        while (valueEnd < content.length) {
+          const char = content[valueEnd];
+          if (escapeNext) {
+            escapeNext = false;
+          } else if (char === '\\') {
+            escapeNext = true;
+          } else if (char === '"') {
+            break;
+          }
+          valueEnd++;
+        }
+        
+        if (valueEnd >= content.length) {
+          // 字符串未结束，可能还在生成中
+          return content.substring(valueStart + 1, valueEnd).replace(/\\n/g, '\n').replace(/\\"/g, '"') + '...';
+        }
+        
+        return content.substring(valueStart + 1, valueEnd).replace(/\\n/g, '\n').replace(/\\"/g, '"');
       };
 
-      // 提取部分完成的字段值
-      result.originalWord = extractField('originalWord');
-      result.chineseTranslation = extractField('chineseTranslation');
-      result.pos = extractField('pos');
-      result.furigana = extractField('furigana');
-      result.romaji = extractField('romaji');
-      result.dictionaryForm = extractField('dictionaryForm');
-      result.explanation = extractField('explanation');
-
-      // 如果explanation字段正在生成中但还没有结束引号，尝试提取部分内容
-      if (!result.explanation && content.includes('"explanation"')) {
-        const explanationMatch = content.match(/"explanation"\s*:\s*"([^"]*)$/);
-        if (explanationMatch) {
-          result.explanation = explanationMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') + '...';
-        }
-      }
+      // 只解析当前需要显示的字段
+      result.originalWord = extractFieldEfficient('originalWord');
+      result.chineseTranslation = extractFieldEfficient('chineseTranslation');
+      result.pos = extractFieldEfficient('pos');
+      result.furigana = extractFieldEfficient('furigana');
+      result.romaji = extractFieldEfficient('romaji');
+      result.dictionaryForm = extractFieldEfficient('dictionaryForm');
+      result.explanation = extractFieldEfficient('explanation');
 
       return result;
     } catch (e) {
       console.warn('实时解析出错:', e);
       return result;
     }
-  };
+  }, []);
 
   const fetchWordDetails = async (word: string, pos: string, sentence: string, furigana?: string, romaji?: string) => {
     // 重置状态
@@ -147,7 +214,7 @@ export default function AnalysisResult({
         (chunk, isDone) => {
           setStreamContent(chunk);
           
-          // 实时解析并更新显示
+          // 实时解析并更新显示 - 使用防抖优化
           const realtimeData = parseStreamContentRealtime(chunk);
           if (realtimeData.originalWord || realtimeData.chineseTranslation || realtimeData.explanation) {
             // 创建一个临时的 WordDetail 对象用于实时显示
@@ -160,7 +227,7 @@ export default function AnalysisResult({
               dictionaryForm: realtimeData.dictionaryForm || '',
               explanation: realtimeData.explanation || '正在生成解释...'
             };
-            setWordDetail(tempWordDetail);
+            updateWordDetailThrottled(tempWordDetail);
           }
           
           if (isDone) {
@@ -283,17 +350,25 @@ export default function AnalysisResult({
     }
   };
 
-  // 格式化解释文本，支持换行和高亮
-  const formatExplanation = (text: string): { __html: string } | undefined => {
-    if (!text) return undefined;
-    
-    const formattedText = text
-      .replace(/\n/g, '<br />')
-      .replace(/【([^】]+)】/g, '<strong class="text-indigo-600">$1</strong>')
-      .replace(/「([^」]+)」/g, '<strong class="text-indigo-600">$1</strong>');
+  // 格式化解释文本，支持换行和高亮 - 优化性能
+  const formatExplanation = useMemo(() => {
+    return (text: string, shouldTruncate: boolean = true): { __html: string } | undefined => {
+      if (!text) return undefined;
+      
+      // 如果文本过长且需要截断，截断并添加省略号
+      const isLongText = text.length > 5000;
+      const displayText = isLongText && shouldTruncate && !isExplanationExpanded 
+        ? text.substring(0, 5000) + '...' 
+        : text;
+      
+      const formattedText = displayText
+        .replace(/\n/g, '<br />')
+        .replace(/【([^】]+)】/g, '<strong class="text-indigo-600">$1</strong>')
+        .replace(/「([^」]+)」/g, '<strong class="text-indigo-600">$1</strong>');
 
-    return { __html: formattedText };
-  };
+      return { __html: formattedText };
+    };
+  }, [isExplanationExpanded]);
 
   // 词语详情内容组件
   const WordDetailContent = () => {
@@ -378,17 +453,29 @@ export default function AnalysisResult({
         </p>
         
         <div className="mb-1"><strong>解释:</strong></div>
-        <div className={`p-3 rounded-md text-base leading-relaxed ${
+        <div className={`word-detail-explanation p-3 rounded-md text-base leading-relaxed ${
           wordDetail?.explanation === '正在生成解释...' 
             ? 'text-gray-600 bg-gray-100 animate-pulse' 
             : 'text-gray-700 bg-gray-50'
         }`}>
-          {wordDetail?.explanation?.endsWith('...') ? (
+          {wordDetail?.explanation?.endsWith('...') || wordDetail?.explanation === '正在生成解释...' ? (
             // 正在生成中的内容，显示原始文本
-            <div className="whitespace-pre-wrap">{wordDetail.explanation}</div>
+            <div className="whitespace-pre-wrap text-streaming">{wordDetail.explanation}</div>
           ) : (
-            // 完整内容，应用格式化
-            <div dangerouslySetInnerHTML={formatExplanation(wordDetail?.explanation || '')} />
+            // 完整内容，应用格式化和截断
+            <>
+              <div dangerouslySetInnerHTML={formatExplanation(wordDetail?.explanation || '', true)} />
+              {showExpandButton && (
+                <div className="expand-button">
+                  <button
+                    onClick={() => setIsExplanationExpanded(!isExplanationExpanded)}
+                    className="mt-3 text-primary hover:text-secondary text-sm font-medium focus:outline-none transition-colors duration-200"
+                  >
+                    {isExplanationExpanded ? '收起 ▲' : '展开全文 ▼'}
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </>
@@ -400,7 +487,7 @@ export default function AnalysisResult({
   }
 
   return (
-    <div className="premium-card">
+    <div className="premium-card relative">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold text-gray-700">解析结果</h2>
         <div className="flex items-center">
@@ -417,6 +504,7 @@ export default function AnalysisResult({
           </label>
         </div>
       </div>
+      
       <div id="analyzedSentenceOutput" className="text-gray-800 mb-2 p-3 bg-gray-50 rounded-lg min-h-[70px]">
         {tokens.map((token, index) => {
           if (token.pos === '改行') {
@@ -453,6 +541,34 @@ export default function AnalysisResult({
             </span>
           );
         })}
+      </div>
+      
+      {/* 词性颜色图例 - 正确放在premium-card右下角 */}
+      <div className="absolute bottom-2 right-2 flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <span className="pos-dot pos-名詞"></span>
+          <span className="text-gray-600 dark:text-gray-400 text-xs">名词</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="pos-dot pos-動詞"></span>
+          <span className="text-gray-600 dark:text-gray-400 text-xs">动词</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="pos-dot pos-形容詞"></span>
+          <span className="text-gray-600 dark:text-gray-400 text-xs">形容词</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="pos-dot pos-副詞"></span>
+          <span className="text-gray-600 dark:text-gray-400 text-xs">副词</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="pos-dot pos-助詞"></span>
+          <span className="text-gray-600 dark:text-gray-400 text-xs">助词</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="pos-dot pos-助動詞"></span>
+          <span className="text-gray-600 dark:text-gray-400 text-xs">助动词</span>
+        </div>
       </div>
       
       {/* 非移动端的内嵌详情展示 */}

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { extractTextFromImage, streamExtractTextFromImage } from '../services/api';
 import { getJapaneseTtsAudioUrl, speakJapanese } from '../utils/helpers';
-import { FaCamera, FaVolumeUp, FaChevronDown, FaRobot, FaInfoCircle } from 'react-icons/fa';
+import { FaInfoCircle } from 'react-icons/fa';
 
 // 添加内联样式
 const placeholderStyle = `
@@ -319,139 +319,108 @@ export default function InputSection({
   };
 
   return (
-    <div className="premium-card">
+    <div className="w-full max-w-4xl mx-auto">
       <style dangerouslySetInnerHTML={{ __html: placeholderStyle }} />
-      <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-3 sm:mb-4">输入日语句子</h2>
-      <div className="relative">
+      
+      <div className="relative bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-600 rounded-3xl shadow-lg focus-within:border-purple-400 focus-within:shadow-xl transition-all duration-200">
         <textarea 
           id="japaneseInput" 
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#007AFF] focus:border-[#007AFF] transition duration-150 ease-in-out resize-none japanese-text" 
-          rows={4} 
-          placeholder="例：天気がいいから、散歩しましょう。或上传图片识别文字，也可直接粘贴图片。"
+          className="w-full p-6 pr-40 pb-20 resize-none japanese-text bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 border-none outline-none text-lg leading-relaxed scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent dark:scrollbar-thumb-gray-600" 
+          rows={3} 
+          placeholder="输入日语句子，例：天気がいいから、散歩しましょう。或上传图片识别文字，也可直接粘贴图片。"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onPaste={handlePaste}
           style={{ 
-            fontSize: '16px', // 防止移动设备缩放
-            WebkitTextFillColor: 'black', // Safari特定修复
-            color: 'black',
-            fontFamily: "'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif"
+            fontSize: '16px',
+            fontFamily: "'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif",
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
           }}
           autoCapitalize="none"
           autoComplete="off"
           autoCorrect="off"
           spellCheck="false"
         ></textarea>
-        {inputText.trim() !== '' && (
-          <button 
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 focus:outline-none"
-            onClick={() => setInputText('')}
-            title="清空内容"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-          </button>
-        )}
-      </div>
-      
-      <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-        <input 
-          type="file" 
-          id="imageUploadInput" 
-          accept="image/*" 
-          className="hidden" 
-          onChange={handleImageUpload}
-        />
-        <div className="flex gap-2 w-full sm:w-auto mb-2 sm:mb-0 sm:order-1">
+        
+        {/* 底部渐变遮罩，防止文字进入按钮区域 */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white dark:from-gray-800 via-white/80 dark:via-gray-800/80 to-transparent pointer-events-none rounded-b-3xl"></div>
+        
+        {/* 左侧工具按钮区域 */}
+        <div className="absolute left-4 bottom-4 flex items-center gap-1 z-10">
+          {/* 上传图片按钮 */}
           <button
             id="uploadImageButton"
-            className="premium-button premium-button-secondary flex-1 sm:w-auto text-sm sm:text-base py-2 sm:py-3"
+            className="material-icon-button material-ripple w-10 h-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all duration-200"
             onClick={() => document.getElementById('imageUploadInput')?.click()}
             disabled={isImageUploading}
             title="上传图片提取文字"
           >
-            <FaCamera />
-            {isImageUploading && <div className="loading-spinner ml-2" style={{ width: '18px', height: '18px' }}></div>}
+            <i className="fas fa-camera text-lg"></i>
+            {isImageUploading && <div className="loading-spinner ml-1" style={{ width: '12px', height: '12px' }}></div>}
           </button>
 
           {/* TTS按钮组 */}
-          <div className="relative flex-1 sm:w-auto" ref={dropdownRef}>
-            <div className="flex">
-              <button
-                id="speakButton"
-                className="premium-button premium-button-secondary flex-1 sm:w-auto text-sm sm:text-base py-2 sm:py-3 rounded-r-none border-r-0"
-                onClick={handleSpeak}
-                disabled={!inputText.trim() || isLoading || isSpeaking}
-                title={inputText.trim() ? 
-                  (ttsProvider === 'edge' ? 
-                    `朗读文本 (Edge TTS，预计需要 ${getEstimatedTime(inputText)})` : 
-                    `朗读文本 (Gemini TTS，预计需要 ${getEstimatedTime(inputText)})`
-                  ) : 
-                  '请先输入文本'
-                }
-              >
-                <FaVolumeUp />
-                {isSpeaking && <div className="loading-spinner ml-2" style={{ width: '18px', height: '18px' }}></div>}
-              </button>
-              
-              <button
-                className="premium-button premium-button-secondary px-2 py-2 sm:py-3 rounded-l-none border-l border-gray-300"
-                onClick={() => setShowTtsDropdown(!showTtsDropdown)}
-                disabled={isLoading || isSpeaking}
-                title="选择语音合成方式"
-              >
-                <FaChevronDown className="text-xs" />
-              </button>
-            </div>
+          <div className="relative flex" ref={dropdownRef}>
+            <button
+              id="speakButton"
+              className="material-icon-button material-ripple w-10 h-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-l-full transition-all duration-200"
+              onClick={handleSpeak}
+              disabled={!inputText.trim() || isLoading || isSpeaking}
+              title={inputText.trim() ? 
+                (ttsProvider === 'edge' ? 
+                  `朗读文本 (Edge TTS，预计需要 ${getEstimatedTime(inputText)})` : 
+                  `朗读文本 (Gemini TTS，预计需要 ${getEstimatedTime(inputText)})`
+                ) : 
+                '请先输入文本'
+              }
+            >
+              <i className="fas fa-volume-up text-lg"></i>
+              {isSpeaking && <div className="loading-spinner ml-1" style={{ width: '12px', height: '12px' }}></div>}
+            </button>
             
-            {/* TTS选择下拉菜单 */}
+            <button
+              className="material-icon-button material-ripple w-6 h-10 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-full border-l border-gray-300 dark:border-gray-600 transition-all duration-200"
+              onClick={() => setShowTtsDropdown(!showTtsDropdown)}
+              disabled={isLoading || isSpeaking}
+              title="语音设置"
+            >
+              <i className="fas fa-chevron-down text-sm"></i>
+            </button>
+            
+            {/* TTS设置下拉菜单 */}
             {showTtsDropdown && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-3 w-72">
+              <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-2xl shadow-xl z-20 p-4 min-w-[280px]">
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">语音设置</div>
+                
                 {/* TTS提供商选择 */}
                 <div className="mb-3">
-                  <label className="block text-xs font-medium text-gray-700 mb-2">语音合成方式</label>
-                  <div className="space-y-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">语音引擎</label>
+                  <div className="flex gap-2">
                     <button
-                      className={`w-full px-3 py-2 text-left text-sm rounded-md transition-colors ${
-                        ttsProvider === 'edge' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
+                      className={`px-3 py-2 text-sm rounded-full transition-colors ${ttsProvider === 'edge' ? 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}
                       onClick={() => handleTtsProviderSelect('edge')}
                     >
-                      <FaVolumeUp className="mr-2 inline" />
-                      Edge TTS (默认)
-                      <div className="text-xs text-gray-500 mt-1">高质量日语语音，速度快</div>
+                      Edge TTS
                     </button>
                     <button
-                      className={`w-full px-3 py-2 text-left text-sm rounded-md transition-colors ${
-                        ttsProvider === 'gemini' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
+                      className={`px-3 py-2 text-sm rounded-full transition-colors ${ttsProvider === 'gemini' ? 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}
                       onClick={() => handleTtsProviderSelect('gemini')}
                     >
-                      <FaRobot className="mr-2 inline" />
                       Gemini TTS
-                      <div className="text-xs text-gray-500 mt-1">AI语音，音质自然，速度慢</div>
                     </button>
                   </div>
                 </div>
 
-                {/* Edge TTS 专用设置 */}
+                {/* Edge TTS 设置 */}
                 {ttsProvider === 'edge' && (
                   <>
-                    {/* 性别选择 */}
                     <div className="mb-3">
-                      <label className="block text-xs font-medium text-gray-700 mb-2">语音性别</label>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">语音性别</label>
                       <select
                         value={selectedGender}
                         onChange={(e) => handleGenderChange(e.target.value as 'male' | 'female')}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: 'right 0.5rem center',
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '1.5em 1.5em',
-                          paddingRight: '2.5rem'
-                        }}
+                        className="w-full text-sm px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                       >
                         {TTS_GENDERS.map((gender) => (
                           <option key={gender.value} value={gender.value}>
@@ -460,10 +429,9 @@ export default function InputSection({
                         ))}
                       </select>
                     </div>
-
-                    {/* 语速滑块 */}
-                    <div className="mb-3">
-                      <label className="block text-xs font-medium text-gray-700 mb-2">
+                    
+                    <div className="mb-2">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                         语速: {getRateLabel(selectedRate)} ({selectedRate})
                       </label>
                       <input
@@ -473,56 +441,26 @@ export default function InputSection({
                         step="10"
                         value={selectedRate}
                         onChange={(e) => handleRateChange(parseInt(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
                       />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                         <span>-100</span>
                         <span>0</span>
                         <span>100</span>
                       </div>
                     </div>
-
-                    {/* 语调暂时禁用
-                    <div className="mb-3">
-                      <label className="block text-xs font-medium text-gray-700 mb-2">
-                        语调: {getPitchLabel(selectedPitch)} ({selectedPitch})
-                      </label>
-                      <input
-                        type="range"
-                        min="-100"
-                        max="100"
-                        step="10"
-                        value={selectedPitch}
-                        onChange={(e) => handlePitchChange(parseInt(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>-100</span>
-                        <span>0</span>
-                        <span>100</span>
-                      </div>
-                    </div>
-                    */}
                   </>
                 )}
 
-                {/* Gemini TTS 专用设置 */}
+                {/* Gemini TTS 设置 */}
                 {ttsProvider === 'gemini' && (
                   <>
-                    {/* 语音选择 */}
                     <div className="mb-3">
-                      <label className="block text-xs font-medium text-gray-700 mb-2">语音选择</label>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">语音选择</label>
                       <select
                         value={selectedVoice}
                         onChange={(e) => handleVoiceChange(e.target.value)}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: 'right 0.5rem center',
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '1.5em 1.5em',
-                          paddingRight: '2.5rem'
-                        }}
+                        className="w-full text-sm px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                       >
                         {GEMINI_VOICES.map((voice) => (
                           <option key={voice.value} value={voice.value}>
@@ -531,21 +469,13 @@ export default function InputSection({
                         ))}
                       </select>
                     </div>
-
-                    {/* 语音风格 */}
+                    
                     <div className="mb-2">
-                      <label className="block text-xs font-medium text-gray-700 mb-2">语音风格</label>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">语音风格</label>
                       <select
                         value={selectedStyle}
                         onChange={(e) => handleStyleChange(e.target.value)}
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: 'right 0.5rem center',
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '1.5em 1.5em',
-                          paddingRight: '2.5rem'
-                        }}
+                        className="w-full text-sm px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                       >
                         {TTS_STYLES.map((style) => (
                           <option key={style.value} value={style.value}>
@@ -560,45 +490,69 @@ export default function InputSection({
             )}
           </div>
         </div>
+        
+        {/* 右侧按钮组 */}
+        <div className="absolute right-4 bottom-4 flex items-center gap-2">
+          {/* 清空按钮 */}
+          {inputText.trim() !== '' && (
+            <button 
+              className="material-icon-button material-ripple w-10 h-10 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all duration-200"
+              onClick={() => setInputText('')}
+              title="清空内容"
+            >
+              <i className="fas fa-times text-lg"></i>
+            </button>
+          )}
 
-        <button
-          id="analyzeButton"
-          className="premium-button premium-button-primary w-full sm:w-auto sm:order-2 text-sm sm:text-base py-2 sm:py-3"
-          onClick={handleAnalyze}
-          disabled={isLoading}
-        >
-          {!isLoading && <span className="button-text">解析句子</span>}
-          <div className="loading-spinner" style={{ display: isLoading ? 'inline-block' : 'none', width: '18px', height: '18px' }}></div>
-          {isLoading && <span className="button-text">解析中...</span>}
-        </button>
+          {/* 解析按钮 */}
+          <button
+            id="analyzeButton"
+            className="material-filled-button material-button-base material-ripple px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+            onClick={handleAnalyze}
+            disabled={isLoading}
+          >
+            <i className="fas fa-search text-sm mr-2"></i>
+            {isLoading ? '解析中...' : '解析'}
+            {isLoading && <div className="loading-spinner ml-2" style={{ width: '16px', height: '16px' }}></div>}
+          </button>
+        </div>
+        
+        {/* 隐藏的文件输入 */}
+        <input 
+          type="file" 
+          id="imageUploadInput" 
+          accept="image/*" 
+          className="hidden" 
+          onChange={handleImageUpload}
+        />
       </div>
       
       <div id="imageUploadStatus" className={uploadStatusClass}>{uploadStatus}</div>
       
       {ttsAudioUrl && (
-        <div className="mt-3">
+        <div className="mt-6 mb-8">
           <audio 
             key={ttsAudioUrl} 
             src={ttsAudioUrl} 
             controls 
             autoPlay 
-            className="w-full"
+            className="w-full rounded-lg"
             style={{ height: '40px' }}
           />
         </div>
       )}
 
       {isSpeaking && (
-        <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-r-xl">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <FaInfoCircle className="text-blue-500 mt-0.5" />
             </div>
             <div className="ml-3">
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
                 <strong>正在进行高质量语音合成，请稍候...</strong>
               </p>
-              <p className="text-xs text-blue-600 mt-1">
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                 • 使用 {ttsProvider === 'edge' ? 'Edge' : 'Gemini'} TTS 技术，音质更自然<br/>
                 • 当前文本预计需要：{getEstimatedTime(inputText)}<br/>
                 • 请保持页面打开，不要离开或刷新

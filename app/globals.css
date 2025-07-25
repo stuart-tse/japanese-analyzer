@@ -149,11 +149,11 @@ body {
   color: var(--foreground);
   font-family: Inter, 'Noto Sans JP', sans-serif;
   color: rgb(var(--foreground-rgb));
-  background-color: #f0f2f5;
+  background-color: #ffffff;
 }
 
 .premium-card {
-  background-color: white;
+  background-color: #f7f2fa; /* 浅紫色背景，与实际显示颜色一致 */
   border-radius: 12px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   padding: 2rem 1.5rem; /* 较小的水平内边距，适应移动设备 */
@@ -349,6 +349,7 @@ body {
   word-spacing: 0.3em; /* 增加词间距 */
   overflow-wrap: break-word; /* 允许长单词在必要时换行 */
   word-break: break-all; /* 在必要时允许在单词中间换行 */
+  background-color: #f7f2fa; /* 与卡片背景统一的浅紫色 */
 }
 
 @media (max-width: 640px) {
@@ -356,8 +357,65 @@ body {
     line-height: 3.2; /* 移动设备上略小的行高 */
     word-spacing: 0.2em; /* 移动设备上略小的词间距 */
     font-size: 0.95rem; /* 移动设备上略小的字体大小 */
+    background-color: #f7f2fa; /* 移动设备上也保持统一的浅紫色背景 */
   }
 }
+
+/* 词性标记圆点样式 */
+.pos-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  right: -2px;
+  z-index: 10;
+  cursor: help;
+}
+
+/* 图例中的词性圆点样式 */
+.pos-dot:not(.word-unit-wrapper .pos-dot) {
+  position: static;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  top: auto;
+  right: auto;
+  z-index: auto;
+}
+
+@media (max-width: 640px) {
+  .pos-dot {
+    width: 5px;
+    height: 5px;
+    top: 3px;
+    right: -1px;
+  }
+  
+  .pos-dot:not(.word-unit-wrapper .pos-dot) {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+.pos-dot.pos-名詞 { background-color: #89CFF0; }
+.pos-dot.pos-動詞 { background-color: #77DD77; }
+.pos-dot.pos-形容詞 { background-color: #FFB347; }
+.pos-dot.pos-副詞 { background-color: #C3B1E1; }
+.pos-dot.pos-助詞 { background-color: #FF6961; }
+.pos-dot.pos-助動詞 { background-color: #FF8FAB; }
+.pos-dot.pos-接続詞 { background-color: #D2B48C; }
+.pos-dot.pos-感動詞 { background-color: #AEC6CF; }
+.pos-dot.pos-連体詞 { background-color: #7FFFD4; }
+.pos-dot.pos-代名詞 { background-color: #ADD8E6; }
+.pos-dot.pos-形状詞 { background-color: #FDFD96; }
+.pos-dot.pos-記号 { background-color: transparent !important; }
+.pos-dot.pos-接頭辞 { background-color: #DCDCDC; }
+.pos-dot.pos-接尾辞 { background-color: #E6E6FA; }
+.pos-dot.pos-フィラー { background-color: #F5F5F5; }
+.pos-dot.pos-その他 { background-color: #C0C0C0; }
+.pos-dot.pos-default { background-color: #E0E0E0; }
 
 .word-unit-wrapper { 
   display: inline-flex; 
@@ -478,7 +536,7 @@ rb {
 }
 
 #wordDetailInlineContainer {
-  background-color: #ffffff;
+  background-color: #f7f2fa; /* 浅紫色背景 */
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   padding: 1.5rem;
@@ -631,7 +689,7 @@ rb {
   align-items: center;
 }
 .settings-modal-content {
-  background-color: #fff;
+  background-color: #f7f2fa; /* 浅紫色背景 */
   margin: auto;
   padding: 25px;
   border-radius: 10px;
@@ -786,7 +844,7 @@ html.safari #japaneseInput {
 }
 
 .word-detail-modal-content {
-  background-color: white;
+  background-color: #f7f2fa; /* 浅紫色背景 */
   border-radius: 12px;
   padding: 20px;
   width: 100%;
@@ -874,7 +932,7 @@ html.safari #japaneseInput {
 
 /* 暗色模式下的premium卡片 - 优化背景和边框 */
 .dark .premium-card {
-  background-color: #1f2937;
+  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
   border: 1px solid #374151;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
@@ -942,6 +1000,38 @@ html.safari #japaneseInput {
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
 }
 
+/* 输入框滚动条美化 */
+#japaneseInput::-webkit-scrollbar {
+  width: 8px;
+}
+
+#japaneseInput::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+#japaneseInput::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+#japaneseInput::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+  background-clip: content-box;
+}
+
+.dark #japaneseInput::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.4);
+  background-clip: content-box;
+}
+
+.dark #japaneseInput::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.6);
+  background-clip: content-box;
+}
+
 /* 暗色模式下的工具提示 */
 .dark .tooltip .tooltiptext {
   background-color: #1f2937;
@@ -956,7 +1046,7 @@ html.safari #japaneseInput {
 /* 暗色模式下的模态框 */
 .dark .settings-modal-content,
 .dark .word-detail-modal-content {
-  background-color: #1f2937;
+  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
   border: 1px solid #374151;
   color: #f9fafb;
 }
@@ -978,7 +1068,7 @@ html.safari #japaneseInput {
 
 /* 暗色模式下的内联详情容器 */
 .dark #wordDetailInlineContainer {
-  background-color: #1f2937;
+  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
   border: 1px solid #374151;
   color: #f9fafb;
 }
@@ -1070,7 +1160,37 @@ html.safari #japaneseInput {
 }
 
 .dark .bg-gray-50 {
-  background-color: #1f2937 !important;
+  background-color: #2b1d33 !important; /* 深紫色背景用于暗色模式 */
+}
+
+/* 暗色模式下的 bg-gray-100 */
+.dark .bg-gray-100 {
+  background-color: #2b1d33 !important; /* 深紫色背景用于暗色模式 */
+}
+
+/* 暗色模式下的词汇详解背景 */
+.dark .word-detail-explanation {
+  background-color: #2b1d33 !important; /* 深紫色背景用于暗色模式 */
+}
+
+/* 暗色模式下的分析结果输出区域 */
+.dark #analyzedSentenceOutput {
+  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
+}
+
+/* 浅色模式下的灰色背景改为浅紫色，与卡片背景统一 */
+.bg-gray-50 {
+  background-color: #f7f2fa !important; /* 与卡片背景统一的浅紫色 */
+}
+
+/* 浅色模式下的 bg-gray-100 也改为浅紫色，与卡片背景统一 */
+.bg-gray-100 {
+  background-color: #f7f2fa !important; /* 与卡片背景统一的浅紫色 */
+}
+
+/* 词汇详解背景样式，与卡片背景统一 */
+.word-detail-explanation {
+  background-color: #f7f2fa !important; /* 与卡片背景统一的浅紫色 */
 }
 
 .dark .border-red-500 {
@@ -1122,9 +1242,3 @@ html.safari #japaneseInput {
 .dark .border-gray-300 {
   border-color: #4b5563 !important;
 }
-
-/* 清理不再需要的暗色模式按钮样式 */
-
-/* 移除固定定位的主题切换下拉菜单样式，现在使用相对定位 */
-
-/* 清理不再需要的主题切换下拉菜单样式 */

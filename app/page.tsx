@@ -294,10 +294,10 @@ export default function Home() {
       <>
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
           <div className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 transition-colors duration-200">
-              日本語<span className="text-[#007AFF] dark:text-blue-400">文章</span>解析器
+            <h1 className="md-typescale-display-medium text-gray-800 dark:text-gray-100 transition-colors duration-200 mb-3">
+              日本語<span className="text-primary">文章解析器</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mt-2 transition-colors duration-200">
+            <p className="md-typescale-title-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">
               AI驱动・深入理解日语句子结构与词义
             </p>
           </div>
@@ -312,121 +312,123 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-16 sm:pt-20 lg:pt-24 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      {/* 顶部工具栏 */}
-      <TopToolbar onSettingsClick={() => setIsSettingsModalOpen(true)} />
-      
-      <div className="w-full max-w-3xl">
-        <header className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100 transition-colors duration-200">
-            日本語<span className="text-[#007AFF] dark:text-blue-400">文章</span>解析器
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mt-2 transition-colors duration-200">
-            AI驱动・深入理解日语句子结构与词义
-          </p>
-        </header>
+    <>
+      <div className="min-h-screen flex flex-col items-center justify-start pt-16 sm:pt-20 lg:pt-24 p-3 sm:p-4 bg-white dark:bg-gray-900 transition-colors duration-200">
+        {/* 顶部工具栏 */}
+        <TopToolbar onSettingsClick={() => setIsSettingsModalOpen(true)} />
+        
+        <div className="w-full max-w-3xl">
+          <header className="text-center mb-8 sm:mb-12">
+            <h1 className="md-typescale-display-medium text-gray-800 dark:text-gray-100 transition-colors duration-200 mb-3">
+              日本語<span className="text-primary">文章解析器</span>
+            </h1>
+            <p className="md-typescale-title-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">
+              AI驱动・深入理解日语句子结构与词义
+            </p>
+          </header>
 
-        <main>
-          <InputSection 
-            onAnalyze={handleAnalyze}
-            userApiKey={userApiKey}
-            userApiUrl={userApiUrl}
-            useStream={useStream}
-            ttsProvider={ttsProvider}
-            onTtsProviderChange={handleTtsProviderChange}
-          />
-
-          {isAnalyzing && (!analyzedTokens.length || !useStream) && (
-            <div className="premium-card">
-              <div className="flex items-center justify-center py-6">
-                <div className="loading-spinner"></div>
-                <span className="ml-3 text-gray-600 dark:text-gray-400 transition-colors duration-200">正在解析中，请稍候...</span>
-              </div>
-            </div>
-          )}
-
-          {isJsonParseError && streamContent && (
-            <div className="premium-card">
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4 transition-colors duration-200">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <FaExclamationTriangle className="text-yellow-500" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300 transition-colors duration-200">
-                      解析中，已经收到部分内容，但尚未形成完整的结果。
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md overflow-auto max-h-96 text-xs font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-200 transition-colors duration-200">
-                {streamContent}
-              </div>
-            </div>
-          )}
-
-          {analysisError && (
-            <div className="premium-card">
-              <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 sm:p-4 transition-colors duration-200">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <FaExclamationCircle className="text-red-500" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700 dark:text-red-300 transition-colors duration-200">
-                      解析错误：{analysisError}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {shouldShowAnalyzer() && (
-            <AnalysisResult 
-              tokens={analyzedTokens}
-              originalSentence={currentSentence}
-              userApiKey={userApiKey}
-              userApiUrl={userApiUrl}
-              showFurigana={showFurigana}
-              onShowFuriganaChange={setShowFurigana}
-              useStream={useStream}
-            />
-          )}
-
-          {currentSentence && (
-            <TranslationSection
-              japaneseText={currentSentence}
+          <main>
+            <InputSection 
+              onAnalyze={handleAnalyze}
               userApiKey={userApiKey}
               userApiUrl={userApiUrl}
               useStream={useStream}
-              trigger={translationTrigger}
+              ttsProvider={ttsProvider}
+              onTtsProviderChange={handleTtsProviderChange}
             />
-          )}
-        </main>
 
-        <footer className="text-center mt-8 sm:mt-12 py-4 sm:py-6 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
-          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm transition-colors duration-200">&copy; 2025 高级日语解析工具 by Howen. All rights reserved.</p>
-          
-        </footer>
+            {isAnalyzing && (!analyzedTokens.length || !useStream) && (
+              <div className="premium-card">
+                <div className="flex items-center justify-center py-6">
+                  <div className="loading-spinner"></div>
+                  <span className="ml-3 md-typescale-body-medium text-gray-600 dark:text-gray-400 transition-colors duration-200">正在解析中，请稍候...</span>
+                </div>
+              </div>
+            )}
+
+            {isJsonParseError && streamContent && (
+              <div className="premium-card">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 sm:p-4 mb-4 transition-colors duration-200">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <FaExclamationTriangle className="text-yellow-500" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300 transition-colors duration-200">
+                        解析中，已经收到部分内容，但尚未形成完整的结果。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md overflow-auto max-h-96 text-xs font-mono whitespace-pre-wrap text-gray-800 dark:text-gray-200 transition-colors duration-200">
+                  {streamContent}
+                </div>
+              </div>
+            )}
+
+            {analysisError && (
+              <div className="premium-card">
+                <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-3 sm:p-4 transition-colors duration-200">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <FaExclamationCircle className="text-red-500" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700 dark:text-red-300 transition-colors duration-200">
+                        解析错误：{analysisError}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {shouldShowAnalyzer() && (
+              <AnalysisResult 
+                tokens={analyzedTokens}
+                originalSentence={currentSentence}
+                userApiKey={userApiKey}
+                userApiUrl={userApiUrl}
+                showFurigana={showFurigana}
+                onShowFuriganaChange={setShowFurigana}
+                useStream={useStream}
+              />
+            )}
+
+            {currentSentence && (
+              <TranslationSection
+                japaneseText={currentSentence}
+                userApiKey={userApiKey}
+                userApiUrl={userApiUrl}
+                useStream={useStream}
+                trigger={translationTrigger}
+              />
+            )}
+          </main>
+
+          <footer className="text-center mt-8 sm:mt-12 py-4 sm:py-6 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
+            <p className="md-typescale-body-medium text-gray-500 dark:text-gray-400 transition-colors duration-200">&copy; 2025 高级日语解析工具 by Howen. All rights reserved.</p>
+            
+          </footer>
+        </div>
+        
+        {/* 设置模态框 */}
+        <SettingsModal
+          userApiKey={userApiKey}
+          userApiUrl={userApiUrl}
+          defaultApiUrl={DEFAULT_API_URL}
+          useStream={useStream}
+          onSaveSettings={handleSaveSettings}
+          isModalOpen={isSettingsModalOpen}
+          onModalClose={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
+        />
       </div>
       
-      {/* 设置模态框 */}
-      <SettingsModal
-        userApiKey={userApiKey}
-        userApiUrl={userApiUrl}
-        defaultApiUrl={DEFAULT_API_URL}
-        useStream={useStream}
-        onSaveSettings={handleSaveSettings}
-        isModalOpen={isSettingsModalOpen}
-        onModalClose={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
-      />
-      
-      {/* AI聊天助手 */}
+      {/* AI聊天助手 - 移到主容器外面 */}
       <AIChat 
         userApiKey={userApiKey}
         currentSentence={currentSentence}
       />
-    </div>
+    </>
   );
 }

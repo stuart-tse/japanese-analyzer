@@ -188,29 +188,28 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
       
       {/* 聊天窗口 */}
       {isOpen && (
-        <div className={`fixed bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl flex flex-col transition-all duration-300 ${
+        <div className={`fixed bg-surface dark:bg-surface border border-outline-variant dark:border-outline-variant rounded-xl shadow-xl flex flex-col transition-all duration-300 ${
           isExpanded 
             ? 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] z-50' 
             : 'bottom-20 right-4 w-96 h-[500px] z-50'
         }`}>
           {/* 头部 */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-4 border-b border-outline dark:border-outline-variant bg-surface-container dark:bg-surface-container">
             <div className="flex items-center space-x-3">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200">AI 日语助手</h3>
+              <h3 className="md-typescale-title-medium text-on-surface dark:text-on-surface">AI 日语助手</h3>
             </div>
             <div className="flex items-center space-x-2">
               {/* 展开/收缩按钮 */}
               <button
                 onClick={toggleExpand}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                className="material-icon-button material-ripple w-10 h-10 text-on-surface-variant dark:text-on-surface-variant"
                 title={isExpanded ? "收缩窗口" : "展开窗口"}
               >
                 {isExpanded ? <FaCompress /> : <FaExpand />}
               </button>
-              {/* 关闭按钮 */}
               <button
                 onClick={toggleChat}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                className="material-icon-button material-ripple w-10 h-10 text-on-surface-variant dark:text-on-surface-variant"
                 title="关闭聊天"
               >
                 <FaTimes />
@@ -227,10 +226,10 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`${isExpanded ? 'max-w-[70%]' : 'max-w-[80%]'} p-3 rounded-lg text-sm ${
+                  className={`${isExpanded ? 'max-w-[70%]' : 'max-w-[80%]'} p-4 rounded-2xl shadow-sm transition-all duration-200 ${
                     message.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                      ? 'bg-gradient-to-br from-blue-400 to-blue-500 text-white ml-4'
+                      : 'bg-gradient-to-br from-purple-100 to-purple-200 text-purple-800 mr-4 border border-purple-300'
                   }`}
                 >
                   {message.role === 'user' ? (
@@ -245,13 +244,13 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
                             const { className, children } = props;
                             const inline = !className;
                             return !inline ? (
-                              <pre className="bg-gray-100 dark:bg-gray-700 p-2 rounded text-sm overflow-x-auto">
+                              <pre className="bg-surface-container dark:bg-surface-container-low p-2 rounded md-typescale-body-small overflow-x-auto">
                                 <code className={className}>
                                   {children}
                                 </code>
                               </pre>
                             ) : (
-                              <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm">
+                              <code className="bg-surface-container dark:bg-surface-container-low px-1 py-0.5 rounded md-typescale-body-small">
                                 {children}
                               </code>
                             );
@@ -263,20 +262,20 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
                           ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
                           li: ({ children }) => <li className="mb-1">{children}</li>,
                           // 自定义强调样式
-                          strong: ({ children }) => <strong className="font-semibold text-blue-600 dark:text-blue-400">{children}</strong>,
-                          em: ({ children }) => <em className="italic text-purple-600 dark:text-purple-400">{children}</em>,
+                          strong: ({ children }) => <strong className="font-semibold text-primary dark:text-primary">{children}</strong>,
+                          em: ({ children }) => <em className="italic text-secondary dark:text-secondary">{children}</em>,
                         }}
                       >
                         {message.content}
                       </ReactMarkdown>
                       {/* 显示实时生成指示器 */}
                       {isLoading && message.content && !message.content.endsWith('.') && !message.content.endsWith('。') && (
-                        <span className="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1" title="正在实时生成..."/>
+                        <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" title="正在实时生成..."/>
                       )}
                     </div>
                   )}
-                  <div className={`text-xs mt-1 opacity-70 ${
-                    message.role === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+                  <div className={`md-typescale-label-small mt-2 opacity-70 ${
+                    message.role === 'user' ? 'text-blue-100' : 'text-purple-600'
                   }`}>
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
@@ -286,10 +285,10 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-2xl shadow-sm mr-4 border border-purple-300">
                   <div className="flex items-center space-x-2">
                     <div className="loading-spinner w-4 h-4"></div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">AI正在思考...</span>
+                    <span className="md-typescale-body-small text-purple-700">AI正在思考...</span>
                   </div>
                 </div>
               </div>
@@ -299,7 +298,7 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
           </div>
 
           {/* 输入区域 */}
-          <div className={`border-t border-gray-200 dark:border-gray-700 ${isExpanded ? 'p-6' : 'p-4'}`}>
+          <div className={`border-t border-outline-variant dark:border-outline-variant ${isExpanded ? 'p-6' : 'p-4'}`}>
             <div className="flex items-end space-x-2">
               <textarea
                 ref={inputRef}
@@ -307,7 +306,7 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="输入你的日语问题..."
-                className={`flex-1 resize-none border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-all ${
+                className={`flex-1 resize-none border border-outline dark:border-outline rounded-lg px-3 py-2 md-typescale-body-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-surface dark:bg-surface text-on-surface dark:text-on-surface transition-all ${
                   isExpanded ? 'max-h-32' : 'max-h-20'
                 }`}
                 rows={isExpanded ? 3 : 1}
@@ -316,7 +315,7 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isLoading}
-                className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="material-filled-button material-button-base material-ripple p-2 min-w-10 min-h-10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FaPaperPlane className="w-4 h-4" />
               </button>
@@ -329,8 +328,17 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
       {(!isOpen || !isExpanded) && (
         <button
           onClick={toggleChat}
-          className="fixed bottom-4 right-4 w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-40 flex items-center justify-center"
+          className="bg-primary hover:bg-primary text-white rounded-full md-elevation-3 hover:md-elevation-4 material-ripple transition-all duration-200 flex items-center justify-center"
           title="AI 日语助手"
+          style={{
+            position: 'fixed !important' as any,
+            bottom: '24px !important' as any,
+            right: '24px !important' as any,
+            zIndex: 9999,
+            width: '56px',
+            height: '56px',
+            transform: 'none !important' as any
+          }}
         >
           <FaComments className="w-6 h-6" />
         </button>
