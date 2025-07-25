@@ -331,14 +331,14 @@ export default function AIChat({ userApiKey, currentSentence }: AIChatProps) {
           className="bg-primary hover:bg-primary text-white rounded-full md-elevation-3 hover:md-elevation-4 material-ripple transition-all duration-200 flex items-center justify-center"
           title="AI 日语助手"
           style={{
-            position: 'fixed !important' as any,
-            bottom: '24px !important' as any,
-            right: '24px !important' as any,
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
             zIndex: 9999,
             width: '56px',
             height: '56px',
-            transform: 'none !important' as any
-          }}
+            transform: 'none'
+          } as React.CSSProperties}
         >
           <FaComments className="w-6 h-6" />
         </button>
