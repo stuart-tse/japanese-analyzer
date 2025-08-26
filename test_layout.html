@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Layout Preservation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-input { width: 100%; height: 200px; margin: 10px 0; }
+        .test-output { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Japanese Analyzer Layout Preservation Test</h1>
+    
+    <div>
+        <h2>Test Input (Multi-line Japanese Text):</h2>
+        <textarea class="test-input" id="testText">
+今日は良い天気ですね。
+明日も晴れるでしょう。
+来週は雨が降りそうです。
+
+先生はとても親切な人です。
+生徒たちは熱心に勉強しています。
+        </textarea>
+        
+        <button onclick="testAnalysis()">Test Layout Preservation</button>
+        
+        <div class="test-output" id="output"></div>
+    </div>
+    
+    <script>
+        async function testAnalysis() {
+            const text = document.getElementById('testText').value;
+            const output = document.getElementById('output');
+            
+            output.innerHTML = '<p>Testing... Please manually verify in the main application.</p>';
+            
+            // Show the test text with preserved formatting
+            const formattedText = text.split('\n').map(line => {
+                if (line.trim() === '') {
+                    return '<div style="height: 20px;"></div>';
+                }
+                return `<div style="margin: 5px 0; font-size: 18px; color: #333;">${line}</div>`;
+            }).join('');
+            
+            output.innerHTML = `
+                <h3>Expected Layout:</h3>
+                <div style="border: 1px solid #eee; padding: 15px; background: #f9f9f9;">
+                    ${formattedText}
+                </div>
+                <p><strong>Instructions:</strong></p>
+                <ol>
+                    <li>Copy the text above</li>
+                    <li>Go to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                    <li>Paste the text in the input field</li>
+                    <li>Click Analyze</li>
+                    <li>Verify that the tokens preserve the line breaks and spacing as shown above</li>
+                    <li>Test different analysis modes (Tokens, Grammar, Translation, Pronunciation)</li>
+                </ol>
+            `;
+        }
+    </script>
+</body>
+</html>

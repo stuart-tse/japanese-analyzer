@@ -8,7 +8,7 @@ const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
 export async function POST(req: NextRequest) {
   try {
     // 解析请求体
-    const { word, pos, sentence, furigana, romaji, model = MODEL_NAME, apiUrl, useStream = false } = await req.json();
+    const { word, pos, sentence, furigana, romaji, model = MODEL_NAME, apiUrl, useStream = false, learningMode = 'intermediate' } = await req.json();
     
     // 从请求头中获取用户提供的API密钥（如果有）
     const authHeader = req.headers.get('Authorization');
@@ -40,8 +40,59 @@ export async function POST(req: NextRequest) {
     if (romaji) contextWordInfo += `, 罗马音: ${romaji}`;
     contextWordInfo += `)`;
 
-    // 构建详情查询请求
-    const detailPrompt = `在日语句子 "${sentence}" 的上下文中，${contextWordInfo} 的具体含义是什么？请提供以下信息，并以严格的JSON对象格式返回，不要包含任何markdown或其他非JSON字符：\n\n请特别注意：\n1. 在 "explanation" 字段中，对所有重要的语法术语、动词原形、词形变化等使用【】符号进行高亮标记。\n2. 在 "explanation" 字段的字符串值中，必须使用 \\n (反斜杠和n) 来表示换行。\n3. 在 "explanation" 字段中，提供详尽的语法解释，包括：\n   a. 如果是助词，解释其在本句中的【具体功能和用法】。\n   b. 如果有词形变化，详细说明其【变化规则】（例如：五段动词的て形变化）。\n   c. 解释该词汇在句子结构中扮演的【角色】。\n   d. 提供1-2个简单的【例句】来展示该词形或语法的典型用法。\n4. 如果是动词，准确识别其时态、语态和礼貌程度。\n5. 对于助动词与动词组合，明确说明原形及活用过程。\n6. 对于形容词，注意区分い形容词和な形容词，并识别其活用形式。\n7. 准确提供辞书形。\n\n{\n  "originalWord": "${word}",\n  "chineseTranslation": "中文翻译",\n  "pos": "${pos}",\n  "furigana": "${furigana || ''}",\n  "romaji": "${romaji || ''}",\n  "dictionaryForm": "辞书形（如果适用）",\n  "explanation": "中文解释（请包含详细语法、词形变化规则、助词用法及例句，并使用【】高亮关键术语和 \\n 换行）"\n}`;
+    // 根据学习模式构建不同的提示
+    let detailPrompt = '';
+    
+    if (learningMode === 'beginner') {
+      detailPrompt = `在日语句子 "${sentence}" 的上下文中，${contextWordInfo} 的具体含义是什么？请提供基础学习者需要的信息，以严格的JSON对象格式返回，不要包含任何markdown或其他非JSON字符：
+
+{
+  "originalWord": "${word}",
+  "chineseTranslation": "精确的中文翻译",
+  "pos": "${pos}",
+  "furigana": "${furigana || ''}",
+  "romaji": "${romaji || ''}",
+  "dictionaryForm": "辞书形（如果适用）",
+  "explanation": "简单易懂的中文解释",
+  "jlptLevel": "JLPT等级（N1, N2, N3, N4, N5之一）",
+  "frequency": "使用频率（Very High, High, Medium, Low之一）"
+}`;
+    } else if (learningMode === 'intermediate') {
+      detailPrompt = `在日语句子 "${sentence}" 的上下文中，${contextWordInfo} 的具体含义是什么？请提供中级学习者需要的信息，以严格的JSON对象格式返回，不要包含任何markdown或其他非JSON字符：
+
+{
+  "originalWord": "${word}",
+  "chineseTranslation": "精确的中文翻译",
+  "pos": "${pos}",
+  "furigana": "${furigana || ''}",
+  "romaji": "${romaji || ''}",
+  "dictionaryForm": "辞书形（如果适用）",
+  "explanation": "详细的中文解释（使用【】高亮关键术语）",
+  "jlptLevel": "JLPT等级（N1, N2, N3, N4, N5之一）",
+  "frequency": "使用频率（Very High, High, Medium, Low之一）",
+  "usageExamples": ["例句1：日文 → 中文翻译", "例句2：日文 → 中文翻译"],
+  "grammarNotes": "语法使用说明",
+  "culturalNotes": "文化背景说明（如果适用）"
+}`;
+    } else { // advanced
+      detailPrompt = `在日语句子 "${sentence}" 的上下文中，${contextWordInfo} 的具体含义是什么？请提供高级学习者需要的完整信息，以严格的JSON对象格式返回，不要包含任何markdown或其他非JSON字符：
+
+{
+  "originalWord": "${word}",
+  "chineseTranslation": "精确的中文翻译",
+  "pos": "${pos}",
+  "furigana": "${furigana || ''}",
+  "romaji": "${romaji || ''}",
+  "dictionaryForm": "辞书形（如果适用）",
+  "explanation": "详尽的中文解释（包含语法、词形变化规则、助词用法，使用【】高亮关键术语和 \\n 换行）",
+  "jlptLevel": "JLPT等级（N1, N2, N3, N4, N5之一）",
+  "frequency": "使用频率（Very High, High, Medium, Low之一）",
+  "usageExamples": ["例句1：日文 → 中文翻译", "例句2：日文 → 中文翻译", "例句3：日文 → 中文翻译"],
+  "grammarNotes": "详细语法使用说明",
+  "culturalNotes": "文化背景说明（如果适用）",
+  "etymology": "词源说明（如果适用）"
+}`;
+    }
 
     const payload = {
       model: model,

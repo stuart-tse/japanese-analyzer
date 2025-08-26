@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Accessibility Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 2rem;
+        }
+        
+        .guideline {
+            background: #f8f9fa;
+            border-left: 4px solid #1976d2;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .guideline-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1976d2;
+        }
+        
+        .do-dont {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .do, .dont {
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .do {
+            background: #e8f5e8;
+            border-color: #4caf50;
+        }
+        
+        .dont {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .do-title, .dont-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .do-title {
+            color: #2e7d32;
+        }
+        
+        .dont-title {
+            color: #c62828;
+        }
+        
+        .example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .accessibility-demo {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            background: #fafafa;
+        }
+        
+        .contrast-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .contrast-item {
+            padding: 1rem;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .contrast-good {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .contrast-poor {
+            background: #bbdefb;
+            color: #e3f2fd;
+        }
+        
+        .focus-demo {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border: 2px solid #1976d2;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .focus-demo:focus {
+            outline: 3px solid #ffeb3b;
+            outline-offset: 2px;
+        }
+        
+        .screen-reader-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .checklist li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .aria-demo {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: white;
+        }
+        
+        .aria-demo[aria-expanded="true"] {
+            background: #e3f2fd;
+        }
+        
+        .keyboard-demo {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #333;
+            color: white;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            margin: 0 0.25rem;
+        }
+        
+        .wcag-level {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+        
+        .wcag-a {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .wcag-aa {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .wcag-aaa {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        @media (max-width: 768px) {
+            .do-dont {
+                grid-template-columns: 1fr;
+            }
+            
+            .contrast-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Analyzer - Accessibility Guide</h1>
+            <p>Comprehensive accessibility guidelines following WCAG 2.1 AA standards for inclusive Japanese language learning</p>
+        </div>
+
+        <!-- Color and Contrast -->
+        <div class="section">
+            <div class="section-header">Color and Contrast Accessibility</div>
+            <div class="section-content">
+                <div class="guideline">
+                    <div class="guideline-title">WCAG 2.1 AA Compliance <span class="wcag-level wcag-aa">AA</span></div>
+                    <p>All text must maintain a contrast ratio of at least 4.5:1 against backgrounds. Large text (18pt+) requires 3:1. Color cannot be the only way to convey information.</p>
+                </div>
+
+                <h3>Contrast Examples</h3>
+                <div class="contrast-demo">
+                    <div class="contrast-good">
+                        Good Contrast<br>
+                        <small>4.53:1 Ratio</small>
+                    </div>
+                    <div class="contrast-poor">
+                        Poor Contrast<br>
+                        <small>1.58:1 Ratio</small>
+                    </div>
+                </div>
+
+                <div class="do-dont">
+                    <div class="do">
+                        <div class="do-title">✓ Do</div>
+                        <ul>
+                            <li>Use sufficient color contrast (4.5:1 minimum)</li>
+                            <li>Combine color with text labels for POS types</li>
+                            <li>Provide alternative ways to distinguish tokens</li>
+                            <li>Test with color blindness simulators</li>
+                            <li>Support dark mode with appropriate contrasts</li>
+                        </ul>
+                    </div>
+                    <div class="dont">
+                        <div class="dont-title">✗ Don't</div>
+                        <ul>
+                            <li>Rely solely on color to convey meaning</li>
+                            <li>Use light text on light backgrounds</li>
+                            <li>Assume users can distinguish all colors</li>
+                            <li>Use red/green as the only indicators</li>
+                            <li>Ignore contrast in interactive states</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example">
+<span style="color: #66d9ef;">/* Accessible POS token styling */</span>
+<span style="color: #f8f8f2;">.token-noun {</span>
+  <span style="color: #f92672;">background</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#e3f2fd</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">border</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">2px</span> <span style="color: #f8f8f2;">solid</span> <span style="color: #e6db74;">#2196f3</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">color</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#0d47a1</span><span style="color: #f8f8f2;">;</span> <span style="color: #75715e;">/* 7.12:1 contrast */</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #f8f8f2;">.token-noun::before {</span>
+  <span style="color: #f92672;">content</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'名'</span><span style="color: #f8f8f2;">;</span> <span style="color: #75715e;">/* Text indicator for screen readers */</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Navigation -->
+        <div class="section">
+            <div class="section-header">Keyboard Navigation</div>
+            <div class="section-content">
+                <div class="guideline">
+                    <div class="guideline-title">Keyboard Accessibility <span class="wcag-level wcag-aa">AA</span></div>
+                    <p>All interactive elements must be reachable and operable using only the keyboard. Users should be able to navigate through tokens, access detailed information, and use all features without a mouse.</p>
+                </div>
+
+                <h3>Required Keyboard Support</h3>
+                <div class="accessibility-demo">
+                    <p><strong>Navigation Keys:</strong></p>
+                    <span class="keyboard-demo">Tab</span> - Move to next interactive element<br>
+                    <span class="keyboard-demo">Shift + Tab</span> - Move to previous element<br>
+                    <span class="keyboard-demo">Enter</span> - Activate selected element<br>
+                    <span class="keyboard-demo">Space</span> - Toggle/select element<br>
+                    <span class="keyboard-demo">Arrow Keys</span> - Navigate within token groups<br>
+                    <span class="keyboard-demo">Esc</span> - Close modals/exit modes
+                </div>
+
+                <h3>Focus Management Demo</h3>
+                <div class="accessibility-demo">
+                    <button class="focus-demo" tabindex="0">Focusable Token 1</button>
+                    <button class="focus-demo" tabindex="0">Focusable Token 2</button>
+                    <button class="focus-demo" tabindex="0">Focusable Token 3</button>
+                    <p><em>Try navigating with Tab key to see focus indicators</em></p>
+                </div>
+
+                <div class="example">
+<span style="color: #66d9ef;">/* Accessible focus styles */</span>
+<span style="color: #f8f8f2;">.token:focus {</span>
+  <span style="color: #f92672;">outline</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">3px</span> <span style="color: #f8f8f2;">solid</span> <span style="color: #e6db74;">#ffeb3b</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">outline-offset</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">2px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">z-index</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">10</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">/* Skip to content link */</span>
+<span style="color: #f8f8f2;">.skip-link {</span>
+  <span style="color: #f92672;">position</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">absolute</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">top</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">-40px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">left</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">6px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">background</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#000</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">color</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#fff</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">padding</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">8px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">text-decoration</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">none</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #f8f8f2;">.skip-link:focus {</span>
+  <span style="color: #f92672;">top</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">6px</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+
+                <div class="do-dont">
+                    <div class="do">
+                        <div class="do-title">✓ Keyboard Best Practices</div>
+                        <ul>
+                            <li>Provide visible focus indicators</li>
+                            <li>Implement logical tab order</li>
+                            <li>Support arrow key navigation in token groups</li>
+                            <li>Enable keyboard shortcuts for common actions</li>
+                            <li>Trap focus in modals</li>
+                        </ul>
+                    </div>
+                    <div class="dont">
+                        <div class="dont-title">✗ Keyboard Pitfalls</div>
+                        <ul>
+                            <li>Remove default focus outlines without replacement</li>
+                            <li>Create keyboard traps without escape routes</li>
+                            <li>Rely on hover-only interactions</li>
+                            <li>Use tabindex values greater than 0</li>
+                            <li>Ignore focus management in dynamic content</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen Reader Support -->
+        <div class="section">
+            <div class="section-header">Screen Reader Support</div>
+            <div class="section-content">
+                <div class="guideline">
+                    <div class="guideline-title">Screen Reader Accessibility <span class="wcag-level wcag-aa">AA</span></div>
+                    <p>Provide comprehensive ARIA labels, descriptions, and semantic markup to ensure screen readers can effectively communicate the analysis results and interface structure.</p>
+                </div>
+
+                <h3>ARIA Attributes for Japanese Analysis</h3>
+                <div class="example">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token token-noun"</span>
+     <span style="color: #a6e22e;">role</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"button"</span>
+     <span style="color: #a6e22e;">tabindex</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"0"</span>
+     <span style="color: #a6e22e;">aria-label</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"Noun: 今日, reading: きょう, romanization: kyou, meaning: today"</span>
+     <span style="color: #a6e22e;">aria-describedby</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-help"</span>
+     <span style="color: #a6e22e;">aria-expanded</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"false"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-furigana"</span> <span style="color: #a6e22e;">aria-hidden</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"true"</span><span style="color: #66d9ef;">&gt;</span>きょう<span style="color: #66d9ef;">&lt;/span&gt;</span>
+  <span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-main"</span><span style="color: #66d9ef;">&gt;</span>今日<span style="color: #66d9ef;">&lt;/span&gt;</span>
+  <span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-romaji"</span> <span style="color: #a6e22e;">aria-hidden</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"true"</span><span style="color: #66d9ef;">&gt;</span>kyou<span style="color: #66d9ef;">&lt;/span&gt;</span>
+  <span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"screen-reader-only"</span><span style="color: #66d9ef;">&gt;</span>Press Enter for detailed analysis<span style="color: #66d9ef;">&lt;/span&gt;</span>
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-help"</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"screen-reader-only"</span><span style="color: #66d9ef;">&gt;</span>
+  This is a clickable token. Use arrow keys to navigate between tokens.
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                </div>
+
+                <h3>Live Regions for Dynamic Content</h3>
+                <div class="example">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">aria-live</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"polite"</span> 
+     <span style="color: #a6e22e;">aria-atomic</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"true"</span>
+     <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"analysis-status"</span><span style="color: #66d9ef;">&gt;</span>
+  Analysis complete. Found 6 tokens including 2 nouns, 1 verb, 2 particles, and 1 adjective.
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">aria-live</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"assertive"</span> 
+     <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"error-announcements"</span><span style="color: #66d9ef;">&gt;</span>
+  Error: Unable to process the input text. Please check for valid Japanese characters.
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                </div>
+
+                <h3>Semantic Structure</h3>
+                <div class="example">
+<span style="color: #66d9ef;">&lt;main</span> <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"main-content"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;section</span> <span style="color: #a6e22e;">aria-labelledby</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-heading"</span><span style="color: #66d9ef;">&gt;</span>
+    <span style="color: #66d9ef;">&lt;h2</span> <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-heading"</span><span style="color: #66d9ef;">&gt;</span>Japanese Text Input<span style="color: #66d9ef;">&lt;/h2&gt;</span>
+    <span style="color: #66d9ef;">&lt;form</span> <span style="color: #a6e22e;">role</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"search"</span><span style="color: #66d9ef;">&gt;</span>
+      <span style="color: #66d9ef;">&lt;label</span> <span style="color: #a6e22e;">for</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"japanese-input"</span><span style="color: #66d9ef;">&gt;</span>Enter Japanese text<span style="color: #66d9ef;">&lt;/label&gt;</span>
+      <span style="color: #66d9ef;">&lt;textarea</span> <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"japanese-input"</span> 
+                <span style="color: #a6e22e;">aria-describedby</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-help"</span>
+                <span style="color: #a6e22e;">required</span><span style="color: #66d9ef;">&gt;&lt;/textarea&gt;</span>
+      <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-help"</span><span style="color: #66d9ef;">&gt;</span>Enter Japanese text using hiragana, katakana, or kanji<span style="color: #66d9ef;">&lt;/div&gt;</span>
+    <span style="color: #66d9ef;">&lt;/form&gt;</span>
+  <span style="color: #66d9ef;">&lt;/section&gt;</span>
+  
+  <span style="color: #66d9ef;">&lt;section</span> <span style="color: #a6e22e;">aria-labelledby</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"results-heading"</span><span style="color: #66d9ef;">&gt;</span>
+    <span style="color: #66d9ef;">&lt;h2</span> <span style="color: #a6e22e;">id</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"results-heading"</span><span style="color: #66d9ef;">&gt;</span>Analysis Results<span style="color: #66d9ef;">&lt;/h2&gt;</span>
+    <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">role</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"group"</span> <span style="color: #a6e22e;">aria-label</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"Tokenized sentence"</span><span style="color: #66d9ef;">&gt;</span>
+      <span style="color: #75715e;"><!-- Token elements here --></span>
+    <span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;/section&gt;</span>
+<span style="color: #66d9ef;">&lt;/main&gt;</span>
+                </div>
+
+                <ul class="checklist">
+                    <li>Use semantic HTML elements (main, section, article, nav)</li>
+                    <li>Provide descriptive headings that outline content structure</li>
+                    <li>Include alt text for images and icons</li>
+                    <li>Use ARIA labels for complex interactive elements</li>
+                    <li>Implement live regions for dynamic content updates</li>
+                    <li>Provide skip navigation links</li>
+                    <li>Ensure form labels are properly associated</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Motor Accessibility -->
+        <div class="section">
+            <div class="section-header">Motor Accessibility</div>
+            <div class="section-content">
+                <div class="guideline">
+                    <div class="guideline-title">Motor Impairment Support <span class="wcag-level wcag-aa">AA</span></div>
+                    <p>Ensure interfaces are usable by people with motor impairments by providing adequate touch targets, reducing required precision, and offering alternative interaction methods.</p>
+                </div>
+
+                <h3>Touch Target Guidelines</h3>
+                <div class="accessibility-demo">
+                    <p><strong>Minimum touch target sizes:</strong></p>
+                    <ul>
+                        <li>Mobile: 44px × 44px (iOS) or 48dp × 48dp (Android)</li>
+                        <li>Desktop: 24px × 24px minimum</li>
+                        <li>Spacing: 8px minimum between adjacent targets</li>
+                        <li>Exception: Inline text links can be smaller</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+<span style="color: #66d9ef;">/* Accessible touch targets */</span>
+<span style="color: #f8f8f2;">.token {</span>
+  <span style="color: #f92672;">min-width</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">44px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">min-height</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">44px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">margin</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">4px</span><span style="color: #f8f8f2;">;</span> <span style="color: #75715e;">/* 8px total spacing */</span>
+  <span style="color: #f92672;">padding</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">12px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">cursor</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">pointer</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">/* Larger targets for primary actions */</span>
+<span style="color: #f8f8f2;">.btn-primary {</span>
+  <span style="color: #f92672;">min-height</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">48px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">padding</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">12px</span> <span style="color: #ae81ff;">24px</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">@media (max-width: 768px) {</span>
+  <span style="color: #f8f8f2;">.token {</span>
+    <span style="color: #f92672;">min-width</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">48px</span><span style="color: #f8f8f2;">;</span>
+    <span style="color: #f92672;">min-height</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">48px</span><span style="color: #f8f8f2;">;</span>
+    <span style="color: #f92672;">margin</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">6px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f8f8f2;">}</span>
+<span style="color: #66d9ef;">}</span>
+                </div>
+
+                <div class="do-dont">
+                    <div class="do">
+                        <div class="do-title">✓ Motor Accessibility</div>
+                        <ul>
+                            <li>Provide large, easy-to-hit touch targets</li>
+                            <li>Allow drag and drop with keyboard alternatives</li>
+                            <li>Implement click and hover tolerance</li>
+                            <li>Offer voice input as an alternative</li>
+                            <li>Provide customizable UI scaling</li>
+                        </ul>
+                    </div>
+                    <div class="dont">
+                        <div class="dont-title">✗ Motor Barriers</div>
+                        <ul>
+                            <li>Require precise mouse movements</li>
+                            <li>Use tiny clickable areas</li>
+                            <li>Implement time-sensitive interactions</li>
+                            <li>Require multi-step drag operations</li>
+                            <li>Place targets too close together</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cognitive Accessibility -->
+        <div class="section">
+            <div class="section-header">Cognitive Accessibility</div>
+            <div class="section-content">
+                <div class="guideline">
+                    <div class="guideline-title">Cognitive Support <span class="wcag-level wcag-aaa">AAA</span></div>
+                    <p>Design interfaces that reduce cognitive load, provide clear navigation, and support users with varying attention spans and memory capabilities.</p>
+                </div>
+
+                <h3>Progressive Disclosure Implementation</h3>
+                <div class="accessibility-demo">
+                    <div class="aria-demo" aria-expanded="false" tabindex="0" role="button">
+                        <strong>Basic Information</strong> (Click to expand)
+                        <div style="margin-top: 0.5rem; display: none;">
+                            <p>天気 means "weather" in Japanese. It uses the same kanji as Chinese but different pronunciation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="checklist">
+                    <li>Use clear, simple language in instructions</li>
+                    <li>Provide consistent navigation patterns</li>
+                    <li>Implement breadcrumbs for complex flows</li>
+                    <li>Offer progress indicators for multi-step processes</li>
+                    <li>Provide help and documentation</li>
+                    <li>Use familiar icons with text labels</li>
+                    <li>Allow users to control information density</li>
+                    <li>Implement error prevention and recovery</li>
+                </ul>
+
+                <div class="example">
+<span style="color: #66d9ef;">/* Cognitive load reduction */</span>
+<span style="color: #f8f8f2;">.learning-mode-beginner .advanced-info {</span>
+  <span style="color: #f92672;">display</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">none</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #f8f8f2;">.error-message {</span>
+  <span style="color: #f92672;">color</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#c62828</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">background</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#ffebee</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">border</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">1px</span> <span style="color: #f8f8f2;">solid</span> <span style="color: #e6db74;">#ef5350</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">padding</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">12px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">border-radius</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">4px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">font-weight</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">600</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #f8f8f2;">.progress-indicator {</span>
+  <span style="color: #f92672;">width</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">100%</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">height</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">4px</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">background</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">#e0e0e0</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">border-radius</span><span style="color: #f8f8f2;">:</span> <span style="color: #ae81ff;">2px</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testing and Validation -->
+        <div class="section">
+            <div class="section-header">Testing and Validation</div>
+            <div class="section-content">
+                <div class="guideline">
+                    <div class="guideline-title">Accessibility Testing <span class="wcag-level wcag-aa">AA</span></div>
+                    <p>Regular testing with assistive technologies and automated tools ensures continued accessibility compliance and usability.</p>
+                </div>
+
+                <h3>Testing Checklist</h3>
+                <ul class="checklist">
+                    <li>Test with screen readers (NVDA, JAWS, VoiceOver)</li>
+                    <li>Verify keyboard-only navigation</li>
+                    <li>Check color contrast ratios</li>
+                    <li>Test with browser zoom up to 200%</li>
+                    <li>Validate HTML and ARIA markup</li>
+                    <li>Test with voice control software</li>
+                    <li>Verify mobile accessibility</li>
+                    <li>Test with users who have disabilities</li>
+                </ul>
+
+                <h3>Automated Testing Tools</h3>
+                <div class="example">
+<span style="color: #75715e;">// Install accessibility testing tools</span>
+<span style="color: #f8f8f2;">npm install </span><span style="color: #66d9ef;">--save-dev</span><span style="color: #f8f8f2;"> @axe-core/react</span>
+<span style="color: #f8f8f2;">npm install </span><span style="color: #66d9ef;">--save-dev</span><span style="color: #f8f8f2;"> jest-axe</span>
+
+<span style="color: #75715e;">// Example test</span>
+<span style="color: #66d9ef;">import</span> <span style="color: #f8f8f2;">{ axe, toHaveNoViolations } </span><span style="color: #66d9ef;">from</span> <span style="color: #e6db74;">'jest-axe'</span><span style="color: #f8f8f2;">;</span>
+
+<span style="color: #a6e22e;">test</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'token component should be accessible'</span><span style="color: #f8f8f2;">, </span><span style="color: #66d9ef;">async</span> <span style="color: #f8f8f2;">() </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">{ container } = render(</span><span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">TokenComponent</span> <span style="color: #66d9ef;">/&gt;</span><span style="color: #f8f8f2;">);</span>
+  <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">results = </span><span style="color: #66d9ef;">await</span> <span style="color: #a6e22e;">axe</span><span style="color: #f8f8f2;">(container);</span>
+  <span style="color: #a6e22e;">expect</span><span style="color: #f8f8f2;">(results).</span><span style="color: #a6e22e;">toHaveNoViolations</span><span style="color: #f8f8f2;">();</span>
+<span style="color: #f8f8f2;">});</span>
+                </div>
+
+                <h3>Manual Testing Workflow</h3>
+                <div class="accessibility-demo">
+                    <ol style="margin-left: 1.5rem;">
+                        <li><strong>Keyboard Testing:</strong> Tab through entire interface</li>
+                        <li><strong>Screen Reader:</strong> Navigate with NVDA/VoiceOver</li>
+                        <li><strong>Zoom Testing:</strong> Test at 200% browser zoom</li>
+                        <li><strong>Color Testing:</strong> Test with color blindness simulator</li>
+                        <li><strong>Mobile Testing:</strong> Test touch accessibility on devices</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Recommendations -->
+        <div class="section">
+            <div class="section-header">Implementation Recommendations</div>
+            <div class="section-content">
+                <h3>Priority Implementation Order</h3>
+                <div class="accessibility-demo">
+                    <ol style="margin-left: 1.5rem;">
+                        <li><strong>Foundation (Week 1):</strong> Semantic HTML, keyboard navigation, focus management</li>
+                        <li><strong>Core Accessibility (Week 2):</strong> ARIA labels, screen reader support, color contrast</li>
+                        <li><strong>Enhanced Support (Week 3):</strong> Motor accessibility, cognitive support features</li>
+                        <li><strong>Testing & Refinement (Week 4):</strong> User testing, automated testing integration</li>
+                    </ol>
+                </div>
+
+                <h3>Component-Specific Recommendations</h3>
+                <div class="do-dont">
+                    <div class="do">
+                        <div class="do-title">✓ Japanese Token Components</div>
+                        <ul>
+                            <li>Provide comprehensive ARIA labels with readings and meanings</li>
+                            <li>Implement arrow key navigation between tokens</li>
+                            <li>Use semantic role="group" for sentence groupings</li>
+                            <li>Announce analysis completion to screen readers</li>
+                            <li>Support both visual and audio pronunciation guides</li>
+                        </ul>
+                    </div>
+                    <div class="do">
+                        <div class="do-title">✓ Input Components</div>
+                        <ul>
+                            <li>Support multiple input methods (text, voice, OCR)</li>
+                            <li>Provide clear labeling and helper text</li>
+                            <li>Implement real-time validation feedback</li>
+                            <li>Support paste operations with automatic cleanup</li>
+                            <li>Announce character count and limits</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="example">
+<span style="color: #75715e;">// Accessibility context provider</span>
+<span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">AccessibilityProvider</span> <span style="color: #f8f8f2;">= ({ children }) </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">[announcements, setAnnouncements] = </span><span style="color: #a6e22e;">useState</span><span style="color: #f8f8f2;">([]);</span>
+  
+  <span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">announce</span> <span style="color: #f8f8f2;">= (message, priority = </span><span style="color: #e6db74;">'polite'</span><span style="color: #f8f8f2;">) </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+    <span style="color: #a6e22e;">setAnnouncements</span><span style="color: #f8f8f2;">(prev </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">[...prev, { message, priority, id: Date.</span><span style="color: #a6e22e;">now</span><span style="color: #f8f8f2;">() }]);</span>
+  <span style="color: #f8f8f2;">};</span>
+  
+  <span style="color: #66d9ef;">return</span> <span style="color: #f8f8f2;">(</span>
+    <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">AccessibilityContext.Provider</span> <span style="color: #f92672;">value</span><span style="color: #f8f8f2;">={{ announce }}&gt;</span>
+      <span style="color: #f8f8f2;">{children}</span>
+      <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">LiveRegion</span> <span style="color: #f92672;">announcements</span><span style="color: #f8f8f2;">={announcements} /&gt;</span>
+    <span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">AccessibilityContext.Provider</span><span style="color: #f8f8f2;">&gt;</span>
+  <span style="color: #f8f8f2;">);</span>
+<span style="color: #f8f8f2;">};</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo: Toggle ARIA expanded state
+        document.querySelector('.aria-demo').addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            const content = this.querySelector('div');
+            content.style.display = isExpanded ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>

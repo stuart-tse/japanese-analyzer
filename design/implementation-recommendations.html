@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementation Recommendations - Japanese Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 2rem;
+        }
+        
+        .priority-high {
+            border-left: 4px solid #f44336;
+            background: #ffebee;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .priority-medium {
+            border-left: 4px solid #ff9800;
+            background: #fff3e0;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .priority-low {
+            border-left: 4px solid #4caf50;
+            background: #e8f5e8;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        .implementation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .implementation-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #1976d2;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -0.5rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            background: #1976d2;
+            border-radius: 50%;
+        }
+        
+        .timeline-week {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-structure {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .checklist li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .performance-metric {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+        
+        .metric-label {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .before, .after {
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .before {
+            background: #ffebee;
+            border: 1px solid #f44336;
+        }
+        
+        .after {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+        }
+        
+        .before-title, .after-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .before-title {
+            color: #c62828;
+        }
+        
+        .after-title {
+            color: #2e7d32;
+        }
+        
+        @media (max-width: 768px) {
+            .implementation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .before-after {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Analyzer - Implementation Recommendations</h1>
+            <p>Comprehensive guide for implementing the enhanced learning-focused design system</p>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <div class="section-header">Executive Summary</div>
+            <div class="section-content">
+                <p>This document provides actionable recommendations for transforming the Japanese Sentence Analyzer into a more effective learning tool. The proposed changes focus on:</p>
+                
+                <div class="implementation-grid">
+                    <div class="implementation-card">
+                        <div class="card-title">🎯 Learning-Focused UX</div>
+                        <p>Progressive disclosure, difficulty adaptation, and context-aware features that match user learning levels.</p>
+                    </div>
+                    <div class="implementation-card">
+                        <div class="card-title">📱 Mobile-First Design</div>
+                        <p>Responsive interface optimized for touch interactions with proper spacing and accessibility.</p>
+                    </div>
+                    <div class="implementation-card">
+                        <div class="card-title">♿ Accessibility Standards</div>
+                        <p>WCAG 2.1 AA compliance with comprehensive screen reader and keyboard support.</p>
+                    </div>
+                    <div class="implementation-card">
+                        <div class="card-title">🎨 Design System</div>
+                        <p>Consistent visual language with semantic color coding and reusable components.</p>
+                    </div>
+                </div>
+                
+                <div class="priority-high">
+                    <strong>Key Insight:</strong> The current single-column layout doesn't effectively support the complex information hierarchy needed for language learning. The proposed three-panel desktop layout with progressive disclosure will significantly improve learning outcomes.
+                </div>
+            </div>
+        </div>
+
+        <!-- High Priority Changes -->
+        <div class="section">
+            <div class="section-header">High Priority Implementation (Week 1-2)</div>
+            <div class="section-content">
+                <h3>1. Layout Architecture Overhaul</h3>
+                
+                <div class="before-after">
+                    <div class="before">
+                        <div class="before-title">Current Layout Issues</div>
+                        <ul>
+                            <li>Single column forces linear interaction</li>
+                            <li>Information is overwhelming for beginners</li>
+                            <li>No persistent context during exploration</li>
+                            <li>Mobile experience is secondary</li>
+                        </ul>
+                    </div>
+                    <div class="after">
+                        <div class="after-title">Proposed Improvements</div>
+                        <ul>
+                            <li>Three-panel desktop layout with clear separation</li>
+                            <li>Progressive disclosure based on learning level</li>
+                            <li>Persistent detail panel for exploration</li>
+                            <li>Mobile-first responsive design</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="priority-high">
+                    <strong>Action Required:</strong> Implement responsive grid system with CSS Grid/Flexbox for the three-panel layout.
+                </div>
+
+                <div class="code-block">
+<span style="color: #75715e;">// app/components/LayoutProvider.tsx</span>
+<span style="color: #66d9ef;">export</span> <span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">LayoutProvider</span> <span style="color: #f8f8f2;">= ({ children }) </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">[isMobile] = </span><span style="color: #a6e22e;">useMediaQuery</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'(max-width: 768px)'</span><span style="color: #f8f8f2;">);</span>
+  
+  <span style="color: #66d9ef;">return</span> <span style="color: #f8f8f2;">(</span>
+    <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">div</span> <span style="color: #f92672;">className</span><span style="color: #f8f8f2;">={</span><span style="color: #e6db74;">`layout </span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">isMobile </span><span style="color: #66d9ef;">?</span> <span style="color: #e6db74;">'mobile'</span> <span style="color: #66d9ef;">:</span> <span style="color: #e6db74;">'desktop'</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;">`</span><span style="color: #f8f8f2;">}&gt;</span>
+      <span style="color: #f8f8f2;">{isMobile </span><span style="color: #66d9ef;">?</span> <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">MobileLayout</span><span style="color: #66d9ef;">&gt;</span><span style="color: #f8f8f2;">{children}</span><span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">MobileLayout</span><span style="color: #66d9ef;">&gt;</span> <span style="color: #66d9ef;">:</span> <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">DesktopLayout</span><span style="color: #66d9ef;">&gt;</span><span style="color: #f8f8f2;">{children}</span><span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">DesktopLayout</span><span style="color: #66d9ef;">&gt;</span><span style="color: #f8f8f2;">}</span>
+    <span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">div</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #f8f8f2;">);</span>
+<span style="color: #f8f8f2;">};</span>
+                </div>
+
+                <h3>2. Enhanced Token Component System</h3>
+                
+                <div class="priority-high">
+                    <strong>Current Issues:</strong> Limited visual differentiation, poor mobile touch targets, no progressive information disclosure.
+                </div>
+
+                <div class="code-block">
+<span style="color: #75715e;">// app/components/EnhancedToken.tsx</span>
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">EnhancedTokenProps</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">token</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">TokenData</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">displayMode</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'compact'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'detailed'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'minimal'</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">learningMode</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'beginner'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'intermediate'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'advanced'</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">onSelect</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">token</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">TokenData</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">isSelected</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">export</span> <span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">EnhancedToken</span> <span style="color: #f8f8f2;">= ({ token, displayMode, learningMode, onSelect, isSelected }) </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">posClass = </span><span style="color: #e6db74;">`token-</span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">token.pos.toLowerCase()</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;">`</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">showDetails = learningMode !== </span><span style="color: #e6db74;">'beginner'</span> <span style="color: #f8f8f2;">|| displayMode === </span><span style="color: #e6db74;">'detailed'</span><span style="color: #f8f8f2;">;</span>
+  
+  <span style="color: #66d9ef;">return</span> <span style="color: #f8f8f2;">(</span>
+    <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">button</span>
+      <span style="color: #f92672;">className</span><span style="color: #f8f8f2;">={</span><span style="color: #e6db74;">`enhanced-token </span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">posClass</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;"> </span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">isSelected </span><span style="color: #66d9ef;">?</span> <span style="color: #e6db74;">'selected'</span> <span style="color: #66d9ef;">:</span> <span style="color: #e6db74;">''</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;">`</span><span style="color: #f8f8f2;">}</span>
+      <span style="color: #f92672;">onClick</span><span style="color: #f8f8f2;">={() </span><span style="color: #66d9ef;">=></span> <span style="color: #a6e22e;">onSelect</span><span style="color: #f8f8f2;">(token)}</span>
+      <span style="color: #f92672;">aria-label</span><span style="color: #f8f8f2;">={</span><span style="color: #e6db74;">`</span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">token.pos</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;">: </span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">token.word</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;">, reading: </span><span style="color: #f8f8f2;">${</span><span style="color: #f8f8f2;">token.furigana</span><span style="color: #f8f8f2;">}</span><span style="color: #e6db74;">`</span><span style="color: #f8f8f2;">}</span>
+    <span style="color: #66d9ef;">&gt;</span>
+      <span style="color: #f8f8f2;">{showDetails && token.furigana && (</span>
+        <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">span</span> <span style="color: #f92672;">className</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-furigana"</span> <span style="color: #f92672;">aria-hidden</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"true"</span><span style="color: #66d9ef;">&gt;</span><span style="color: #f8f8f2;">{token.furigana}</span><span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">span</span><span style="color: #66d9ef;">&gt;</span>
+      <span style="color: #f8f8f2;">)}</span>
+      <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">span</span> <span style="color: #f92672;">className</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-main"</span><span style="color: #66d9ef;">&gt;</span><span style="color: #f8f8f2;">{token.word}</span><span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">span</span><span style="color: #66d9ef;">&gt;</span>
+      <span style="color: #f8f8f2;">{showDetails && token.romaji && (</span>
+        <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">span</span> <span style="color: #f92672;">className</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-romaji"</span> <span style="color: #f92672;">aria-hidden</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"true"</span><span style="color: #66d9ef;">&gt;</span><span style="color: #f8f8f2;">{token.romaji}</span><span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">span</span><span style="color: #66d9ef;">&gt;</span>
+      <span style="color: #f8f8f2;">)}</span>
+    <span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">button</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #f8f8f2;">);</span>
+<span style="color: #f8f8f2;">};</span>
+                </div>
+
+                <h3>3. Learning Mode Context System</h3>
+                
+                <div class="code-block">
+<span style="color: #75715e;">// app/contexts/LearningContext.tsx</span>
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">LearningContextType</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">mode</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'beginner'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'intermediate'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'advanced'</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">setMode</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">mode</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">preferences</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">LearningPreferences</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">updatePreferences</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">prefs</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">Partial</span><span style="color: #f8f8f2;">&lt;</span><span style="color: #a6e22e;">LearningPreferences</span><span style="color: #f8f8f2;">&gt;)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">LearningPreferences</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">showFurigana</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">showRomaji</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">autoPlayTTS</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">expandedSections</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">[];</span>
+  <span style="color: #f92672;">colorCodingEnabled</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <div class="section">
+            <div class="section-header">Implementation Timeline</div>
+            <div class="section-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-week">Week 1: Foundation</div>
+                        <ul>
+                            <li>Set up new layout architecture with CSS Grid</li>
+                            <li>Implement responsive breakpoint system</li>
+                            <li>Create enhanced token component with accessibility</li>
+                            <li>Add learning mode context provider</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-week">Week 2: Core Components</div>
+                        <ul>
+                            <li>Build progressive detail panel component</li>
+                            <li>Implement enhanced input section with multiple modes</li>
+                            <li>Add keyboard navigation and focus management</li>
+                            <li>Create mobile-optimized layouts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-week">Week 3: Enhanced Features</div>
+                        <ul>
+                            <li>Implement difficulty indicators and JLPT level badges</li>
+                            <li>Add translation component with contextual information</li>
+                            <li>Create learning progress tracking</li>
+                            <li>Integrate voice input and improved OCR workflow</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-week">Week 4: Polish & Testing</div>
+                        <ul>
+                            <li>Complete accessibility testing and WCAG compliance</li>
+                            <li>Performance optimization and loading states</li>
+                            <li>User testing with target learning personas</li>
+                            <li>Documentation and component library finalization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Structure Changes -->
+        <div class="section">
+            <div class="section-header">Required File Structure Changes</div>
+            <div class="section-content">
+                <div class="priority-medium">
+                    <strong>Current Structure Issues:</strong> Components are not organized by feature, missing shared utilities, no design system integration.
+                </div>
+
+                <div class="file-structure">
+app/
+├── components/
+│   ├── common/           # Shared UI components
+│   │   ├── Button/
+│   │   ├── Input/
+│   │   ├── Card/
+│   │   └── Badge/
+│   ├── japanese/         # Japanese-specific components
+│   │   ├── TokenDisplay/
+│   │   ├── EnhancedToken/
+│   │   ├── DetailPanel/
+│   │   └── SentenceFlow/
+│   ├── layout/           # Layout components
+│   │   ├── LayoutProvider/
+│   │   ├── DesktopLayout/
+│   │   ├── MobileLayout/
+│   │   └── ResponsiveGrid/
+│   └── learning/         # Learning-focused components
+│       ├── LearningModeSelector/
+│       ├── ProgressIndicator/
+│       ├── DifficultyBadge/
+│       └── StudyTools/
+├── contexts/
+│   ├── LearningContext.tsx
+│   ├── LayoutContext.tsx
+│   └── AccessibilityContext.tsx
+├── hooks/
+│   ├── useMediaQuery.ts
+│   ├── useLearningMode.ts
+│   ├── useKeyboardNavigation.ts
+│   └── useAccessibility.ts
+├── styles/
+│   ├── tokens.css        # Design system tokens
+│   ├── components.css    # Component styles
+│   ├── layout.css        # Layout-specific styles
+│   └── accessibility.css # A11y-specific styles
+└── utils/
+    ├── accessibility.ts
+    ├── japanese.ts
+    └── learning.ts
+                </div>
+
+                <div class="priority-medium">
+                    <strong>Migration Strategy:</strong> Create new structure alongside existing components, gradually migrate functionality, maintain backward compatibility during transition.
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Considerations -->
+        <div class="section">
+            <div class="section-header">Performance & Technical Considerations</div>
+            <div class="section-content">
+                <h3>Key Performance Metrics</h3>
+                
+                <div class="performance-metric">
+                    <div class="metric-label">First Contentful Paint (FCP):</div>
+                    Target: &lt; 1.5s | Current: Unknown | Priority: High
+                </div>
+                
+                <div class="performance-metric">
+                    <div class="metric-label">Time to Interactive (TTI):</div>
+                    Target: &lt; 3.0s | Current: Unknown | Priority: High
+                </div>
+                
+                <div class="performance-metric">
+                    <div class="metric-label">Cumulative Layout Shift (CLS):</div>
+                    Target: &lt; 0.1 | Current: Unknown | Priority: Medium
+                </div>
+
+                <h3>Optimization Strategies</h3>
+                
+                <div class="implementation-grid">
+                    <div class="implementation-card">
+                        <div class="card-title">Component Lazy Loading</div>
+                        <div class="code-block">
+<span style="color: #75715e;">// Lazy load heavy components</span>
+<span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">DetailPanel</span> <span style="color: #f8f8f2;">= </span><span style="color: #a6e22e;">lazy</span><span style="color: #f8f8f2;">(() </span><span style="color: #66d9ef;">=></span> 
+  <span style="color: #a6e22e;">import</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'./components/DetailPanel'</span><span style="color: #f8f8f2;">)</span>
+<span style="color: #f8f8f2;">);</span>
+
+<span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">AIChat</span> <span style="color: #f8f8f2;">= </span><span style="color: #a6e22e;">lazy</span><span style="color: #f8f8f2;">(() </span><span style="color: #66d9ef;">=></span> 
+  <span style="color: #a6e22e;">import</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'./components/AIChat'</span><span style="color: #f8f8f2;">)</span>
+<span style="color: #f8f8f2;">);</span>
+                        </div>
+                    </div>
+                    
+                    <div class="implementation-card">
+                        <div class="card-title">Token Virtualization</div>
+                        <div class="code-block">
+<span style="color: #75715e;">// For large text analysis</span>
+<span style="color: #66d9ef;">import</span> <span style="color: #f8f8f2;">{ FixedSizeList </span><span style="color: #66d9ef;">as</span> <span style="color: #f8f8f2;">List } </span><span style="color: #66d9ef;">from</span> <span style="color: #e6db74;">'react-window'</span><span style="color: #f8f8f2;">;</span>
+
+<span style="color: #66d9ef;">const</span> <span style="color: #a6e22e;">VirtualizedTokens</span> <span style="color: #f8f8f2;">= ({ tokens }) </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">(</span>
+  <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">List</span>
+    <span style="color: #f92672;">height</span><span style="color: #f8f8f2;">={</span><span style="color: #ae81ff;">400</span><span style="color: #f8f8f2;">}</span>
+    <span style="color: #f92672;">itemCount</span><span style="color: #f8f8f2;">={tokens.length}</span>
+    <span style="color: #f92672;">itemSize</span><span style="color: #f8f8f2;">={</span><span style="color: #ae81ff;">80</span><span style="color: #f8f8f2;">}</span>
+  <span style="color: #66d9ef;">&gt;</span>
+    <span style="color: #f8f8f2;">{TokenRow}</span>
+  <span style="color: #66d9ef;">&lt;/</span><span style="color: #a6e22e;">List</span><span style="color: #66d9ef;">&gt;</span>
+<span style="color: #f8f8f2;">);</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="priority-medium">
+                    <strong>Memory Management:</strong> Implement proper cleanup for event listeners, API calls, and large state objects. Use useMemo and useCallback for expensive operations.
+                </div>
+            </div>
+        </div>
+
+        <!-- Testing Strategy -->
+        <div class="section">
+            <div class="section-header">Testing & Quality Assurance</div>
+            <div class="section-content">
+                <h3>Testing Implementation Checklist</h3>
+                
+                <ul class="checklist">
+                    <li>Unit tests for all new components using Jest/Testing Library</li>
+                    <li>Integration tests for learning mode functionality</li>
+                    <li>Accessibility testing with jest-axe and manual testing</li>
+                    <li>Visual regression testing with Percy or Chromatic</li>
+                    <li>Performance testing with Lighthouse CI</li>
+                    <li>Cross-browser testing (Chrome, Firefox, Safari, Edge)</li>
+                    <li>Mobile device testing on iOS and Android</li>
+                    <li>Screen reader testing with NVDA, JAWS, VoiceOver</li>
+                </ul>
+
+                <div class="code-block">
+<span style="color: #75715e;">// Example test structure</span>
+<span style="color: #66d9ef;">describe</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'EnhancedToken Component'</span><span style="color: #f8f8f2;">, () </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #a6e22e;">test</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'renders with correct accessibility attributes'</span><span style="color: #f8f8f2;">, () </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+    <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">{ getByRole } = render(</span>
+      <span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">EnhancedToken</span> <span style="color: #f92672;">token</span><span style="color: #f8f8f2;">={mockToken} </span><span style="color: #f92672;">onSelect</span><span style="color: #f8f8f2;">={mockOnSelect} /&gt;</span>
+    <span style="color: #f8f8f2;">);</span>
+    
+    <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">button = getByRole(</span><span style="color: #e6db74;">'button'</span><span style="color: #f8f8f2;">);</span>
+    <span style="color: #a6e22e;">expect</span><span style="color: #f8f8f2;">(button).toHaveAttribute(</span><span style="color: #e6db74;">'aria-label'</span><span style="color: #f8f8f2;">);</span>
+    <span style="color: #a6e22e;">expect</span><span style="color: #f8f8f2;">(button).toBeVisible();</span>
+  <span style="color: #f8f8f2;">});</span>
+  
+  <span style="color: #a6e22e;">test</span><span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'meets accessibility standards'</span><span style="color: #f8f8f2;">, </span><span style="color: #66d9ef;">async</span> <span style="color: #f8f8f2;">() </span><span style="color: #66d9ef;">=></span> <span style="color: #f8f8f2;">{</span>
+    <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">{ container } = render(</span><span style="color: #66d9ef;">&lt;</span><span style="color: #a6e22e;">EnhancedToken</span> <span style="color: #f92672;">token</span><span style="color: #f8f8f2;">={mockToken} /&gt;);</span>
+    <span style="color: #66d9ef;">const</span> <span style="color: #f8f8f2;">results = </span><span style="color: #66d9ef;">await</span> <span style="color: #a6e22e;">axe</span><span style="color: #f8f8f2;">(container);</span>
+    <span style="color: #a6e22e;">expect</span><span style="color: #f8f8f2;">(results).toHaveNoViolations();</span>
+  <span style="color: #f8f8f2;">});</span>
+<span style="color: #f8f8f2;">});</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="section">
+            <div class="section-header">Success Metrics & KPIs</div>
+            <div class="section-content">
+                <h3>Learning Effectiveness Metrics</h3>
+                
+                <div class="implementation-grid">
+                    <div class="implementation-card">
+                        <div class="card-title">📊 Engagement Metrics</div>
+                        <ul>
+                            <li>Session duration increase: Target +40%</li>
+                            <li>Token interaction rate: Target +60%</li>
+                            <li>Feature adoption rate: Target 80%</li>
+                            <li>Mobile usage increase: Target +50%</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="implementation-card">
+                        <div class="card-title">🎯 Learning Outcomes</div>
+                        <ul>
+                            <li>Time to comprehension: Target -30%</li>
+                            <li>Vocabulary retention: Target +25%</li>
+                            <li>Error rate reduction: Target -40%</li>
+                            <li>User progression rate: Target +35%</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="implementation-card">
+                        <div class="card-title">⚡ Technical Performance</div>
+                        <ul>
+                            <li>Page load time: Target &lt; 2s</li>
+                            <li>Accessibility score: Target 100%</li>
+                            <li>Mobile performance: Target 90+</li>
+                            <li>SEO score: Target 95+</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="implementation-card">
+                        <div class="card-title">♿ Accessibility Impact</div>
+                        <ul>
+                            <li>Screen reader compatibility: 100%</li>
+                            <li>Keyboard navigation: 100%</li>
+                            <li>Color contrast compliance: WCAG AA</li>
+                            <li>Motor accessibility: Full support</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="priority-high">
+                    <strong>Measurement Implementation:</strong> Set up analytics tracking for user interactions with tokens, learning mode usage, and accessibility feature adoption. Use Google Analytics 4 events and custom dashboards.
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="section">
+            <div class="section-header">Immediate Next Steps</div>
+            <div class="section-content">
+                <div class="priority-high">
+                    <strong>Start Here (Next 48 hours):</strong>
+                    <ol style="margin-left: 2rem; margin-top: 1rem;">
+                        <li>Review and approve the design system tokens</li>
+                        <li>Set up the new file structure for components</li>
+                        <li>Begin implementing the ResponsiveLayout component</li>
+                        <li>Create the LearningContext provider</li>
+                        <li>Start building the EnhancedToken component</li>
+                    </ol>
+                </div>
+
+                <div class="priority-medium">
+                    <strong>Week 1 Goals:</strong>
+                    <ul style="margin-left: 2rem; margin-top: 1rem;">
+                        <li>Complete responsive layout architecture</li>
+                        <li>Implement basic three-panel desktop layout</li>
+                        <li>Create mobile-optimized token display</li>
+                        <li>Add keyboard navigation foundation</li>
+                        <li>Set up accessibility testing framework</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+<span style="color: #75715e;">// Quick setup command sequence</span>
+<span style="color: #f8f8f2;">mkdir -p app/components/</span><span style="color: #f8f8f2;">{common,japanese,layout,learning}</span>
+<span style="color: #f8f8f2;">mkdir -p app/</span><span style="color: #f8f8f2;">{contexts,hooks,utils}</span>
+<span style="color: #f8f8f2;">mkdir -p app/styles</span>
+
+<span style="color: #75715e;"># Install required dependencies</span>
+<span style="color: #f8f8f2;">npm install @testing-library/jest-dom jest-axe</span>
+<span style="color: #f8f8f2;">npm install react-window react-window-infinite-loader</span>
+<span style="color: #f8f8f2;">npm install clsx classnames</span>
+                </div>
+
+                <div class="priority-low">
+                    <strong>Success Indicators:</strong> You'll know the implementation is successful when users can navigate the entire interface using only the keyboard, when mobile users can easily interact with tokens, and when beginners can use the app without feeling overwhelmed by information density.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

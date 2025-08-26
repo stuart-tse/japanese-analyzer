@@ -34,13 +34,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 构建翻译请求
-    const translationPrompt = `请将以下日文文本翻译成简体中文。重要：请务必保持与原文完全相同的段落和换行结构。
+    // 构建翻译请求 - 保持原始布局格式
+    const translationPrompt = `请将以下日文文本翻译成简体中文。
+
+重要要求：
+1. 保持与原文完全相同的文本布局和格式
+2. 不要在翻译中添加任何换行符或分段
+3. 如果原文是一行，翻译也必须是一行
+4. 不要重新排版或调整原文的文本结构
+5. 仅进行语言翻译，保持格式不变
 
 原文：
 ${text}
 
-请仅返回翻译后的中文文本。`;
+请仅返回翻译后的中文文本，严格保持原文的格式和布局。`;
     const payload = {
       model: model,
       reasoning_effort: "none",

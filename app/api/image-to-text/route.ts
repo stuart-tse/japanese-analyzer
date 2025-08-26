@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // API密钥从环境变量获取，不暴露给前端
 const API_KEY = process.env.API_KEY || '';
-const API_URL = process.env.API_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+const API_URL = process.env.API_URL || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent';
 const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
 
 // 配置API路由支持大尺寸请求
@@ -60,20 +60,28 @@ export async function POST(req: NextRequest) {
     // 优化提示词，避免换行符
     const defaultPrompt = "请提取并返回这张图片中的所有日文文字。提取的文本应保持原始格式，但不要输出换行符，用空格替代。不要添加任何解释或说明。";
     
-    // 构建发送到AI服务的请求
+    // 检测图片的MIME类型
+    let mimeType = 'image/jpeg'; // 默认类型
+    if (imageData.startsWith('/9j/')) {
+      mimeType = 'image/jpeg';
+    } else if (imageData.startsWith('iVBORw0KGgo')) {
+      mimeType = 'image/png';
+    } else if (imageData.startsWith('R0lGOD')) {
+      mimeType = 'image/gif';
+    } else if (imageData.startsWith('UklGR')) {
+      mimeType = 'image/webp';
+    }
+    
+    // 构建发送到AI服务的请求 - 使用Gemini Vision API的正确格式
     const payload = {
-      model: model,
-      reasoning_effort: "none",
-      stream: stream,
-      messages: [
+      contents: [
         {
-          role: "user",
-          content: [
-            { type: "text", text: prompt || defaultPrompt },
+          parts: [
+            { text: prompt || defaultPrompt },
             {
-              type: "image_url",
-              image_url: {
-                url: imageData
+              inline_data: {
+                mime_type: mimeType,
+                data: imageData
               }
             }
           ]
@@ -81,8 +89,8 @@ export async function POST(req: NextRequest) {
       ]
     };
 
-    // 验证imageData大小
-    if (imageData.length > 1024 * 1024 * 8) { // 8MB限制
+    // 验证imageData大小 - base64字符串大约是原始数据的1.33倍
+    if (imageData.length > 1024 * 1024 * 10) { // 10MB base64限制 (约7.5MB原始数据)
       return NextResponse.json(
         { error: { message: '图片数据太大，请压缩后重试' } },
         { status: 413 }
@@ -90,12 +98,23 @@ export async function POST(req: NextRequest) {
     }
 
     // 发送到实际的AI API
-    const response = await fetch(effectiveApiUrl, {
+    // For native Gemini API, use query parameter for API key
+    const apiUrlWithKey = effectiveApiUrl.includes('openai') 
+      ? effectiveApiUrl 
+      : `${effectiveApiUrl}?key=${effectiveApiKey}`;
+    
+    const headers = effectiveApiUrl.includes('openai')
+      ? {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${effectiveApiKey}`
+        }
+      : {
+          'Content-Type': 'application/json'
+        };
+    
+    const response = await fetch(apiUrlWithKey, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${effectiveApiKey}`
-      },
+      headers,
       body: JSON.stringify(payload)
     });
 

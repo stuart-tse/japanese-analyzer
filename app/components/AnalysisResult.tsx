@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts, getJapaneseTtsAudioUrl } from '../utils/helpers';
+import { containsKanji, getPosClass, posChineseMap, speakJapanese, generateFuriganaParts, getJapaneseTtsAudioUrl, getGrammarColorClass, getGrammarColor } from '../utils/helpers';
 import { getWordDetails, streamWordDetails, TokenData, WordDetail } from '../services/api';
 import { FaVolumeUp } from 'react-icons/fa';
 
@@ -396,7 +396,7 @@ export default function AnalysisResult({
     
     return (
       <>
-        <h3 className="text-xl font-semibold text-[#007AFF] mb-3">
+        <h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--grammar-verb)' }}>
           词汇详解{titleSuffix}
           {isStreamLoading && (
             <div className="inline-block ml-2">
@@ -407,7 +407,7 @@ export default function AnalysisResult({
         
         <p className="mb-1">
           <strong>原文:</strong> 
-          <span className="font-mono text-lg text-gray-800">{wordDetail?.originalWord}</span> 
+          <span className="font-mono text-lg" style={{ color: getGrammarColor(wordDetail?.pos || '') }}>{wordDetail?.originalWord}</span> 
           <button 
             className="read-aloud-button" 
             title="朗读此词汇"
@@ -420,21 +420,21 @@ export default function AnalysisResult({
         {wordDetail?.furigana && (
           <p className="mb-1">
             <strong>读音 (Furigana):</strong> 
-            <span className="text-sm text-purple-700">{wordDetail.furigana}</span>
+            <span className="text-sm" style={{ color: 'var(--grammar-adverb)' }}>{wordDetail.furigana}</span>
           </p>
         )}
         
         {wordDetail?.romaji && (
           <p className="mb-1">
             <strong>罗马音 (Romaji):</strong> 
-            <span className="text-sm text-cyan-700">{wordDetail.romaji}</span>
+            <span className="text-sm" style={{ color: 'var(--grammar-adverb)' }}>{wordDetail.romaji}</span>
           </p>
         )}
         
         {wordDetail?.dictionaryForm && wordDetail.dictionaryForm !== wordDetail.originalWord && (
           <p className="mb-2">
             <strong>辞书形:</strong> 
-            <span className="text-md text-blue-700 font-medium">{wordDetail.dictionaryForm}</span>
+            <span className="text-md font-medium" style={{ color: getGrammarColor(wordDetail?.pos || '') }}>{wordDetail.dictionaryForm}</span>
           </p>
         )}
         
@@ -447,7 +447,8 @@ export default function AnalysisResult({
         
         <p className="mb-2">
           <strong>中文译文:</strong> 
-          <span className={`text-lg font-medium ${wordDetail?.chineseTranslation === '加载中...' ? 'text-gray-500 animate-pulse' : 'text-green-700'}`}>
+          <span className={`text-lg font-medium ${wordDetail?.chineseTranslation === '加载中...' ? 'text-gray-500 animate-pulse' : ''}`}
+                style={{ color: wordDetail?.chineseTranslation === '加载中...' ? undefined : 'var(--grammar-verb)' }}>
             {wordDetail?.chineseTranslation}
           </span>
         </p>
@@ -455,9 +456,13 @@ export default function AnalysisResult({
         <div className="mb-1"><strong>解释:</strong></div>
         <div className={`word-detail-explanation p-3 rounded-md text-base leading-relaxed ${
           wordDetail?.explanation === '正在生成解释...' 
-            ? 'text-gray-600 bg-gray-100 animate-pulse' 
-            : 'text-gray-700 bg-gray-50'
-        }`}>
+            ? 'animate-pulse' 
+            : ''
+        }`}
+             style={{ 
+               backgroundColor: 'var(--grammar-background)',
+               color: wordDetail?.explanation === '正在生成觢释...' ? 'var(--grammar-adverb)' : 'var(--on-surface)' 
+             }}>
           {wordDetail?.explanation?.endsWith('...') || wordDetail?.explanation === '正在生成解释...' ? (
             // 正在生成中的内容，显示原始文本
             <div className="whitespace-pre-wrap text-streaming">{wordDetail.explanation}</div>
@@ -489,7 +494,7 @@ export default function AnalysisResult({
   return (
     <div className="premium-card relative">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-700">解析结果</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: 'var(--on-surface)' }}>解析结果</h2>
         <div className="flex items-center">
           <label htmlFor="furiganaToggle" className="text-sm font-medium text-gray-700 mr-2">显示假名:</label>
           <label className="inline-flex items-center cursor-pointer">
@@ -506,7 +511,13 @@ export default function AnalysisResult({
       </div>
       
       <div id="analyzedSentenceOutput" className="text-gray-800 mb-2 p-3 bg-gray-50 rounded-lg min-h-[70px]">
-        {tokens.map((token, index) => {
+        {tokens
+          .filter(token => {
+            // Filter out spaces, commas, and periods
+            const word = token.word.trim();
+            return word !== '' && word !== '，' && word !== '。' && word !== ',' && word !== '.' && word !== ' ';
+          })
+          .map((token, index) => {
           if (token.pos === '改行') {
             return <br key={index} />;
           }
@@ -514,7 +525,8 @@ export default function AnalysisResult({
           return (
             <span key={index} className="word-unit-wrapper tooltip">
               <span 
-                className={`word-token ${getPosClass(token.pos)}`}
+                className={`word-token ${getPosClass(token.pos)} ${getGrammarColorClass(token.pos)}`}
+                style={{ color: getGrammarColor(token.pos) }}
                 onClick={(e) => handleWordClick(e, token)}
               >
                 {showFurigana && token.furigana && token.furigana !== token.word && containsKanji(token.word) && token.pos !== '記号'
@@ -543,31 +555,31 @@ export default function AnalysisResult({
         })}
       </div>
       
-      {/* 词性颜色图例 - 正确放在premium-card右下角 */}
+      {/* 词性颜色图例 - Updated with new Japanese color system */}
       <div className="absolute bottom-2 right-2 flex items-center gap-2">
         <div className="flex items-center gap-1">
           <span className="pos-dot pos-名詞"></span>
-          <span className="text-gray-600 dark:text-gray-400 text-xs">名词</span>
+          <span className="text-xs" style={{ color: 'var(--grammar-noun)' }}>名词</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="pos-dot pos-動詞"></span>
-          <span className="text-gray-600 dark:text-gray-400 text-xs">动词</span>
+          <span className="text-xs" style={{ color: 'var(--grammar-verb)' }}>动词</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="pos-dot pos-形容詞"></span>
-          <span className="text-gray-600 dark:text-gray-400 text-xs">形容词</span>
+          <span className="text-xs" style={{ color: 'var(--grammar-adjective)' }}>形容词</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="pos-dot pos-副詞"></span>
-          <span className="text-gray-600 dark:text-gray-400 text-xs">副词</span>
+          <span className="text-xs" style={{ color: 'var(--grammar-adverb)' }}>副词</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="pos-dot pos-助詞"></span>
-          <span className="text-gray-600 dark:text-gray-400 text-xs">助词</span>
+          <span className="text-xs" style={{ color: 'var(--grammar-particle)' }}>助词</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="pos-dot pos-助動詞"></span>
-          <span className="text-gray-600 dark:text-gray-400 text-xs">助动词</span>
+          <span className="text-xs" style={{ color: 'var(--grammar-auxiliary)' }}>助动词</span>
         </div>
       </div>
       

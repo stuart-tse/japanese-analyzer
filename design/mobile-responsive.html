@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Mobile Responsive Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .device-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .device-frame {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .device-frame h3 {
+            margin-bottom: 1rem;
+            color: #1976d2;
+        }
+        
+        /* Mobile Phone Frame */
+        .mobile-frame {
+            width: 280px;
+            height: 500px;
+            border: 8px solid #333;
+            border-radius: 25px;
+            overflow: hidden;
+            background: white;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .mobile-frame::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: #666;
+            border-radius: 2px;
+        }
+        
+        .mobile-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: #666;
+            border-radius: 2px;
+        }
+        
+        .mobile-content {
+            padding: 25px 16px 16px;
+            height: 100%;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .mobile-header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .mobile-input-section {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .input-tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .mobile-textarea {
+            width: 100%;
+            min-height: 80px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 16px;
+            resize: none;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+        
+        .mobile-textarea:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25,118,210,0.1);
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .analyze-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .results-section {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-tokens {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            line-height: 1.4;
+        }
+        
+        .mobile-token {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .mobile-token.noun {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+        
+        .mobile-token.verb {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+        }
+        
+        .mobile-token.adjective {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+        
+        .mobile-token.particle {
+            background: #fce4ec;
+            border: 2px solid #e91e63;
+        }
+        
+        .mobile-token:active {
+            transform: scale(0.95);
+        }
+        
+        .token-word {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .token-reading {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        .translation-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .translation-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .translation-text {
+            font-size: 16px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        /* Tablet Frame */
+        .tablet-frame {
+            width: 400px;
+            height: 300px;
+            border: 6px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+            background: white;
+            margin: 0 auto;
+        }
+        
+        .tablet-content {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .tablet-left {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .tablet-right {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* Responsive Breakpoints Section */
+        .breakpoints-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .breakpoint {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+        }
+        
+        .breakpoint:last-child {
+            border-bottom: none;
+        }
+        
+        .breakpoint-label {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .breakpoint-specs {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        /* Touch Interaction Guidelines */
+        .touch-guidelines {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .touch-target {
+            display: inline-block;
+            width: 44px;
+            height: 44px;
+            background: #4caf50;
+            border-radius: 8px;
+            margin: 0.5rem;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .touch-target::after {
+            content: attr(data-size);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .touch-target.small {
+            width: 32px;
+            height: 32px;
+            background: #f44336;
+        }
+        
+        .touch-target.large {
+            width: 56px;
+            height: 56px;
+            background: #2196f3;
+        }
+        
+        /* Performance Optimization Notes */
+        .optimization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .optimization-card {
+            background: #f8f9fa;
+            border-left: 4px solid #1976d2;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .optimization-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1976d2;
+        }
+        
+        /* Layout Adaptation Examples */
+        .layout-demo {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .layout-demo-header {
+            background: #f5f5f5;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .layout-demo-content {
+            padding: 1rem;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: #999;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .device-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .tablet-frame {
+                width: 100%;
+                max-width: 350px;
+                height: 250px;
+            }
+            
+            .tablet-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Analyzer - Mobile Responsive Design</h1>
+            <p>Comprehensive mobile-first design specifications for optimal learning experience across all devices</p>
+        </div>
+
+        <!-- Device Showcase -->
+        <div class="device-showcase">
+            <div class="device-frame">
+                <h3>Mobile Phone (320-480px)</h3>
+                <div class="mobile-frame">
+                    <div class="mobile-content">
+                        <div class="mobile-header">
+                            日本語解析器
+                        </div>
+                        
+                        <div class="mobile-input-section">
+                            <div class="input-tabs">
+                                <div class="tab active">Text</div>
+                                <div class="tab">OCR</div>
+                                <div class="tab">Voice</div>
+                            </div>
+                            <textarea class="mobile-textarea" placeholder="今日は良い天気ですね。"></textarea>
+                            <button class="analyze-btn">分析 Analyze</button>
+                        </div>
+                        
+                        <div class="results-section">
+                            <div class="mobile-tokens">
+                                <div class="mobile-token noun">
+                                    <div class="token-word">今日</div>
+                                    <div class="token-reading">kyou</div>
+                                </div>
+                                <div class="mobile-token particle">
+                                    <div class="token-word">は</div>
+                                    <div class="token-reading">wa</div>
+                                </div>
+                                <div class="mobile-token adjective">
+                                    <div class="token-word">良い</div>
+                                    <div class="token-reading">ii</div>
+                                </div>
+                                <div class="mobile-token noun">
+                                    <div class="token-word">天気</div>
+                                    <div class="token-reading">tenki</div>
+                                </div>
+                                <div class="mobile-token verb">
+                                    <div class="token-word">です</div>
+                                    <div class="token-reading">desu</div>
+                                </div>
+                                <div class="mobile-token particle">
+                                    <div class="token-word">ね</div>
+                                    <div class="token-reading">ne</div>
+                                </div>
+                            </div>
+                            
+                            <div class="translation-card">
+                                <div class="translation-label">English</div>
+                                <div class="translation-text">Today is nice weather, isn't it?</div>
+                                <div class="translation-label">中文</div>
+                                <div class="translation-text">今天天气很好呢。</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="device-frame">
+                <h3>Tablet (768-1024px)</h3>
+                <div class="tablet-frame">
+                    <div class="tablet-content">
+                        <div class="tablet-left">
+                            <h4>Input & Controls</h4>
+                            <textarea placeholder="Enter Japanese text..." style="width: 100%; height: 60px; border: 1px solid #ddd; border-radius: 6px; padding: 8px; resize: none; margin-bottom: 8px;"></textarea>
+                            <button style="width: 100%; background: #4caf50; color: white; border: none; padding: 10px; border-radius: 6px;">Analyze</button>
+                        </div>
+                        <div class="tablet-right">
+                            <h4>Results</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
+                                <span style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-size: 12px;">今日</span>
+                                <span style="background: #fce4ec; padding: 4px 8px; border-radius: 4px; font-size: 12px;">は</span>
+                                <span style="background: #fff3e0; padding: 4px 8px; border-radius: 4px; font-size: 12px;">良い</span>
+                                <span style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-size: 12px;">天気</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responsive Breakpoints -->
+        <div class="breakpoints-section">
+            <h2>Responsive Breakpoints & Layout Adaptations</h2>
+            
+            <div class="breakpoint">
+                <div class="breakpoint-label">Mobile Portrait</div>
+                <div class="breakpoint-specs">
+                    320px - 480px | Single column | Stack all components<br>
+                    Touch-optimized buttons (min 44px) | Large text (16px+)
+                </div>
+            </div>
+            
+            <div class="breakpoint">
+                <div class="breakpoint-label">Mobile Landscape</div>
+                <div class="breakpoint-specs">
+                    481px - 767px | Two column for results | Compact header<br>
+                    Horizontal token scrolling | Slide-out detail panel
+                </div>
+            </div>
+            
+            <div class="breakpoint">
+                <div class="breakpoint-label">Tablet Portrait</div>
+                <div class="breakpoint-specs">
+                    768px - 1024px | Two panel layout | Side-by-side input/results<br>
+                    Floating action buttons | Grid-based token layout
+                </div>
+            </div>
+            
+            <div class="breakpoint">
+                <div class="breakpoint-label">Desktop</div>
+                <div class="breakpoint-specs">
+                    1025px+ | Three panel layout | Full feature set<br>
+                    Hover states | Keyboard shortcuts | Multi-selection
+                </div>
+            </div>
+        </div>
+
+        <!-- Touch Interaction Guidelines -->
+        <div class="touch-guidelines">
+            <h2>Touch Interaction Guidelines</h2>
+            
+            <h3>Touch Target Sizes</h3>
+            <div style="margin: 2rem 0;">
+                <div class="touch-target small" data-size="32px (Too Small)"></div>
+                <div class="touch-target" data-size="44px (Minimum)"></div>
+                <div class="touch-target large" data-size="56px (Optimal)"></div>
+            </div>
+            
+            <h3>Gesture Patterns</h3>
+            <div class="optimization-grid">
+                <div class="optimization-card">
+                    <div class="optimization-title">Tap Interactions</div>
+                    <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                        <li>Single tap: Select token</li>
+                        <li>Double tap: Quick translate</li>
+                        <li>Long press: Detailed analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Swipe Gestures</div>
+                    <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                        <li>Left/Right: Navigate analysis modes</li>
+                        <li>Up/Down: Scroll content</li>
+                        <li>Pull down: Refresh analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Pinch & Zoom</div>
+                    <ul style="margin-top: 0.5rem; padding-left: 1rem;">
+                        <li>Text size adjustment</li>
+                        <li>Token spacing control</li>
+                        <li>Detail level zoom</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout Adaptation Examples -->
+        <div class="breakpoints-section">
+            <h2>Component Layout Adaptations</h2>
+            
+            <h3>Input Section Adaptations</h3>
+            <div class="layout-demo">
+                <div class="layout-demo-header">Mobile: Stacked Layout</div>
+                <div class="layout-demo-content">
+                    Input tabs above textarea above analyze button (vertical stack)
+                </div>
+            </div>
+            
+            <div class="layout-demo">
+                <div class="layout-demo-header">Tablet: Compact Layout</div>
+                <div class="layout-demo-content">
+                    Side tabs with inline textarea and button (horizontal flow)
+                </div>
+            </div>
+            
+            <div class="layout-demo">
+                <div class="layout-demo-header">Desktop: Extended Layout</div>
+                <div class="layout-demo-content">
+                    Full sidebar with advanced options and batch processing
+                </div>
+            </div>
+            
+            <h3>Analysis Results Adaptations</h3>
+            <div class="layout-demo">
+                <div class="layout-demo-header">Mobile: Card-based Tokens</div>
+                <div class="layout-demo-content">
+                    Large, touch-friendly token cards with vertical text layout
+                </div>
+            </div>
+            
+            <div class="layout-demo">
+                <div class="layout-demo-header">Tablet: Grid Layout</div>
+                <div class="layout-demo-content">
+                    2-3 column grid with medium-sized tokens and hover previews
+                </div>
+            </div>
+            
+            <div class="layout-demo">
+                <div class="layout-demo-header">Desktop: Inline Annotations</div>
+                <div class="layout-demo-content">
+                    Sentence-flow layout with popup details and contextual information
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Optimizations -->
+        <div class="touch-guidelines">
+            <h2>Mobile Performance Optimizations</h2>
+            
+            <div class="optimization-grid">
+                <div class="optimization-card">
+                    <div class="optimization-title">Lazy Loading</div>
+                    Load detailed word information only when requested. Implement virtual scrolling for long token lists.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Offline Support</div>
+                    Cache analyzed sentences and common word definitions. Enable offline mode for previously analyzed content.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Touch Optimization</div>
+                    Debounce touch events, optimize scroll performance, use hardware acceleration for animations.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Battery Efficiency</div>
+                    Reduce background processing, optimize API calls, implement smart refresh strategies.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Network Efficiency</div>
+                    Compress API responses, implement request caching, use progressive loading for large analyses.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Memory Management</div>
+                    Clean up unused components, limit concurrent analyses, implement efficient state management.
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile-Specific Features -->
+        <div class="breakpoints-section">
+            <h2>Mobile-Specific Features</h2>
+            
+            <h3>Voice Input Integration</h3>
+            <div style="background: #f0f7ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>Implementation:</strong> Use Web Speech API for voice-to-text conversion with Japanese language support.
+                Real-time feedback during speech recognition with visual waveform display.
+            </div>
+            
+            <h3>Camera OCR Integration</h3>
+            <div style="background: #f0f7ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>Implementation:</strong> Direct camera access with real-time text detection overlay.
+                Crop and enhance image quality before OCR processing. Support for various Japanese fonts and handwriting.
+            </div>
+            
+            <h3>Haptic Feedback</h3>
+            <div style="background: #f0f7ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>Implementation:</strong> Subtle vibration feedback for token selection and important actions.
+                Different vibration patterns for different types of feedback (success, error, selection).
+            </div>
+            
+            <h3>Share & Export</h3>
+            <div style="background: #f0f7ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <strong>Implementation:</strong> Native sharing API integration for exporting analysis results.
+                Support for sharing to notes apps, social media, and study tools. Generate shareable analysis images.
+            </div>
+        </div>
+
+        <!-- Accessibility Considerations -->
+        <div class="touch-guidelines">
+            <h2>Mobile Accessibility</h2>
+            
+            <div class="optimization-grid">
+                <div class="optimization-card">
+                    <div class="optimization-title">Screen Reader Support</div>
+                    Proper ARIA labels for all interactive elements. Structured content hierarchy for navigation.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">High Contrast Mode</div>
+                    Support for system high contrast settings. Alternative color schemes for better visibility.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Text Scaling</div>
+                    Respect system font size settings. Maintain layout integrity at 200% zoom level.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Motor Accessibility</div>
+                    Larger touch targets for users with motor impairments. Alternative input methods support.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Cognitive Accessibility</div>
+                    Clear navigation patterns. Consistent interaction behaviors. Error prevention and recovery.
+                </div>
+                
+                <div class="optimization-card">
+                    <div class="optimization-title">Language Support</div>
+                    RTL language support preparation. Multiple language interface options for learning contexts.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

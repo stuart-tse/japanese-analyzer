@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Preservation Test Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-input {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Yu Gothic', 'Hiragino Sans', monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            background: #fafafa;
+        }
+        .btn {
+            background: #2D5A27;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #1e3d1a;
+        }
+        .expected-layout {
+            border: 2px solid #2D5A27;
+            padding: 20px;
+            background: #f8fff8;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Yu Gothic', 'Hiragino Sans', monospace;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        .test-step {
+            background: #e8f4fd;
+            border-left: 4px solid #1976d2;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .success-criteria {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        h1 { color: #2D5A27; }
+        h2 { color: #C41E3A; margin-top: 30px; }
+        h3 { color: #1976d2; }
+        .line-number {
+            color: #666;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .app-link {
+            display: inline-block;
+            background: #C41E3A;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: background 0.2s;
+        }
+        .app-link:hover {
+            background: #a01729;
+        }
+        .analysis-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .mode-card {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #b3d9ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Japanese Sentence Analyzer - Layout Preservation Test</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Note:</strong> This application requires an API key to function. Make sure you have configured your Gemini API key in the settings before testing.
+        </div>
+        
+        <a href="http://localhost:3000" target="_blank" class="app-link">
+            🚀 Open Japanese Analyzer Application
+        </a>
+        
+        <h2>🎯 Test Objective</h2>
+        <p>Verify that the enhanced token rendering system correctly preserves the original text layout with proper line breaks and spacing instead of displaying everything in a continuous flow.</p>
+        
+        <h2>📋 Test Input</h2>
+        <p>Copy and paste this multi-line Japanese text into the application:</p>
+        
+        <textarea class="test-input" id="testText" readonly>今日は良い天気ですね。
+明日も晴れるでしょう。
+来週は雨が降りそうです。
+
+先生はとても親切な人です。
+生徒たちは熱心に勉強しています。</textarea>
+        
+        <button class="btn" onclick="copyText()">📋 Copy Test Text</button>
+        <button class="btn" onclick="showExpectedLayout()">👁️ Show Expected Layout</button>
+        
+        <div id="expectedLayout" style="display: none;">
+            <h3>Expected Visual Layout:</h3>
+            <div class="expected-layout">
+                <div><span class="line-number">1:</span>今日は良い天気ですね。</div>
+                <div><span class="line-number">2:</span>明日も晴れるでしょう。</div>
+                <div><span class="line-number">3:</span>来週は雨が降りそうです。</div>
+                <div><span class="line-number">4:</span><em>(empty line)</em></div>
+                <div><span class="line-number">5:</span>先生はとても親切な人です。</div>
+                <div><span class="line-number">6:</span>生徒たちは熱心に勉強しています。</div>
+            </div>
+        </div>
+        
+        <h2>🗒️ Test Procedure</h2>
+        
+        <div class="test-step">
+            <strong>Step 1:</strong> Open the Japanese Analyzer application in a new tab using the button above.
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 2:</strong> If prompted, configure your Gemini API key in the Settings menu.
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 3:</strong> Copy the test text above and paste it into the input field of the application.
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 4:</strong> Click the "Analyze" button to process the text.
+        </div>
+        
+        <div class="test-step">
+            <strong>Step 5:</strong> Observe the token display in the analysis viewport and verify layout preservation.
+        </div>
+        
+        <h2>📊 Analysis Modes to Test</h2>
+        
+        <div class="analysis-modes">
+            <div class="mode-card">
+                <h4>🧩 Tokens Mode</h4>
+                <p>Interactive token display with preserved line breaks and spacing.</p>
+            </div>
+            <div class="mode-card">
+                <h4>📜 Grammar Mode</h4>
+                <p>Grammar analysis with maintained text structure.</p>
+            </div>
+            <div class="mode-card">
+                <h4>🌏 Translation Mode</h4>
+                <p>Word-by-word translation preserving layout.</p>
+            </div>
+            <div class="mode-card">
+                <h4>🔊 Pronunciation Mode</h4>
+                <p>Phonetic guide with original text structure.</p>
+            </div>
+        </div>
+        
+        <h2>✅ Success Criteria</h2>
+        
+        <div class="success-criteria">
+            <strong>✓ Line Breaks Preserved:</strong> Each line of the original text should appear on a separate line in the token display.
+        </div>
+        
+        <div class="success-criteria">
+            <strong>✓ Empty Lines Maintained:</strong> The empty line between the two paragraphs should create visible vertical space.
+        </div>
+        
+        <div class="success-criteria">
+            <strong>✓ No Continuous Flow:</strong> Tokens should NOT appear in a single continuous line ignoring the original structure.
+        </div>
+        
+        <div class="success-criteria">
+            <strong>✓ Mode Consistency:</strong> Layout preservation should work consistently across all analysis modes.
+        </div>
+        
+        <div class="success-criteria">
+            <strong>✓ Interactivity Maintained:</strong> Tokens should remain clickable for detailed word information.
+        </div>
+        
+        <h2>❌ Potential Issues</h2>
+        
+        <div class="warning">
+            <strong>Issue 1:</strong> All tokens appearing in a single continuous line
+            <br><strong>Cause:</strong> Line break tokens not being generated or rendered properly
+        </div>
+        
+        <div class="warning">
+            <strong>Issue 2:</strong> Missing empty line space
+            <br><strong>Cause:</strong> Consecutive line breaks not being handled correctly
+        </div>
+        
+        <div class="warning">
+            <strong>Issue 3:</strong> Inconsistent layout between modes
+            <br><strong>Cause:</strong> Different rendering logic in different analysis modes
+        </div>
+        
+        <h2>📝 Test Report</h2>
+        
+        <div id="testResults">
+            <p>After completing the test, document your findings:</p>
+            
+            <textarea id="reportText" style="width: 100%; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Record your test results here...\n\n✓ Layout preservation working: Yes/No\n✓ Line breaks preserved: Yes/No\n✓ Empty lines maintained: Yes/No\n✓ All modes consistent: Yes/No\n\nNotes: [Any issues or observations]">
+            </textarea>
+            
+            <button class="btn" onclick="takeScreenshot()">📷 Take Screenshot</button>
+            <button class="btn" onclick="saveReport()">💾 Save Report</button>
+        </div>
+    </div>
+    
+    <script>
+        function copyText() {
+            const textArea = document.getElementById('testText');
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            btn.style.background = '#4caf50';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#2D5A27';
+            }, 2000);
+        }
+        
+        function showExpectedLayout() {
+            const layout = document.getElementById('expectedLayout');
+            const btn = event.target;
+            
+            if (layout.style.display === 'none') {
+                layout.style.display = 'block';
+                btn.textContent = '🙈 Hide Expected Layout';
+            } else {
+                layout.style.display = 'none';
+                btn.textContent = '👁️ Show Expected Layout';
+            }
+        }
+        
+        function takeScreenshot() {
+            alert('📷 Please take a manual screenshot of the Japanese Analyzer application showing the token layout.\n\nOn Mac: Cmd+Shift+4\nOn Windows: Windows+Shift+S');
+        }
+        
+        function saveReport() {
+            const reportText = document.getElementById('reportText').value;
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            
+            const reportContent = `Japanese Analyzer Layout Preservation Test Report
+Date: ${new Date().toLocaleString()}
+
+${reportText}
+
+Test completed using: ${window.location.href}`;
+            
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `layout-test-report-${timestamp}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Auto-select text when page loads
+        window.onload = function() {
+            console.log('🎉 Layout Preservation Test Guide Loaded');
+            console.log('🗺️ Ready to test Japanese Analyzer layout preservation');
+        };
+    </script>
+</body>
+</html>

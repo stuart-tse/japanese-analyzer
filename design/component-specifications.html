@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .component-section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 2rem;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .component-preview {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #fafafa;
+        }
+        
+        .component-specs {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .spec-table th,
+        .spec-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .spec-table th {
+            background: #f0f0f0;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        /* Component Previews */
+        .enhanced-input {
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .enhanced-input:focus-within {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25,118,210,0.1);
+        }
+        
+        .input-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .input-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .input-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .input-tab.active {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .input-mode {
+            font-size: 0.875rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .difficulty-indicator {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            background: #e8f5e8;
+            color: #2e7d32;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .input-body {
+            padding: 1rem;
+        }
+        
+        .enhanced-textarea {
+            width: 100%;
+            min-height: 100px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            background: transparent;
+        }
+        
+        .input-footer {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .char-count {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .analyze-button {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .analyze-button:hover {
+            transform: translateY(-1px);
+        }
+        
+        /* Token Display Component */
+        .token-display {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .display-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+        
+        .control-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .control-button.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sentence-flow {
+            line-height: 2.5;
+            font-size: 1.125rem;
+        }
+        
+        .enhanced-token {
+            display: inline-block;
+            margin: 0.25rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            vertical-align: top;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .enhanced-token:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .enhanced-token.selected {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .enhanced-token.noun {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border: 2px solid #2196f3;
+            color: #0d47a1;
+        }
+        
+        .enhanced-token.verb {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            border: 2px solid #4caf50;
+            color: #1b5e20;
+        }
+        
+        .enhanced-token.adjective {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border: 2px solid #ff9800;
+            color: #e65100;
+        }
+        
+        .enhanced-token.particle {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+            border: 2px solid #e91e63;
+            color: #880e4f;
+        }
+        
+        .token-furigana {
+            font-size: 0.7rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+            opacity: 0.8;
+        }
+        
+        .token-main {
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+        
+        .token-romaji {
+            font-size: 0.65rem;
+            line-height: 1;
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .token-pos {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #666;
+            color: white;
+            font-size: 0.6rem;
+            padding: 0.125rem 0.25rem;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .enhanced-token:hover .token-pos {
+            opacity: 1;
+        }
+        
+        /* Detail Panel Component */
+        .detail-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            min-height: 400px;
+        }
+        
+        .detail-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .word-main-info {
+            flex: 1;
+        }
+        
+        .word-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+        }
+        
+        .word-readings {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .reading-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 0.875rem;
+        }
+        
+        .reading-label {
+            font-weight: 600;
+            color: #666;
+            margin-right: 0.5rem;
+        }
+        
+        .audio-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .audio-button {
+            background: #ff5722;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .detail-content {
+            padding: 1.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .disclosure-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .disclosure-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .disclosure-toggle {
+            background: #f5f5f5;
+            border: none;
+            padding: 1rem 1.5rem;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .disclosure-toggle:hover {
+            background: #eeeeee;
+        }
+        
+        .disclosure-content {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Translation Component */
+        .translation-component {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .translation-header {
+            background: #1976d2;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .translation-body {
+            padding: 1.5rem;
+        }
+        
+        .translation-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .translation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .translation-lang {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .translation-text {
+            font-size: 1.125rem;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Loading States */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .loading-token {
+            width: 60px;
+            height: 40px;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+        
+        .loading-text {
+            height: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .word-readings {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .detail-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+        }
+        
+        .implementation-notes {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .props-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .props-table th,
+        .props-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .props-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .prop-type {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 0.125rem 0.25rem;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Analyzer - Component Specifications</h1>
+            <p>Detailed component designs and implementation specifications for the enhanced learning interface</p>
+        </div>
+
+        <!-- Enhanced Input Component -->
+        <div class="component-section">
+            <div class="section-header">1. Enhanced Input Component</div>
+            <div class="section-content">
+                <div class="component-grid">
+                    <div class="component-preview">
+                        <h3>Component Preview</h3>
+                        <div class="enhanced-input">
+                            <div class="input-header">
+                                <div class="input-tabs">
+                                    <button class="input-tab active">Text</button>
+                                    <button class="input-tab">OCR</button>
+                                    <button class="input-tab">Voice</button>
+                                </div>
+                                <div class="input-mode">
+                                    Mode: <span class="difficulty-indicator">Beginner</span>
+                                </div>
+                            </div>
+                            <div class="input-body">
+                                <textarea class="enhanced-textarea" placeholder="Enter Japanese text to analyze...&#10;&#10;Example: 今日は良い天気ですね。&#10;(Today is nice weather, isn't it?)"></textarea>
+                            </div>
+                            <div class="input-footer">
+                                <span class="char-count">0/500 characters • ~2s analysis</span>
+                                <button class="analyze-button">分析 Analyze</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-specs">
+                        <h3>Component Specifications</h3>
+                        <table class="spec-table">
+                            <tr>
+                                <th>Property</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr>
+                                <td>Max Height</td>
+                                <td>300px (with scroll)</td>
+                            </tr>
+                            <tr>
+                                <td>Character Limit</td>
+                                <td>500 characters</td>
+                            </tr>
+                            <tr>
+                                <td>Min Touch Target</td>
+                                <td>44px for mobile</td>
+                            </tr>
+                            <tr>
+                                <td>Input Modes</td>
+                                <td>Text, OCR, Voice</td>
+                            </tr>
+                            <tr>
+                                <td>Auto-resize</td>
+                                <td>Yes (min 100px)</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="implementation-notes">
+                            <strong>Key Features:</strong>
+                            <ul>
+                                <li>Smart paste detection (auto-clean formatting)</li>
+                                <li>Character count with analysis time estimation</li>
+                                <li>Contextual examples based on difficulty level</li>
+                                <li>Real-time input validation</li>
+                                <li>Batch input support for multiple sentences</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="code-snippet">
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">EnhancedInputProps</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">value</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">onChange</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">value</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">onAnalyze</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">()</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">learningMode</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'beginner'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'intermediate'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'advanced'</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">isAnalyzing</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">estimatedTime</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">number</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">maxLength</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">number</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">supportedInputModes</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #e6db74;">'text'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'ocr'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'voice'</span><span style="color: #f8f8f2;">)[];</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+                
+                <table class="props-table">
+                    <thead>
+                        <tr>
+                            <th>Prop</th>
+                            <th>Type</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>value</td>
+                            <td><span class="prop-type">string</span></td>
+                            <td>""</td>
+                            <td>Current input text value</td>
+                        </tr>
+                        <tr>
+                            <td>learningMode</td>
+                            <td><span class="prop-type">string</span></td>
+                            <td>"beginner"</td>
+                            <td>Adjusts examples and complexity</td>
+                        </tr>
+                        <tr>
+                            <td>isAnalyzing</td>
+                            <td><span class="prop-type">boolean</span></td>
+                            <td>false</td>
+                            <td>Shows loading state</td>
+                        </tr>
+                        <tr>
+                            <td>maxLength</td>
+                            <td><span class="prop-type">number</span></td>
+                            <td>500</td>
+                            <td>Maximum character limit</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Token Display Component -->
+        <div class="component-section">
+            <div class="section-header">2. Interactive Token Display Component</div>
+            <div class="section-content">
+                <div class="component-grid">
+                    <div class="component-preview">
+                        <h3>Component Preview</h3>
+                        <div class="token-display">
+                            <div class="display-controls">
+                                <div class="control-group">
+                                    <button class="control-button active">Tokens</button>
+                                    <button class="control-button">Grammar</button>
+                                    <button class="control-button">Meaning</button>
+                                </div>
+                                <div class="control-group">
+                                    <button class="control-button active">Furigana</button>
+                                    <button class="control-button">Romaji</button>
+                                </div>
+                            </div>
+                            
+                            <div class="sentence-flow">
+                                <div class="enhanced-token noun">
+                                    <div class="token-furigana">きょう</div>
+                                    <div class="token-main">今日</div>
+                                    <div class="token-romaji">kyou</div>
+                                    <div class="token-pos">名詞</div>
+                                </div>
+                                <div class="enhanced-token particle">
+                                    <div class="token-furigana">は</div>
+                                    <div class="token-main">は</div>
+                                    <div class="token-romaji">wa</div>
+                                    <div class="token-pos">助詞</div>
+                                </div>
+                                <div class="enhanced-token adjective selected">
+                                    <div class="token-furigana">いい</div>
+                                    <div class="token-main">良い</div>
+                                    <div class="token-romaji">ii</div>
+                                    <div class="token-pos">形容詞</div>
+                                </div>
+                                <div class="enhanced-token noun">
+                                    <div class="token-furigana">てんき</div>
+                                    <div class="token-main">天気</div>
+                                    <div class="token-romaji">tenki</div>
+                                    <div class="token-pos">名詞</div>
+                                </div>
+                                <div class="enhanced-token verb">
+                                    <div class="token-furigana">です</div>
+                                    <div class="token-main">です</div>
+                                    <div class="token-romaji">desu</div>
+                                    <div class="token-pos">動詞</div>
+                                </div>
+                                <div class="enhanced-token particle">
+                                    <div class="token-furigana">ね</div>
+                                    <div class="token-main">ね</div>
+                                    <div class="token-romaji">ne</div>
+                                    <div class="token-pos">助詞</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-specs">
+                        <h3>Component Specifications</h3>
+                        <table class="spec-table">
+                            <tr>
+                                <th>Feature</th>
+                                <th>Implementation</th>
+                            </tr>
+                            <tr>
+                                <td>POS Color Coding</td>
+                                <td>6 distinct color schemes</td>
+                            </tr>
+                            <tr>
+                                <td>Interaction States</td>
+                                <td>Hover, Selected, Disabled</td>
+                            </tr>
+                            <tr>
+                                <td>Display Modes</td>
+                                <td>Compact, Detailed, Minimal</td>
+                            </tr>
+                            <tr>
+                                <td>Animation</td>
+                                <td>Smooth hover and selection</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-selection</td>
+                                <td>Ctrl/Cmd + click support</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="implementation-notes">
+                            <strong>Color Scheme Mapping:</strong>
+                            <ul>
+                                <li><strong>Nouns:</strong> Blue spectrum (#2196f3)</li>
+                                <li><strong>Verbs:</strong> Green spectrum (#4caf50)</li>
+                                <li><strong>Adjectives:</strong> Orange spectrum (#ff9800)</li>
+                                <li><strong>Particles:</strong> Pink spectrum (#e91e63)</li>
+                                <li><strong>Adverbs:</strong> Purple spectrum (#9c27b0)</li>
+                                <li><strong>Others:</strong> Gray spectrum (#607d8b)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-snippet">
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">TokenDisplayProps</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">tokens</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">TokenData</span><span style="color: #f8f8f2;">[];</span>
+  <span style="color: #f92672;">selectedTokens</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">number</span><span style="color: #f8f8f2;">[];</span>
+  <span style="color: #f92672;">onTokenSelect</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">index</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">number</span><span style="color: #f8f8f2;">,</span> <span style="color: #fd971f;">multiSelect</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">displayMode</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'compact'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'detailed'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'minimal'</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">showFurigana</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">showRomaji</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">showPOS</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">isLoading</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">TokenData</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">word</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">pos</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">furigana</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">romaji</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">confidence</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">number</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">jlptLevel</span><span style="color: #f8f8f2;">?:</span> <span style="color: #e6db74;">'N1'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'N2'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'N3'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'N4'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'N5'</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Panel Component -->
+        <div class="component-section">
+            <div class="section-header">3. Progressive Detail Panel Component</div>
+            <div class="section-content">
+                <div class="component-grid">
+                    <div class="component-preview">
+                        <h3>Component Preview</h3>
+                        <div class="detail-panel">
+                            <div class="detail-header">
+                                <div class="word-main-info">
+                                    <div class="word-title">天気</div>
+                                    <div class="word-readings">
+                                        <div class="reading-item">
+                                            <span class="reading-label">読み:</span>てんき
+                                        </div>
+                                        <div class="reading-item">
+                                            <span class="reading-label">ローマ字:</span>tenki
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="audio-controls">
+                                    <button class="audio-button">
+                                        🔊 Japanese
+                                    </button>
+                                    <button class="audio-button">
+                                        🗣️ Chinese
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-content">
+                                <div class="info-grid">
+                                    <div class="info-card">
+                                        <div class="info-label">Chinese Translation</div>
+                                        <div class="info-value">天气</div>
+                                    </div>
+                                    <div class="info-card">
+                                        <div class="info-label">Part of Speech</div>
+                                        <div class="info-value">Noun (名詞)</div>
+                                    </div>
+                                    <div class="info-card">
+                                        <div class="info-label">JLPT Level</div>
+                                        <div class="info-value">N5 (Basic)</div>
+                                    </div>
+                                    <div class="info-card">
+                                        <div class="info-label">Frequency</div>
+                                        <div class="info-value">Very Common</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="disclosure-sections">
+                                    <div class="disclosure-item">
+                                        <button class="disclosure-toggle">
+                                            <span>Basic Explanation</span>
+                                            <span>▼</span>
+                                        </button>
+                                        <div class="disclosure-content">
+                                            Weather; atmospheric conditions. Uses the same characters as Chinese 天气, but with different pronunciation. Commonly used in daily conversation.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="disclosure-item">
+                                        <button class="disclosure-toggle">
+                                            <span>Usage Examples</span>
+                                            <span>▶</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="disclosure-item">
+                                        <button class="disclosure-toggle">
+                                            <span>Cultural Context</span>
+                                            <span>▶</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-specs">
+                        <h3>Component Specifications</h3>
+                        <table class="spec-table">
+                            <tr>
+                                <th>Section</th>
+                                <th>Content</th>
+                            </tr>
+                            <tr>
+                                <td>Header</td>
+                                <td>Word, readings, audio controls</td>
+                            </tr>
+                            <tr>
+                                <td>Quick Info</td>
+                                <td>Translation, POS, JLPT, frequency</td>
+                            </tr>
+                            <tr>
+                                <td>Level 1</td>
+                                <td>Basic explanation & translation</td>
+                            </tr>
+                            <tr>
+                                <td>Level 2</td>
+                                <td>Usage examples & grammar notes</td>
+                            </tr>
+                            <tr>
+                                <td>Level 3</td>
+                                <td>Cultural context & advanced usage</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="implementation-notes">
+                            <strong>Progressive Disclosure Strategy:</strong>
+                            <ul>
+                                <li>Always show: Translation, POS, basic info</li>
+                                <li>Beginner mode: Expand Level 1 by default</li>
+                                <li>Intermediate mode: Show Levels 1-2</li>
+                                <li>Advanced mode: All levels available</li>
+                                <li>Remember user's expansion preferences</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-snippet">
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">DetailPanelProps</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">wordDetail</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">WordDetail</span> <span style="color: #f8f8f2;">|</span> <span style="color: #66d9ef;">null</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">learningMode</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'beginner'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'intermediate'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'advanced'</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">onTTS</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">text</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">,</span> <span style="color: #fd971f;">language</span><span style="color: #f8f8f2;">:</span> <span style="color: #e6db74;">'ja'</span> <span style="color: #f8f8f2;">|</span> <span style="color: #e6db74;">'zh'</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">onBookmark</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">word</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">isLoading</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">boolean</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">expandedSections</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">[];</span>
+  <span style="color: #f92672;">onSectionToggle</span><span style="color: #f8f8f2;">:</span> <span style="color: #f8f8f2;">(</span><span style="color: #fd971f;">section</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">)</span> <span style="color: #66d9ef;">=></span> <span style="color: #66d9ef;">void</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+
+<span style="color: #66d9ef;">interface</span> <span style="color: #a6e22e;">WordDetail</span> <span style="color: #f8f8f2;">{</span>
+  <span style="color: #f92672;">originalWord</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">chineseTranslation</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">pos</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">furigana</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">romaji</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">jlptLevel</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">frequency</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">explanation</span><span style="color: #f8f8f2;">:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+  <span style="color: #f92672;">examples</span><span style="color: #f8f8f2;">:</span> <span style="color: #a6e22e;">Example</span><span style="color: #f8f8f2;">[];</span>
+  <span style="color: #f92672;">culturalContext</span><span style="color: #f8f8f2;">?:</span> <span style="color: #66d9ef;">string</span><span style="color: #f8f8f2;">;</span>
+<span style="color: #f8f8f2;">}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Translation Component -->
+        <div class="component-section">
+            <div class="section-header">4. Contextual Translation Component</div>
+            <div class="section-content">
+                <div class="component-grid">
+                    <div class="component-preview">
+                        <h3>Component Preview</h3>
+                        <div class="translation-component">
+                            <div class="translation-header">
+                                Translation Results
+                            </div>
+                            <div class="translation-body">
+                                <div class="translation-item">
+                                    <div class="translation-lang">English</div>
+                                    <div class="translation-text">Today is nice weather, isn't it?</div>
+                                </div>
+                                <div class="translation-item">
+                                    <div class="translation-lang">中文 (Chinese)</div>
+                                    <div class="translation-text">今天天气很好呢。</div>
+                                </div>
+                                <div class="translation-item">
+                                    <div class="translation-lang">Grammar Analysis</div>
+                                    <div class="translation-text">
+                                        <strong>Pattern:</strong> [Topic]は [Adjective][Noun]です[Particle]<br>
+                                        <strong>Politeness:</strong> Polite form (です/ます)<br>
+                                        <strong>Function:</strong> Seeking agreement (ね particle)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-specs">
+                        <h3>Component Specifications</h3>
+                        <table class="spec-table">
+                            <tr>
+                                <th>Feature</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <td>Multi-language</td>
+                                <td>English, Chinese, Grammar analysis</td>
+                            </tr>
+                            <tr>
+                                <td>Contextual hints</td>
+                                <td>Cultural and usage context</td>
+                            </tr>
+                            <tr>
+                                <td>Confidence scores</td>
+                                <td>Show translation reliability</td>
+                            </tr>
+                            <tr>
+                                <td>Alternative translations</td>
+                                <td>Multiple interpretation options</td>
+                            </tr>
+                            <tr>
+                                <td>Copy functionality</td>
+                                <td>Easy text copying for study</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="implementation-notes">
+                            <strong>Translation Strategy:</strong>
+                            <ul>
+                                <li>Prioritize natural, contextual translations</li>
+                                <li>Show literal vs. natural interpretations</li>
+                                <li>Include cultural context when relevant</li>
+                                <li>Highlight difficult-to-translate concepts</li>
+                                <li>Provide alternative meanings for ambiguous text</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading States -->
+        <div class="component-section">
+            <div class="section-header">5. Loading States & Skeleton Components</div>
+            <div class="section-content">
+                <h3>Token Loading Skeleton</h3>
+                <div style="margin: 2rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div class="loading-skeleton loading-token"></div>
+                    <div class="loading-skeleton loading-token"></div>
+                    <div class="loading-skeleton loading-token"></div>
+                    <div class="loading-skeleton loading-token"></div>
+                    <div class="loading-skeleton loading-token"></div>
+                </div>
+                
+                <h3>Text Loading Skeleton</h3>
+                <div style="margin: 2rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div class="loading-skeleton loading-text" style="width: 80%;"></div>
+                    <div class="loading-skeleton loading-text" style="width: 60%;"></div>
+                    <div class="loading-skeleton loading-text" style="width: 90%;"></div>
+                </div>
+                
+                <div class="implementation-notes">
+                    <strong>Loading State Strategy:</strong>
+                    <ul>
+                        <li>Show skeleton UI that matches final layout</li>
+                        <li>Animate loading indicators for engagement</li>
+                        <li>Provide estimated completion times</li>
+                        <li>Allow cancellation of long-running operations</li>
+                        <li>Implement progressive loading for large analyses</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

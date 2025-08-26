@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Component Design Specifications</title>
+    <style>
+        :root {
+            /* Japanese Color Palette */
+            --japanese-red: #DF3307;
+            --japanese-charcoal: #42433B;
+            --japanese-brown: #8F7E74;
+            --japanese-beige: #DAC8C0;
+            --japanese-blue-gray: #9FAEB3;
+            
+            /* Material Design 3 Extended */
+            --surface: #FFFBFE;
+            --surface-variant: #E7E0EC;
+            --surface-container: #F3EDF7;
+            --surface-container-low: #F7F2FA;
+            --surface-container-high: #ECE6F0;
+            --on-surface: var(--japanese-charcoal);
+            --on-surface-variant: var(--japanese-brown);
+            --outline: var(--japanese-blue-gray);
+            --outline-variant: #CAC4D0;
+            
+            /* Elevation shadows */
+            --elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+            --elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+            --elevation-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--surface);
+            color: var(--on-surface);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--elevation-2);
+        }
+
+        h1, h2, h3 {
+            color: var(--japanese-charcoal);
+        }
+
+        h1 {
+            border-bottom: 3px solid var(--japanese-red);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--japanese-red);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .component-showcase {
+            margin-bottom: 50px;
+            padding: 30px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--surface), var(--surface-container-low));
+        }
+
+        /* Enhanced Translation Mode Tabs */
+        .translation-tabs {
+            display: flex;
+            background: var(--surface-container);
+            border-radius: 28px;
+            padding: 4px;
+            margin-bottom: 24px;
+            box-shadow: var(--elevation-1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            font-weight: 500;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .tab:hover::before {
+            opacity: 0.08;
+        }
+
+        .tab.active {
+            background: var(--japanese-red);
+            color: white;
+            box-shadow: var(--elevation-2);
+            transform: translateY(-1px);
+        }
+
+        .tab.active::before {
+            opacity: 0;
+        }
+
+        .tab:not(.active) {
+            color: var(--on-surface-variant);
+        }
+
+        /* Enhanced Translation Cards */
+        .translation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        .translation-card {
+            background: var(--surface-container-low);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--elevation-1);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            border: 1px solid var(--outline-variant);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .translation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--japanese-red), var(--japanese-brown));
+        }
+
+        .translation-card:hover {
+            box-shadow: var(--elevation-2);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .card-content {
+            font-size: 18px;
+            line-height: 1.4;
+            margin: 16px 0;
+            color: var(--on-surface);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .confidence-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 16px 0;
+            padding: 12px;
+            background: var(--surface-container);
+            border-radius: 12px;
+        }
+
+        .confidence-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+        }
+
+        .confidence-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--outline-variant);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--japanese-red), #4CAF50);
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.2, 0, 0, 1);
+            position: relative;
+        }
+
+        .confidence-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .confidence-badge {
+            background: var(--japanese-red);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Enhanced Token Breakdown */
+        .token-breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+            padding: 16px;
+            background: var(--surface-container);
+            border-radius: 12px;
+            border: 1px solid var(--outline-variant);
+        }
+
+        .token {
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+        }
+
+        .token::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--japanese-red);
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .token:hover {
+            border-color: var(--japanese-red);
+            box-shadow: var(--elevation-1);
+            transform: translateY(-1px);
+        }
+
+        .token:hover::before {
+            opacity: 0.08;
+        }
+
+        .token.selected {
+            background: var(--japanese-red);
+            color: white;
+            border-color: var(--japanese-red);
+            box-shadow: var(--elevation-2);
+        }
+
+        /* Material Design 3 Buttons */
+        .md3-button {
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .md3-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .md3-button:hover::before {
+            opacity: 0.08;
+        }
+
+        .md3-button:active::before {
+            opacity: 0.12;
+        }
+
+        .md3-button.filled {
+            background: var(--japanese-red);
+            color: white;
+            box-shadow: var(--elevation-1);
+        }
+
+        .md3-button.filled:hover {
+            box-shadow: var(--elevation-2);
+            transform: translateY(-1px);
+        }
+
+        .md3-button.outlined {
+            background: transparent;
+            color: var(--japanese-red);
+            border: 1px solid var(--japanese-red);
+        }
+
+        .md3-button.outlined:hover {
+            background: rgba(223, 51, 7, 0.08);
+        }
+
+        .md3-button.text {
+            background: transparent;
+            color: var(--japanese-red);
+            padding: 8px 16px;
+        }
+
+        .md3-button.text:hover {
+            background: rgba(223, 51, 7, 0.08);
+        }
+
+        /* Enhanced Token Analysis Table */
+        .token-analysis-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--elevation-1);
+            margin: 24px 0;
+        }
+
+        .token-analysis-table th {
+            background: var(--japanese-red);
+            color: white;
+            padding: 16px 12px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            position: relative;
+        }
+
+        .token-analysis-table th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        .token-analysis-table th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        .token-analysis-table td {
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--outline-variant);
+            transition: background-color 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .token-analysis-table tr:hover td {
+            background: var(--surface-container-low);
+        }
+
+        .token-analysis-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grammar-tag {
+            background: var(--surface-container);
+            color: var(--on-surface-variant);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--outline-variant);
+        }
+
+        /* Skeleton Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface-container) 25%, var(--surface-container-high) 50%, var(--surface-container) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin: 8px 0;
+        }
+
+        .skeleton-card {
+            height: 120px;
+            border-radius: 12px;
+        }
+
+        /* Mobile Responsive Design */
+        .mobile-preview {
+            max-width: 375px;
+            margin: 20px auto;
+            border: 3px solid var(--japanese-charcoal);
+            border-radius: 25px;
+            padding: 20px;
+            background: var(--surface);
+            box-shadow: var(--elevation-3);
+        }
+
+        .collapsible-section {
+            border: 1px solid var(--outline-variant);
+            border-radius: 12px;
+            margin: 12px 0;
+            overflow: hidden;
+            background: var(--surface);
+        }
+
+        .section-header {
+            padding: 16px;
+            background: var(--surface-container-low);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: background-color 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .section-header:hover {
+            background: var(--surface-container);
+        }
+
+        .section-content {
+            padding: 16px;
+            border-top: 1px solid var(--outline-variant);
+        }
+
+        .expand-icon {
+            transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: var(--japanese-red);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--elevation-3);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            border: none;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* Progress Indicators */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface-container-low);
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .progress-icon {
+            color: var(--japanese-red);
+            font-size: 20px;
+        }
+
+        .progress-text {
+            flex: 1;
+            color: var(--on-surface-variant);
+            font-size: 14px;
+        }
+
+        .progress-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--outline-variant);
+            border-top-color: var(--japanese-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Grid */
+        @media (max-width: 768px) {
+            .translation-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .md3-button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            
+            .token-analysis-table {
+                font-size: 12px;
+            }
+            
+            .token-analysis-table th,
+            .token-analysis-table td {
+                padding: 8px 6px;
+            }
+        }
+
+        .spec-note {
+            background: var(--surface-container-low);
+            border-left: 4px solid var(--japanese-red);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .code-block {
+            background: var(--japanese-charcoal);
+            color: #E5E7EB;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Translation Component Design Specifications</h1>
+        
+        <p><strong>Project:</strong> Japanese Sentence Analyzer - Enhanced Translation Interface</p>
+        <p><strong>Design System:</strong> Material Design 3 + Japanese Cultural Color Palette</p>
+        <p><strong>Focus:</strong> Component-level design specifications with visual hierarchy, interaction patterns, and accessibility considerations.</p>
+
+        <h2>🚀 Enhanced Translation Mode Tabs</h2>
+        
+        <div class="component-showcase">
+            <h3>Primary Navigation Tabs</h3>
+            
+            <div class="translation-tabs">
+                <div class="tab">Quick Translation</div>
+                <div class="tab active">Detailed Analysis</div>
+                <div class="tab">Comparison Mode</div>
+                <div class="tab">Alternative Versions</div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Design Specifications:</strong>
+                <ul>
+                    <li><strong>Container:</strong> Surface container background with elevation-1 shadow</li>
+                    <li><strong>Active State:</strong> Japanese red background with elevation-2 shadow and 1px translateY</li>
+                    <li><strong>Hover State:</strong> 8% overlay of current color</li>
+                    <li><strong>Typography:</strong> 14px font-weight 500, letter-spacing 0.1px</li>
+                    <li><strong>Animation:</strong> 300ms cubic-bezier(0.2, 0, 0, 1) for all transitions</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+.translation-tabs {
+  background: var(--surface-container);
+  border-radius: 28px;
+  padding: 4px;
+  box-shadow: var(--elevation-1);
+}
+
+.tab.active {
+  background: var(--japanese-red);
+  color: white;
+  box-shadow: var(--elevation-2);
+  transform: translateY(-1px);
+}
+            </div>
+        </div>
+
+        <h2>📋 Enhanced Translation Cards</h2>
+        
+        <div class="component-showcase">
+            <h3>Dual-Panel Translation Layout</h3>
+            
+            <div class="translation-grid">
+                <div class="translation-card">
+                    <div class="card-header">
+                        <span>📝</span>
+                        <span>Original Japanese</span>
+                    </div>
+                    <div class="card-content">
+                        今日は良い天気ですね。
+                    </div>
+                    <div class="token-breakdown">
+                        <span class="token">今日</span>
+                        <span class="token selected">は</span>
+                        <span class="token">良い</span>
+                        <span class="token">天気</span>
+                        <span class="token">です</span>
+                        <span class="token">ね</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 16px;">
+                        <button class="md3-button filled">🔊 Pronounce</button>
+                        <button class="md3-button outlined">📋 Copy</button>
+                    </div>
+                </div>
+
+                <div class="translation-card">
+                    <div class="card-header">
+                        <span>🇨🇳</span>
+                        <span>Chinese Translation</span>
+                    </div>
+                    <div class="card-content">
+                        今天天气真好啊。
+                    </div>
+                    <div class="confidence-indicator">
+                        <span class="confidence-label">Translation Confidence:</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 94%;"></div>
+                        </div>
+                        <span class="confidence-badge">94%</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 16px;">
+                        <button class="md3-button filled">🔊 Pronounce</button>
+                        <button class="md3-button outlined">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Card Design Specifications:</strong>
+                <ul>
+                    <li><strong>Background:</strong> Surface container low with 1px outline-variant border</li>
+                    <li><strong>Top Accent:</strong> 4px linear gradient from Japanese red to brown</li>
+                    <li><strong>Hover State:</strong> Elevation-2 shadow with 2px translateY</li>
+                    <li><strong>Border Radius:</strong> 16px for modern rounded aesthetic</li>
+                    <li><strong>Content Typography:</strong> 18px line-height 1.4 for readability</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>📊 Token Analysis Table</h2>
+        
+        <div class="component-showcase">
+            <h3>Interactive Token Breakdown Table</h3>
+            
+            <table class="token-analysis-table">
+                <thead>
+                    <tr>
+                        <th>Japanese</th>
+                        <th>Reading</th>
+                        <th>Chinese</th>
+                        <th>Grammar</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; font-size: 16px;">今日</td>
+                        <td style="color: var(--japanese-brown);">きょう</td>
+                        <td>今天</td>
+                        <td><span class="grammar-tag">名詞</span></td>
+                        <td>
+                            <button class="md3-button text" style="padding: 4px 8px;">🔊</button>
+                            <button class="md3-button text" style="padding: 4px 8px;">📋</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; font-size: 16px;">は</td>
+                        <td style="color: var(--japanese-brown);">wa</td>
+                        <td>(主题标记)</td>
+                        <td><span class="grammar-tag">助詞</span></td>
+                        <td>
+                            <button class="md3-button text" style="padding: 4px 8px;">🔊</button>
+                            <button class="md3-button text" style="padding: 4px 8px;">📋</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; font-size: 16px;">良い</td>
+                        <td style="color: var(--japanese-brown);">よい</td>
+                        <td>好的</td>
+                        <td><span class="grammar-tag">形容詞</span></td>
+                        <td>
+                            <button class="md3-button text" style="padding: 4px 8px;">🔊</button>
+                            <button class="md3-button text" style="padding: 4px 8px;">📋</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 16px;">
+                <button class="md3-button outlined">Show All Tokens</button>
+            </div>
+
+            <div class="spec-note">
+                <strong>Table Design Specifications:</strong>
+                <ul>
+                    <li><strong>Header:</strong> Japanese red background with white text</li>
+                    <li><strong>Row Hover:</strong> Surface container low background transition</li>
+                    <li><strong>Border Radius:</strong> 12px on container, curved top corners only</li>
+                    <li><strong>Spacing:</strong> 16px vertical, 12px horizontal padding</li>
+                    <li><strong>Typography:</strong> 16px for Japanese text, 14px for others</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>⏳ Loading States & Skeleton Screens</h2>
+        
+        <div class="component-showcase">
+            <h3>Progressive Loading States</h3>
+            
+            <div class="translation-grid">
+                <div class="translation-card">
+                    <div class="card-header">
+                        <span>📝</span>
+                        <span>Original Japanese</span>
+                    </div>
+                    <div class="card-content">
+                        今日は良い天気ですね。
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-icon">⚡</div>
+                        <div class="progress-text">Analyzing tokens...</div>
+                        <div class="progress-spinner"></div>
+                    </div>
+                </div>
+
+                <div class="translation-card">
+                    <div class="card-header">
+                        <span>🇨🇳</span>
+                        <span>Chinese Translation</span>
+                    </div>
+                    <div class="skeleton skeleton-card"></div>
+                </div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Loading State Specifications:</strong>
+                <ul>
+                    <li><strong>Skeleton Animation:</strong> Linear gradient shimmer effect</li>
+                    <li><strong>Progress Spinner:</strong> 20px diameter with Japanese red accent</li>
+                    <li><strong>Progress Text:</strong> 14px on-surface-variant color</li>
+                    <li><strong>Animation Duration:</strong> 1.5s infinite for skeleton, 1s for spinner</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>📱 Mobile-First Responsive Design</h2>
+        
+        <div class="component-showcase">
+            <h3>Collapsible Mobile Interface</h3>
+            
+            <div class="mobile-preview">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h4 style="margin: 0; color: var(--japanese-red);">Translation Analysis</h4>
+                </div>
+
+                <div class="translation-tabs" style="margin-bottom: 16px;">
+                    <div class="tab" style="font-size: 12px;">Quick</div>
+                    <div class="tab active" style="font-size: 12px;">Detailed</div>
+                    <div class="tab" style="font-size: 12px;">Compare</div>
+                </div>
+
+                <div class="collapsible-section">
+                    <div class="section-header">
+                        <span>📝 Original Text</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div style="font-size: 16px; margin-bottom: 12px;">今日は良い天気ですね。</div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <span class="token" style="font-size: 12px; padding: 6px 8px;">今日</span>
+                            <span class="token" style="font-size: 12px; padding: 6px 8px;">は</span>
+                            <span class="token" style="font-size: 12px; padding: 6px 8px;">良い</span>
+                            <span class="token" style="font-size: 12px; padding: 6px 8px;">天気</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button class="md3-button filled" style="font-size: 12px; padding: 8px 12px;">🔊</button>
+                            <button class="md3-button outlined" style="font-size: 12px; padding: 8px 12px;">📋</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible-section">
+                    <div class="section-header">
+                        <span>🇨🇳 Chinese Translation</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div style="font-size: 16px; margin-bottom: 12px;">今天天气真好啊。</div>
+                        <div class="confidence-indicator" style="margin: 12px 0;">
+                            <span style="font-size: 12px;">Confidence:</span>
+                            <div class="confidence-bar" style="height: 4px;">
+                                <div class="confidence-fill" style="width: 94%;"></div>
+                            </div>
+                            <span style="font-size: 11px; font-weight: bold;">94%</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="md3-button filled" style="font-size: 12px; padding: 8px 12px;">🔊</button>
+                            <button class="md3-button outlined" style="font-size: 12px; padding: 8px 12px;">📋</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible-section">
+                    <div class="section-header">
+                        <span>🔍 Token Analysis</span>
+                        <span class="expand-icon expanded">▲</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <button class="md3-button filled" style="flex: 1; font-size: 13px;">⚡ Quick Translate</button>
+                    <button class="md3-button outlined" style="flex: 1; font-size: 13px;">🔄 Alternatives</button>
+                </div>
+            </div>
+
+            <div class="fab">+</div>
+
+            <div class="spec-note">
+                <strong>Mobile Design Specifications:</strong>
+                <ul>
+                    <li><strong>Breakpoint:</strong> 768px and below</li>
+                    <li><strong>Touch Targets:</strong> Minimum 44px height for accessibility</li>
+                    <li><strong>Collapsible Sections:</strong> 16px padding, smooth expand/collapse</li>
+                    <li><strong>Typography Scale:</strong> Reduced by 1-2px for mobile screens</li>
+                    <li><strong>FAB Position:</strong> 24px from bottom and right edges</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🎯 Interaction Patterns & Micro-animations</h2>
+        
+        <div class="component-showcase">
+            <h3>Enhanced User Feedback</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 12px;">
+                    <h4>🔄 State Transitions</h4>
+                    <ul style="font-size: 14px;">
+                        <li>Card hover: 300ms ease-out transform and shadow</li>
+                        <li>Button press: 150ms scale(0.98) feedback</li>
+                        <li>Tab switching: 300ms slide transition</li>
+                        <li>Token selection: 200ms color and elevation change</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 12px;">
+                    <h4>📲 Touch Feedback</h4>
+                    <ul style="font-size: 14px;">
+                        <li>Ripple effect on button press</li>
+                        <li>Haptic feedback for mobile interactions</li>
+                        <li>Visual press state with opacity change</li>
+                        <li>Smooth scroll behavior for long content</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 12px;">
+                    <h4>⚡ Loading Animations</h4>
+                    <ul style="font-size: 14px;">
+                        <li>Skeleton shimmer: 1.5s infinite loop</li>
+                        <li>Progress bars: Smooth width transitions</li>
+                        <li>Spinner rotation: 1s linear infinite</li>
+                        <li>Content fade-in: 300ms opacity transition</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>🎨 Visual Hierarchy Guidelines</h2>
+        
+        <div class="component-showcase">
+            <h3>Typography & Color System</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h4>Typography Scale</h4>
+                    <div style="margin: 10px 0;">
+                        <div style="font-size: 20px; font-weight: 600; margin: 8px 0;">Primary Headings (20px/600)</div>
+                        <div style="font-size: 18px; font-weight: 500; margin: 8px 0;">Content Text (18px/500)</div>
+                        <div style="font-size: 16px; font-weight: 500; margin: 8px 0;">Table Text (16px/500)</div>
+                        <div style="font-size: 14px; font-weight: 500; margin: 8px 0;">Button Text (14px/500)</div>
+                        <div style="font-size: 12px; font-weight: 500; margin: 8px 0;">Label Text (12px/500)</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4>Color Applications</h4>
+                    <div style="margin: 10px 0;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 8px 0;">
+                            <div style="width: 20px; height: 20px; background: var(--japanese-red); border-radius: 4px;"></div>
+                            <span>Primary Actions & Active States</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 8px 0;">
+                            <div style="width: 20px; height: 20px; background: var(--japanese-charcoal); border-radius: 4px;"></div>
+                            <span>Primary Text & Icons</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 8px 0;">
+                            <div style="width: 20px; height: 20px; background: var(--japanese-brown); border-radius: 4px;"></div>
+                            <span>Secondary Text & Elements</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 8px 0;">
+                            <div style="width: 20px; height: 20px; background: var(--japanese-beige); border-radius: 4px;"></div>
+                            <span>Backgrounds & Surfaces</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 8px 0;">
+                            <div style="width: 20px; height: 20px; background: var(--japanese-blue-gray); border-radius: 4px;"></div>
+                            <span>Borders & Dividers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: var(--surface-container-low); border-radius: 12px; text-align: center;">
+            <h3 style="margin-top: 0; color: var(--japanese-red);">Implementation Ready</h3>
+            <p>These component designs provide the foundation for implementing the enhanced translation interface. Each component follows Material Design 3 principles while maintaining the Japanese cultural aesthetic.</p>
+            <button class="md3-button filled">🚀 Proceed to Implementation Guide</button>
+        </div>
+    </div>
+</body>
+</html>

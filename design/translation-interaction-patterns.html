@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Interaction Patterns & Micro-interactions</title>
+    <style>
+        :root {
+            /* Japanese Color Palette */
+            --japanese-red: #DF3307;
+            --japanese-charcoal: #42433B;
+            --japanese-brown: #8F7E74;
+            --japanese-beige: #DAC8C0;
+            --japanese-blue-gray: #9FAEB3;
+            
+            /* Material Design 3 */
+            --surface: #FFFBFE;
+            --surface-variant: #E7E0EC;
+            --surface-container: #F3EDF7;
+            --surface-container-low: #F7F2FA;
+            --on-surface: var(--japanese-charcoal);
+            --on-surface-variant: var(--japanese-brown);
+            --outline: var(--japanese-blue-gray);
+            --outline-variant: #CAC4D0;
+            
+            /* Animation timings */
+            --timing-fast: 150ms;
+            --timing-standard: 300ms;
+            --timing-slow: 500ms;
+            --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+            --easing-decelerate: cubic-bezier(0, 0, 0, 1);
+            --easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--surface);
+            color: var(--on-surface);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+        }
+
+        h1, h2, h3 {
+            color: var(--japanese-charcoal);
+        }
+
+        h1 {
+            border-bottom: 3px solid var(--japanese-red);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--japanese-red);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .interaction-demo {
+            margin-bottom: 50px;
+            padding: 30px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--surface), var(--surface-container-low));
+        }
+
+        /* Demonstration Components */
+        .demo-token {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            cursor: pointer;
+            transition: all var(--timing-standard) var(--easing-standard);
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+        }
+
+        .demo-token::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--japanese-red);
+            opacity: 0;
+            transition: opacity var(--timing-fast) var(--easing-standard);
+        }
+
+        .demo-token:hover {
+            border-color: var(--japanese-red);
+            box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .demo-token:hover::before {
+            opacity: 0.08;
+        }
+
+        .demo-token:active {
+            transform: translateY(0) scale(0.98);
+            transition: transform var(--timing-fast) var(--easing-accelerate);
+        }
+
+        .demo-token.selected {
+            background: var(--japanese-red);
+            color: white;
+            border-color: var(--japanese-red);
+            box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .demo-button {
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: none;
+            background: var(--japanese-red);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--timing-standard) var(--easing-standard);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: currentColor;
+            opacity: 0;
+            transition: opacity var(--timing-standard) var(--easing-standard);
+        }
+
+        .demo-button:hover {
+            box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .demo-button:hover::before {
+            opacity: 0.08;
+        }
+
+        .demo-button:active {
+            transform: translateY(0) scale(0.98);
+            transition: transform var(--timing-fast) var(--easing-accelerate);
+        }
+
+        .demo-card {
+            background: var(--surface-container-low);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
+            border: 1px solid var(--outline-variant);
+            transition: all var(--timing-standard) var(--easing-standard);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--japanese-red), var(--japanese-brown));
+        }
+
+        .demo-card:hover {
+            box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Progress and Loading States */
+        .demo-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--outline-variant);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .demo-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--japanese-red), #4CAF50);
+            border-radius: 3px;
+            transition: width var(--timing-slow) var(--easing-decelerate);
+            position: relative;
+        }
+
+        .demo-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .demo-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--outline-variant);
+            border-top-color: var(--japanese-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 16px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Tooltip Demo */
+        .tooltip-demo {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip-content {
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--timing-standard) var(--easing-standard);
+            z-index: 100;
+        }
+
+        .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .tooltip-demo:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        /* Collapsible Demo */
+        .collapsible-demo {
+            border: 1px solid var(--outline-variant);
+            border-radius: 12px;
+            margin: 16px 0;
+            overflow: hidden;
+            background: var(--surface);
+        }
+
+        .collapsible-header {
+            padding: 16px;
+            background: var(--surface-container-low);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            transition: background-color var(--timing-standard) var(--easing-standard);
+        }
+
+        .collapsible-header:hover {
+            background: var(--surface-container);
+        }
+
+        .expand-icon {
+            transition: transform var(--timing-standard) var(--easing-standard);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--timing-slow) var(--easing-standard);
+        }
+
+        .collapsible-content.expanded {
+            max-height: 200px;
+        }
+
+        .collapsible-inner {
+            padding: 16px;
+            border-top: 1px solid var(--outline-variant);
+        }
+
+        /* Ripple Effect */
+        .ripple-demo {
+            position: relative;
+            overflow: hidden;
+            background: var(--japanese-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Interactive Flow Demo */
+        .flow-demo {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--japanese-red);
+            font-weight: bold;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        .spec-note {
+            background: var(--surface-container-low);
+            border-left: 4px solid var(--japanese-red);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .code-snippet {
+            background: var(--japanese-charcoal);
+            color: #E5E7EB;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .timing-chart {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .timing-card {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid var(--outline-variant);
+            border-radius: 12px;
+            background: var(--surface-container-low);
+        }
+
+        .timing-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--japanese-red);
+            margin-bottom: 8px;
+        }
+
+        .accessibility-demo {
+            border: 2px solid var(--japanese-blue-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .focus-indicator {
+            outline: 3px solid var(--japanese-red);
+            outline-offset: 2px;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .flow-demo {
+                flex-direction: column;
+            }
+            
+            .flow-step::after {
+                content: '↓';
+                right: 50%;
+                bottom: -25px;
+                top: auto;
+                transform: translateX(50%);
+            }
+            
+            .timing-chart {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Translation Interaction Patterns & Micro-interactions</h1>
+        
+        <p><strong>Project:</strong> Japanese Sentence Analyzer - Translation Interface Interactions</p>
+        <p><strong>Focus:</strong> Detailed interaction design, animation specifications, and user feedback patterns for the enhanced translation experience.</p>
+
+        <h2>⚡ Core Interaction Patterns</h2>
+        
+        <div class="interaction-demo">
+            <h3>Token Selection & Hover States</h3>
+            
+            <div style="margin: 20px 0;">
+                <p><strong>Interactive Tokens:</strong> Click to select, hover for preview</p>
+                <div style="padding: 20px; background: var(--surface-container); border-radius: 12px;">
+                    <span class="demo-token tooltip-demo">
+                        今日
+                        <div class="tooltip-content">Today (kyou) - Noun</div>
+                    </span>
+                    <span class="demo-token selected tooltip-demo">
+                        は
+                        <div class="tooltip-content">Topic marker (wa) - Particle</div>
+                    </span>
+                    <span class="demo-token tooltip-demo">
+                        良い
+                        <div class="tooltip-content">Good (yoi) - Adjective</div>
+                    </span>
+                    <span class="demo-token tooltip-demo">
+                        天気
+                        <div class="tooltip-content">Weather (tenki) - Noun</div>
+                    </span>
+                </div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Token Interaction Specifications:</strong>
+                <ul>
+                    <li><strong>Hover State:</strong> 300ms ease transition, 1px translateY, red border, elevation-1 shadow</li>
+                    <li><strong>Active State:</strong> 150ms scale(0.98) with accelerate easing</li>
+                    <li><strong>Selected State:</strong> Red background, white text, elevation-2 shadow</li>
+                    <li><strong>Tooltip:</strong> 300ms opacity/visibility transition, 4px translateY on show</li>
+                    <li><strong>Focus State:</strong> 3px red outline for keyboard navigation</li>
+                </ul>
+            </div>
+
+            <div class="code-snippet">
+.token:hover {
+  border-color: var(--japanese-red);
+  transform: translateY(-1px);
+  transition: all 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.token:active {
+  transform: translateY(0) scale(0.98);
+  transition: transform 150ms cubic-bezier(0.3, 0, 1, 1);
+}
+            </div>
+        </div>
+
+        <h2>🔄 Progressive Loading States</h2>
+        
+        <div class="interaction-demo">
+            <h3>Translation Progress Indicators</h3>
+            
+            <div class="flow-demo">
+                <div class="flow-step">
+                    <div class="demo-spinner"></div>
+                    <p><strong>Analyzing</strong><br>Initial processing</p>
+                </div>
+                <div class="flow-step">
+                    <div class="demo-progress-bar">
+                        <div class="demo-progress-fill" style="width: 70%;"></div>
+                    </div>
+                    <p><strong>Translating</strong><br>Progressive completion</p>
+                </div>
+                <div class="flow-step">
+                    <div style="color: var(--japanese-red); font-size: 24px; margin: 16px 0;">✓</div>
+                    <p><strong>Complete</strong><br>Translation ready</p>
+                </div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Loading State Specifications:</strong>
+                <ul>
+                    <li><strong>Spinner:</strong> 1s linear infinite rotation, 2px border with red top accent</li>
+                    <li><strong>Progress Bar:</strong> 500ms decelerate easing for width changes</li>
+                    <li><strong>Shimmer Effect:</strong> 2s infinite linear animation across progress fill</li>
+                    <li><strong>Success State:</strong> Scale animation on completion checkmark</li>
+                    <li><strong>Error State:</strong> Red color with shake animation</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🎨 Button & Action Feedback</h2>
+        
+        <div class="interaction-demo">
+            <h3>Material Design 3 Button States</h3>
+            
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0;">
+                <button class="demo-button ripple-demo" onclick="createRipple(event, this)">
+                    🔊 Pronounce Text
+                </button>
+                <button class="demo-button" style="background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red);">
+                    📋 Copy Translation
+                </button>
+                <button class="demo-button" style="background: var(--surface-container); color: var(--on-surface);">
+                    💾 Save Result
+                </button>
+            </div>
+
+            <div class="spec-note">
+                <strong>Button Interaction Specifications:</strong>
+                <ul>
+                    <li><strong>Hover State:</strong> Elevation-2 shadow, 1px translateY, 8% overlay</li>
+                    <li><strong>Active State:</strong> Scale(0.98) with 150ms accelerate easing</li>
+                    <li><strong>Ripple Effect:</strong> 600ms scale(4) animation from click point</li>
+                    <li><strong>Disabled State:</strong> 50% opacity, no pointer events</li>
+                    <li><strong>Loading State:</strong> Spinner replacement with width preservation</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>📱 Card & Panel Animations</h2>
+        
+        <div class="interaction-demo">
+            <h3>Translation Card Interactions</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="demo-card">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span>📝</span>
+                        <strong>Original Japanese</strong>
+                    </div>
+                    <div style="font-size: 18px; margin: 12px 0;">今日は良い天気ですね。</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="demo-button" style="padding: 8px 16px; font-size: 12px;">🔊</button>
+                        <button class="demo-button" style="padding: 8px 16px; font-size: 12px;">📋</button>
+                    </div>
+                </div>
+
+                <div class="demo-card">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span>🇨🇳</span>
+                        <strong>Chinese Translation</strong>
+                    </div>
+                    <div style="font-size: 18px; margin: 12px 0;">今天天气真好啊。</div>
+                    <div class="demo-progress-bar">
+                        <div class="demo-progress-fill" style="width: 94%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Card Animation Specifications:</strong>
+                <ul>
+                    <li><strong>Hover State:</strong> 2px translateY with elevation-2 shadow</li>
+                    <li><strong>Entry Animation:</strong> 300ms slide-up with opacity fade-in</li>
+                    <li><strong>Content Loading:</strong> Skeleton shimmer effect during data fetch</li>
+                    <li><strong>State Changes:</strong> Smooth transitions between loading/error/success</li>
+                    <li><strong>Resize Transitions:</strong> Height/width changes with 500ms easing</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>📲 Mobile Interaction Patterns</h2>
+        
+        <div class="interaction-demo">
+            <h3>Collapsible Sections & Touch Feedback</h3>
+            
+            <div style="max-width: 375px; margin: 0 auto;">
+                <div class="collapsible-demo">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <span>📝 Original Text Analysis</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-inner">
+                            <p>This section contains detailed analysis of the original Japanese text with token breakdown and pronunciation guides.</p>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px;">
+                                <span class="demo-token" style="font-size: 12px; padding: 6px 8px;">今日</span>
+                                <span class="demo-token" style="font-size: 12px; padding: 6px 8px;">は</span>
+                                <span class="demo-token" style="font-size: 12px; padding: 6px 8px;">良い</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsible-demo">
+                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                        <span>🇨🇳 Translation Results</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="collapsible-content">
+                        <div class="collapsible-inner">
+                            <p>Chinese translation with confidence indicators and alternative suggestions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spec-note">
+                <strong>Mobile Interaction Specifications:</strong>
+                <ul>
+                    <li><strong>Touch Targets:</strong> Minimum 44px height for accessibility</li>
+                    <li><strong>Collapsible Animation:</strong> 500ms max-height transition with standard easing</li>
+                    <li><strong>Icon Rotation:</strong> 300ms transform for expand/collapse indicators</li>
+                    <li><strong>Haptic Feedback:</strong> Light vibration on touch interactions (iOS/Android)</li>
+                    <li><strong>Swipe Gestures:</strong> Horizontal swipe for tab navigation</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>⏱️ Animation Timing Guidelines</h2>
+        
+        <div class="interaction-demo">
+            <h3>Material Design 3 Motion System</h3>
+            
+            <div class="timing-chart">
+                <div class="timing-card">
+                    <div class="timing-value">150ms</div>
+                    <div><strong>Fast</strong></div>
+                    <div style="font-size: 14px; color: var(--on-surface-variant);">
+                        Button press, tooltip hide, quick feedback
+                    </div>
+                </div>
+                <div class="timing-card">
+                    <div class="timing-value">300ms</div>
+                    <div><strong>Standard</strong></div>
+                    <div style="font-size: 14px; color: var(--on-surface-variant);">
+                        Hover states, tab switching, card elevation
+                    </div>
+                </div>
+                <div class="timing-card">
+                    <div class="timing-value">500ms</div>
+                    <div><strong>Slow</strong></div>
+                    <div style="font-size: 14px; color: var(--on-surface-variant);">
+                        Panel expansion, page transitions, complex animations
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <h4>Easing Functions</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div style="padding: 12px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                        <strong>Standard:</strong><br>
+                        <code>cubic-bezier(0.2, 0, 0, 1)</code><br>
+                        <small>Most interactions</small>
+                    </div>
+                    <div style="padding: 12px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                        <strong>Decelerate:</strong><br>
+                        <code>cubic-bezier(0, 0, 0, 1)</code><br>
+                        <small>Enter animations</small>
+                    </div>
+                    <div style="padding: 12px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                        <strong>Accelerate:</strong><br>
+                        <code>cubic-bezier(0.3, 0, 1, 1)</code><br>
+                        <small>Exit animations</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>♿ Accessibility Interaction Patterns</h2>
+        
+        <div class="interaction-demo">
+            <h3>Keyboard Navigation & Screen Reader Support</h3>
+            
+            <div class="accessibility-demo">
+                <h4>Focus Management Examples</h4>
+                
+                <div style="margin: 16px 0;">
+                    <button class="demo-button focus-indicator" style="margin-right: 8px;">
+                        Translate Sentence
+                    </button>
+                    <span style="font-size: 14px; color: var(--on-surface-variant);">
+                        ← Focus indicator with 3px red outline
+                    </span>
+                </div>
+
+                <div style="margin: 16px 0;">
+                    <div class="demo-token focus-indicator" style="display: inline-block;">今日</div>
+                    <span style="font-size: 14px; color: var(--on-surface-variant); margin-left: 8px;">
+                        ← Focusable token with ARIA label
+                    </span>
+                </div>
+
+                <div class="spec-note">
+                    <strong>Accessibility Specifications:</strong>
+                    <ul>
+                        <li><strong>Focus Indicators:</strong> 3px solid outline in Japanese red, 2px offset</li>
+                        <li><strong>Tab Order:</strong> Translation tabs → Token grid → Action buttons → Word details</li>
+                        <li><strong>ARIA Labels:</strong> All interactive elements have descriptive labels</li>
+                        <li><strong>Live Regions:</strong> Translation updates announced to screen readers</li>
+                        <li><strong>Keyboard Shortcuts:</strong> Enter/Space for activation, Arrow keys for navigation</li>
+                        <li><strong>High Contrast:</strong> All colors meet WCAG 2.1 AA contrast requirements</li>
+                    </ul>
+                </div>
+
+                <div class="code-snippet">
+// Keyboard navigation implementation
+.token:focus-visible {
+  outline: 3px solid var(--japanese-red);
+  outline-offset: 2px;
+}
+
+// ARIA live region for translation updates
+&lt;div aria-live="polite" aria-atomic="true"&gt;
+  Translation completed with 94% confidence
+&lt;/div&gt;
+
+// Screen reader announcements
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+                </div>
+            </div>
+        </div>
+
+        <h2>🎯 Implementation Checklist</h2>
+        
+        <div class="interaction-demo">
+            <h3>Development Guidelines</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 12px;">
+                    <h4>✅ Animation Performance</h4>
+                    <ul style="font-size: 14px;">
+                        <li>Use CSS transforms instead of position changes</li>
+                        <li>Prefer opacity changes over visibility</li>
+                        <li>Use will-change property sparingly</li>
+                        <li>Implement reduce-motion preferences</li>
+                        <li>60fps target for all animations</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 12px;">
+                    <h4>🎛️ State Management</h4>
+                    <ul style="font-size: 14px;">
+                        <li>Clear loading/error/success states</li>
+                        <li>Smooth transitions between states</li>
+                        <li>Preserve user selections during updates</li>
+                        <li>Handle edge cases gracefully</li>
+                        <li>Maintain focus during dynamic updates</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 12px;">
+                    <h4>📱 Touch Optimization</h4>
+                    <ul style="font-size: 14px;">
+                        <li>44px minimum touch targets</li>
+                        <li>Visual feedback on touch</li>
+                        <li>Prevent accidental activations</li>
+                        <li>Support gesture navigation</li>
+                        <li>Optimize for one-handed use</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: var(--surface-container-low); border-radius: 12px; text-align: center;">
+            <h3 style="margin-top: 0; color: var(--japanese-red);">Ready for Implementation</h3>
+            <p>These interaction patterns provide the detailed specifications needed to implement engaging, accessible, and performant translation interface interactions that align with Material Design 3 principles and the Japanese cultural aesthetic.</p>
+            <button class="demo-button">🚀 Proceed to Accessibility Guide</button>
+        </div>
+    </div>
+
+    <script>
+        function createRipple(event, button) {
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        }
+
+        function toggleCollapsible(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.style.transform = 'rotate(0deg)';
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                icon.style.transform = 'rotate(180deg)';
+                icon.textContent = '▲';
+            }
+        }
+
+        // Add focus indicators for demo
+        document.addEventListener('DOMContentLoaded', function() {
+            const demoElements = document.querySelectorAll('.demo-button, .demo-token, .collapsible-header');
+            demoElements.forEach(element => {
+                element.setAttribute('tabindex', '0');
+                element.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

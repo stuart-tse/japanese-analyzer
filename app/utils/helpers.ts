@@ -1,10 +1,41 @@
 // 工具函数
-import { synthesizeSpeech } from '../services/api';
+import { synthesizeSpeech, TokenData } from '../services/api';
+
+export { debounce, debouncedUpdate } from './debounce';
+export { ApiError, createApiError, handleApiResponse, logError } from './errorHandler';
+export { processStreamResponse, createGeminiStreamProcessor } from './streamUtils';
 
 // 检查字符串是否包含汉字
 export function containsKanji(text: string): boolean {
   const kanjiRegex = /[\u4E00-\u9FAF\u3400-\u4DBF]/;
   return kanjiRegex.test(text);
+}
+
+// 过滤掉标点符号和空格的Token
+export function filterTokensForDisplay(tokens: TokenData[]): TokenData[] {
+  return tokens.filter(token => {
+    const word = token.word.trim();
+    
+    // Always keep layout tokens (line breaks and spaces)
+    if (token.pos === '改行' || token.pos === '空格') {
+      return true;
+    }
+    
+    // Filter out punctuation and empty tokens
+    return word !== '' && 
+           word !== '，' && 
+           word !== '。' && 
+           word !== ',' && 
+           word !== '.' && 
+           word !== ' ' &&
+           word !== '「' &&
+           word !== '」' &&
+           word !== '？' &&
+           word !== '！' &&
+           word !== '?' &&
+           word !== '!' &&
+           word !== '、';
+  });
 }
 
 export interface FuriganaPart {
@@ -123,10 +154,106 @@ export function speakJapanese(text: string): void {
     utterance.lang = 'ja-JP';
     utterance.rate = 0.9;
     utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
+    
+    const selectJapaneseVoiceAndSpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      
+      // Filter for Japanese voices with comprehensive matching
+      const japaneseVoices = voices.filter(voice => 
+        voice.lang.startsWith('ja') || 
+        voice.lang === 'ja-JP' ||
+        voice.name.toLowerCase().includes('japanese') ||
+        voice.name.toLowerCase().includes('japan') ||
+        voice.name.toLowerCase().includes('kyoko') ||
+        voice.name.toLowerCase().includes('otoya') ||
+        voice.name.toLowerCase().includes('sayaka') ||
+        voice.name.toLowerCase().includes('haruka') ||
+        // Common Japanese voice names across different systems
+        /^(Kyoko|Otoya|Sayaka|Haruka|Ichiro|Hattori)/i.test(voice.name)
+      );
+      
+      if (japaneseVoices.length > 0) {
+        // Prefer female voices, then any Japanese voice
+        const preferredVoice = japaneseVoices.find(voice => 
+          voice.name.toLowerCase().includes('female') ||
+          voice.name.toLowerCase().includes('kyoko') ||
+          voice.name.toLowerCase().includes('sayaka') ||
+          voice.name.toLowerCase().includes('haruka')
+        ) || japaneseVoices[0];
+        
+        utterance.voice = preferredVoice;
+        console.log('🇯🇵 Using Japanese voice:', preferredVoice.name, preferredVoice.lang);
+      } else {
+        console.warn('⚠️ No Japanese voices found. Available voices:', 
+          voices.map(v => ({ name: v.name, lang: v.lang })).slice(0, 10) // Show first 10 to avoid console spam
+        );
+        console.warn('📢 Using default voice with ja-JP language setting');
+      }
+      
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    // Voices might not be loaded immediately, so we need to handle both cases
+    const voices = window.speechSynthesis.getVoices();
+    
+    if (voices.length > 0) {
+      // Voices are already loaded
+      selectJapaneseVoiceAndSpeak();
+    } else {
+      // Voices are not loaded yet, wait for the voiceschanged event
+      const handleVoicesChanged = () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+        selectJapaneseVoiceAndSpeak();
+      };
+      
+      window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+      
+      // Fallback: if voices don't load within 2 seconds, proceed anyway
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+        console.warn('🕐 Voices loading timeout, proceeding with default settings');
+        selectJapaneseVoiceAndSpeak();
+      }, 2000);
+    }
   } else {
-    console.warn('浏览器不支持语音朗读功能');
+    console.warn('🚫 浏览器不支持语音朗读功能');
   }
+}
+
+// 获取可用的日语语音列表
+export function getAvailableJapaneseVoices(): SpeechSynthesisVoice[] {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.filter(voice => 
+      voice.lang.startsWith('ja') || 
+      voice.lang === 'ja-JP' ||
+      voice.name.toLowerCase().includes('japanese') ||
+      voice.name.toLowerCase().includes('japan') ||
+      voice.name.toLowerCase().includes('kyoko') ||
+      voice.name.toLowerCase().includes('otoya') ||
+      voice.name.toLowerCase().includes('sayaka') ||
+      voice.name.toLowerCase().includes('haruka') ||
+      /^(Kyoko|Otoya|Sayaka|Haruka|Ichiro|Hattori)/i.test(voice.name)
+    );
+  }
+  return [];
+}
+
+// 测试日语语音功能
+export function testJapaneseVoice(): void {
+  const testText = "こんにちは。これは日本語のテストです。";
+  console.log('🧪 Testing Japanese voice with:', testText);
+  
+  // Show available Japanese voices
+  const japaneseVoices = getAvailableJapaneseVoices();
+  console.log('🎤 Available Japanese voices:', japaneseVoices.map(v => ({
+    name: v.name,
+    lang: v.lang,
+    default: v.default,
+    localService: v.localService
+  })));
+  
+  speakJapanese(testText);
 }
 
 // 使用Edge/Gemini TTS朗读文本
@@ -258,4 +385,163 @@ export function getApiSettings(): { apiKey: string, apiUrl: string } {
     apiKey: process.env.API_KEY || '', 
     apiUrl: DEFAULT_API_URL 
   };
-} 
+}
+
+// Japanese Color Theme Interface
+export interface JapaneseColorTheme {
+  noun: string;
+  verb: string;
+  adjective: string;
+  particle: string;
+  adverb: string;
+  auxiliary: string;
+  other: string;
+  background: string;
+}
+
+// Enhanced color palette with better variations
+export const posColorMap: Record<string, string> = {
+  "名詞": "#2D5A27",   // Forest Green (enhanced from dark charcoal)
+  "動詞": "#C41E3A",   // Ruby Red (enhanced from primary red)
+  "形容詞": "#8B4513", // Saddle Brown (enhanced warm brown)
+  "副詞": "#4682B4",   // Steel Blue (enhanced from blue-gray)
+  "助詞": "#DAA520",   // Goldenrod (new vibrant color)
+  "助動詞": "#DC143C", // Crimson (enhanced red)
+  "接続詞": "#6A5ACD", // Slate Blue (new purple)
+  "感動詞": "#FF6347", // Tomato (new orange-red)
+  "連体詞": "#4169E1", // Royal Blue (new blue)
+  "代名詞": "#556B2F", // Dark Olive Green (enhanced charcoal)
+  "形状詞": "#A0522D", // Sienna (enhanced brown)
+  "記号": "#708090",   // Slate Gray (enhanced blue-gray)
+  "接頭辞": "#9370DB", // Medium Purple (new purple)
+  "接尾辞": "#20B2AA", // Light Sea Green (new teal)
+  "フィラー": "#CD853F", // Peru (new brown)
+  "その他": "#778899", // Light Slate Gray (enhanced gray)
+  "default": "#778899" // Light Slate Gray
+};
+
+// Color contrast mappings for selected tokens
+export const selectedTokenTextColorMap: Record<string, string> = {
+  "#2D5A27": "#FFFFFF", // Forest Green -> White
+  "#C41E3A": "#FFFFFF", // Ruby Red -> White
+  "#8B4513": "#FFFFFF", // Saddle Brown -> White
+  "#4682B4": "#FFFFFF", // Steel Blue -> White
+  "#DAA520": "#000000", // Goldenrod -> Black
+  "#DC143C": "#FFFFFF", // Crimson -> White
+  "#6A5ACD": "#FFFFFF", // Slate Blue -> White
+  "#FF6347": "#FFFFFF", // Tomato -> White
+  "#4169E1": "#FFFFFF", // Royal Blue -> White
+  "#556B2F": "#FFFFFF", // Dark Olive Green -> White
+  "#A0522D": "#FFFFFF", // Sienna -> White
+  "#708090": "#FFFFFF", // Slate Gray -> White
+  "#9370DB": "#FFFFFF", // Medium Purple -> White
+  "#20B2AA": "#FFFFFF", // Light Sea Green -> White
+  "#CD853F": "#FFFFFF", // Peru -> White
+  "#778899": "#FFFFFF", // Light Slate Gray -> White
+};
+
+// Enhanced color variants for better visual distinction
+export const posColorVariants: Record<string, { light: string; medium: string; dark: string }> = {
+  "名詞": { light: "#90EE90", medium: "#228B22", dark: "#2D5A27" }, // Greens
+  "動詞": { light: "#FFB6C1", medium: "#DC143C", dark: "#C41E3A" }, // Reds
+  "形容詞": { light: "#DEB887", medium: "#A0522D", dark: "#8B4513" }, // Browns
+  "副詞": { light: "#B0E0E6", medium: "#4682B4", dark: "#4682B4" }, // Blues
+  "助詞": { light: "#F0E68C", medium: "#DAA520", dark: "#DAA520" }, // Golds
+  "助動詞": { light: "#FFA07A", medium: "#DC143C", dark: "#DC143C" }, // Crimsons
+  "接続詞": { light: "#DDA0DD", medium: "#6A5ACD", dark: "#6A5ACD" }, // Purples
+  "感動詞": { light: "#FFE4E1", medium: "#FF6347", dark: "#FF6347" }, // Oranges
+  "連体詞": { light: "#E6E6FA", medium: "#4169E1", dark: "#4169E1" }, // Blues
+  "代名詞": { light: "#98FB98", medium: "#556B2F", dark: "#556B2F" }, // Olive Greens
+  "形状詞": { light: "#F5DEB3", medium: "#A0522D", dark: "#A0522D" }, // Browns
+  "記号": { light: "#D3D3D3", medium: "#708090", dark: "#708090" }, // Grays
+  "接頭辞": { light: "#E0B4D6", medium: "#9370DB", dark: "#9370DB" }, // Purples
+  "接尾辞": { light: "#AFEEEE", medium: "#20B2AA", dark: "#20B2AA" }, // Teals
+  "フィラー": { light: "#F5DEB3", medium: "#CD853F", dark: "#CD853F" }, // Browns
+  "その他": { light: "#D3D3D3", medium: "#778899", dark: "#778899" }, // Grays
+};
+
+// 获取词性对应的语法颜色类名 (使用新的颜色体系)
+export function getGrammarColorClass(pos: string): string {
+  const basePos = pos.split('-')[0];
+  
+  switch (basePos) {
+    case '名詞':
+    case '代名詞':
+      return 'text-grammar-noun';
+    case '動詞':
+    case '助動詞':
+      return 'text-grammar-verb';
+    case '形容詞':
+    case '形状詞':
+      return 'text-grammar-adjective';
+    case '助詞':
+      return 'text-grammar-particle';
+    case '副詞':
+      return 'text-grammar-adverb';
+    case '接続詞':
+    case '感動詞':
+    case '連体詞':
+    case '記号':
+    case '接頭辞':
+    case '接尾辞':
+    case 'フィラー':
+    case 'その他':
+    default:
+      return 'text-grammar-other';
+  }
+}
+
+// 获取词性对应的十六进制颜色值
+export function getGrammarColor(pos: string): string {
+  const basePos = pos.split('-')[0];
+  return posColorMap[basePos] || posColorMap['default'];
+}
+
+// Get optimal text color for selected token based on background
+export function getSelectedTokenTextColor(backgroundColor: string): string {
+  // First try direct lookup
+  if (selectedTokenTextColorMap[backgroundColor]) {
+    return selectedTokenTextColorMap[backgroundColor];
+  }
+  
+  // If no direct match, use the contrast calculation function
+  return getContrastColor(backgroundColor);
+}
+
+// Get color variant for enhanced visual distinction
+export function getColorVariant(pos: string, variant: 'light' | 'medium' | 'dark' = 'medium'): string {
+  const basePos = pos.split('-')[0];
+  const variants = posColorVariants[basePos] || posColorVariants['その他'];
+  return variants[variant];
+}
+
+// Calculate color contrast for better accessibility
+export function getContrastColor(hexColor: string): string {
+  // Remove # if present
+  const color = hexColor.replace('#', '');
+  
+  // Parse RGB values
+  const r = parseInt(color.substr(0, 2), 16);
+  const g = parseInt(color.substr(2, 2), 16);
+  const b = parseInt(color.substr(4, 2), 16);
+  
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  // Return white for dark colors, black for light colors
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+}
+
+// 获取当前的日语语法颜色主题 (Enhanced)
+export function getCurrentJapaneseTheme(): JapaneseColorTheme {
+  return {
+    noun: '#2D5A27',       // Forest Green - 名詞
+    verb: '#C41E3A',       // Ruby Red - 動詞
+    adjective: '#8B4513',  // Saddle Brown - 形容詞
+    particle: '#DAA520',   // Goldenrod - 助詞
+    adverb: '#4682B4',     // Steel Blue - 副詞
+    auxiliary: '#DC143C',  // Crimson - 助動詞
+    other: '#778899',      // Light Slate Gray - その他
+    background: '#DAC8C0', // Light Beige - 背景
+  };
+}

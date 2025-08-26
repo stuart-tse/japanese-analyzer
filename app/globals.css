@@ -2,74 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== Material 3 Design Tokens ========== */
+/* ========== Material 3 Design Tokens + Japanese Color Palette ========== */
 :root {
-  /* Primary colors */
+  /* Japanese Analyzer Color Palette */
+  --japanese-red-primary: #994639;   /* Primary Red for verbs, important actions, errors */
+  --japanese-charcoal-dark: #42433B;  /* Dark Charcoal for primary text, nouns */
+  --japanese-brown-warm: #8F7E74;     /* Warm Brown for adjectives, particles, secondary elements */
+  --japanese-beige-light: #DAC8C0;    /* Light Beige for backgrounds */
+  --japanese-blue-gray-cool: #9FAEB3; /* Cool Blue-Gray for adverbs, supporting information, borders */
+  
+  /* Japanese Grammar Colors */
+  --grammar-noun: var(--japanese-charcoal-dark);
+  --grammar-verb: var(--japanese-red-primary);
+  --grammar-adjective: var(--japanese-brown-warm);
+  --grammar-particle: var(--japanese-brown-warm);
+  --grammar-adverb: var(--japanese-blue-gray-cool);
+  --grammar-auxiliary: var(--japanese-red-primary);
+  --grammar-other: var(--japanese-blue-gray-cool);
+  --grammar-background: var(--japanese-beige-light);
+  
+  /* Primary colors - Updated to integrate Japanese palette */
   --primary-50: #f3f0ff;
   --primary-100: #e8def8;
   --primary-200: #d2c4df;
   --primary-300: #b69df8;
   --primary-400: #9777ff;
-  --primary-500: #6750a4;
+  --primary-500: var(--japanese-charcoal-dark); /* Updated to use Japanese palette */
   --primary-600: #5d4e8b;
   --primary-700: #4f3e73;
   --primary-800: #423459;
   --primary-900: #362a41;
   
-  /* Surface colors */
-  --surface: #fef7ff;
+  /* Surface colors - Updated to use Japanese beige */
+  --surface: var(--japanese-beige-light);
   --surface-variant: #e7e0ec;
-  --on-surface: #1d1b20;
-  --on-surface-variant: #49454f;
+  --on-surface: var(--japanese-charcoal-dark);
+  --on-surface-variant: var(--japanese-brown-warm);
   
-  /* Outline colors */
-  --outline: #79747e;
+  /* Outline colors - Updated to use Japanese colors */
+  --outline: var(--japanese-blue-gray-cool);
   --outline-variant: #cac4d0;
   
-  /* Error colors */
-  --error: #ba1a1a;
+  /* Error colors - Updated to use Japanese red */
+  --error: var(--japanese-red-primary);
   --on-error: #ffffff;
   --error-container: #ffdad6;
   --on-error-container: #410002;
 }
 
 .dark {
+  /* Japanese Color Palette - Dark Mode Adaptations */
+  --japanese-red-primary: #FF6B4A;     /* Lighter red for dark mode */
+  --japanese-charcoal-dark: #E5E7EB;   /* Light gray for text in dark mode */
+  --japanese-brown-warm: #D4C4B0;      /* Lighter brown for dark mode */
+  --japanese-beige-light: #2B1D33;     /* Dark purple background */
+  --japanese-blue-gray-cool: #B0C4DE;  /* Lighter blue-gray for dark mode */
+  
+  /* Japanese Grammar Colors - Dark Mode */
+  --grammar-noun: var(--japanese-charcoal-dark);
+  --grammar-verb: var(--japanese-red-primary);
+  --grammar-adjective: var(--japanese-brown-warm);
+  --grammar-particle: var(--japanese-brown-warm);
+  --grammar-adverb: var(--japanese-blue-gray-cool);
+  --grammar-auxiliary: var(--japanese-red-primary);
+  --grammar-other: var(--japanese-blue-gray-cool);
+  --grammar-background: var(--japanese-beige-light);
+  
   /* Primary colors - dark */
   --primary-50: #2b1d33;
   --primary-100: #413347;
   --primary-200: #56485c;
   --primary-300: #6d5e72;
   --primary-400: #847489;
-  --primary-500: #9c8ba1;
+  --primary-500: var(--japanese-charcoal-dark);
   --primary-600: #b4a2ba;
   --primary-700: #cdb9d3;
   --primary-800: #e6d0ed;
   --primary-900: #f8e8ff;
   
   /* Surface colors - dark */
-  --surface: #141218;
+  --surface: var(--japanese-beige-light);
   --surface-variant: #49454f;
-  --on-surface: #e6e0e9;
-  --on-surface-variant: #cac4d0;
+  --on-surface: var(--japanese-charcoal-dark);
+  --on-surface-variant: var(--japanese-brown-warm);
   
   /* Outline colors - dark */
-  --outline: #938f99;
+  --outline: var(--japanese-blue-gray-cool);
   --outline-variant: #49454f;
   
   /* Error colors - dark */
-  --error: #ffb4ab;
+  --error: var(--japanese-red-primary);
   --on-error: #690005;
   --error-container: #93000a;
   --on-error-container: #ffdad6;
 }
 
-/* Material 3 utility classes */
+/* Material 3 + Japanese Grammar utility classes */
 .text-primary-600 { color: var(--primary-600); }
 .text-primary-400 { color: var(--primary-400); }
 .text-on-surface { color: var(--on-surface); }
 .text-on-surface-dark { color: var(--on-surface); }
 .text-on-surface-variant { color: var(--on-surface-variant); }
 .text-on-surface-variant-dark { color: var(--on-surface-variant); }
+
+/* Japanese Grammar Color Classes */
+.text-grammar-noun { color: var(--grammar-noun) !important; }
+.text-grammar-verb { color: var(--grammar-verb) !important; }
+.text-grammar-adjective { color: var(--grammar-adjective) !important; }
+.text-grammar-particle { color: var(--grammar-particle) !important; }
+.text-grammar-adverb { color: var(--grammar-adverb) !important; }
+.text-grammar-auxiliary { color: var(--grammar-auxiliary) !important; }
+.text-grammar-other { color: var(--grammar-other) !important; }
+
+.bg-grammar-background { background-color: var(--grammar-background) !important; }
 
 .bg-surface { background-color: var(--surface); }
 .bg-surface-dark { background-color: var(--surface); }
@@ -145,19 +190,18 @@ input, textarea {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--surface);
+  color: var(--on-surface);
   font-family: Inter, 'Noto Sans JP', sans-serif;
-  color: rgb(var(--foreground-rgb));
-  background-color: #ffffff;
 }
 
 .premium-card {
-  background-color: #f7f2fa; /* 浅紫色背景，与实际显示颜色一致 */
+  background-color: var(--grammar-background); /* Use Japanese beige background */
   border-radius: 12px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   padding: 2rem 1.5rem; /* 较小的水平内边距，适应移动设备 */
   margin-bottom: 1.5rem;
+  border: 1px solid var(--outline);
 }
 
 @media (max-width: 640px) {
@@ -349,7 +393,9 @@ body {
   word-spacing: 0.3em; /* 增加词间距 */
   overflow-wrap: break-word; /* 允许长单词在必要时换行 */
   word-break: break-all; /* 在必要时允许在单词中间换行 */
-  background-color: #f7f2fa; /* 与卡片背景统一的浅紫色 */
+  background-color: var(--grammar-background); /* Use Japanese beige background */
+  border: 1px solid var(--outline);
+  border-radius: 8px;
 }
 
 @media (max-width: 640px) {
@@ -357,7 +403,7 @@ body {
     line-height: 3.2; /* 移动设备上略小的行高 */
     word-spacing: 0.2em; /* 移动设备上略小的词间距 */
     font-size: 0.95rem; /* 移动设备上略小的字体大小 */
-    background-color: #f7f2fa; /* 移动设备上也保持统一的浅紫色背景 */
+    background-color: var(--grammar-background); /* Use Japanese beige background */
   }
 }
 
@@ -399,23 +445,24 @@ body {
   }
 }
 
-.pos-dot.pos-名詞 { background-color: #89CFF0; }
-.pos-dot.pos-動詞 { background-color: #77DD77; }
-.pos-dot.pos-形容詞 { background-color: #FFB347; }
-.pos-dot.pos-副詞 { background-color: #C3B1E1; }
-.pos-dot.pos-助詞 { background-color: #FF6961; }
-.pos-dot.pos-助動詞 { background-color: #FF8FAB; }
-.pos-dot.pos-接続詞 { background-color: #D2B48C; }
-.pos-dot.pos-感動詞 { background-color: #AEC6CF; }
-.pos-dot.pos-連体詞 { background-color: #7FFFD4; }
-.pos-dot.pos-代名詞 { background-color: #ADD8E6; }
-.pos-dot.pos-形状詞 { background-color: #FDFD96; }
+/* Updated POS dots with new Japanese color palette */
+.pos-dot.pos-名詞 { background-color: var(--grammar-noun); }
+.pos-dot.pos-動詞 { background-color: var(--grammar-verb); }
+.pos-dot.pos-形容詞 { background-color: var(--grammar-adjective); }
+.pos-dot.pos-副詞 { background-color: var(--grammar-adverb); }
+.pos-dot.pos-助詞 { background-color: var(--grammar-particle); }
+.pos-dot.pos-助動詞 { background-color: var(--grammar-auxiliary); }
+.pos-dot.pos-接続詞 { background-color: var(--grammar-other); }
+.pos-dot.pos-感動詞 { background-color: var(--grammar-other); }
+.pos-dot.pos-連体詞 { background-color: var(--grammar-other); }
+.pos-dot.pos-代名詞 { background-color: var(--grammar-noun); }
+.pos-dot.pos-形状詞 { background-color: var(--grammar-adjective); }
 .pos-dot.pos-記号 { background-color: transparent !important; }
-.pos-dot.pos-接頭辞 { background-color: #DCDCDC; }
-.pos-dot.pos-接尾辞 { background-color: #E6E6FA; }
-.pos-dot.pos-フィラー { background-color: #F5F5F5; }
-.pos-dot.pos-その他 { background-color: #C0C0C0; }
-.pos-dot.pos-default { background-color: #E0E0E0; }
+.pos-dot.pos-接頭辞 { background-color: var(--grammar-other); }
+.pos-dot.pos-接尾辞 { background-color: var(--grammar-other); }
+.pos-dot.pos-フィラー { background-color: var(--grammar-other); }
+.pos-dot.pos-その他 { background-color: var(--grammar-other); }
+.pos-dot.pos-default { background-color: var(--grammar-other); }
 
 .word-unit-wrapper { 
   display: inline-flex; 
@@ -435,11 +482,12 @@ body {
   padding-bottom: 2px; 
   padding-top: 1.8em; /* 为假名提供足够空间 */
   font-size: 1.2rem; 
-  color: #2c3e50; 
+  color: var(--on-surface); /* Use semantic color instead of hardcoded */
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
   line-height: 1.2; /* 略微增加行高 */
   margin: 0 1px; /* 添加词间距 */
+  font-weight: 500;
 }
 
 @media (max-width: 640px) {
@@ -463,23 +511,31 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.word-token.pos-名詞::after { background-color: #89CFF0; }
-.word-token.pos-動詞::after { background-color: #77DD77; }
-.word-token.pos-形容詞::after { background-color: #FFB347; }
-.word-token.pos-副詞::after { background-color: #C3B1E1; }
-.word-token.pos-助詞::after { background-color: #FF6961; }
-.word-token.pos-助動詞::after { background-color: #FF8FAB; }
-.word-token.pos-接続詞::after { background-color: #D2B48C; }
-.word-token.pos-感動詞::after { background-color: #AEC6CF; }
-.word-token.pos-連体詞::after { background-color: #7FFFD4; }
-.word-token.pos-代名詞::after { background-color: #ADD8E6; }
-.word-token.pos-形状詞::after { background-color: #FDFD96; }
+/* Updated word token underlines with new Japanese color palette */
+.word-token.pos-名詞::after { background-color: var(--grammar-noun); }
+.word-token.pos-動詞::after { background-color: var(--grammar-verb); }
+.word-token.pos-形容詞::after { background-color: var(--grammar-adjective); }
+.word-token.pos-副詞::after { background-color: var(--grammar-adverb); }
+.word-token.pos-助詞::after { background-color: var(--grammar-particle); }
+.word-token.pos-助動詞::after { background-color: var(--grammar-auxiliary); }
+.word-token.pos-接続詞::after { background-color: var(--grammar-other); }
+.word-token.pos-感動詞::after { background-color: var(--grammar-other); }
+.word-token.pos-連体詞::after { background-color: var(--grammar-other); }
+.word-token.pos-代名詞::after { background-color: var(--grammar-noun); }
+.word-token.pos-形状詞::after { background-color: var(--grammar-adjective); }
 .word-token.pos-記号::after { background-color: transparent !important; }
-.word-token.pos-接頭辞::after { background-color: #DCDCDC; }
-.word-token.pos-接尾辞::after { background-color: #E6E6FA; }
-.word-token.pos-フィラー::after { background-color: #F5F5F5; }
-.word-token.pos-その他::after { background-color: #C0C0C0; }
-.word-token.pos-default::after { background-color: #E0E0E0; }
+.word-token.pos-接頭辞::after { background-color: var(--grammar-other); }
+.word-token.pos-接尾辞::after { background-color: var(--grammar-other); }
+.word-token.pos-フィラー::after { background-color: var(--grammar-other); }
+.word-token.pos-その他::after { background-color: var(--grammar-other); }
+.word-token.pos-default::after { background-color: var(--grammar-other); }
+
+/* Enhanced token styling with grammar-based colors */
+.word-token.pos-名詞, .word-token.pos-代名詞 { color: var(--grammar-noun) !important; }
+.word-token.pos-動詞, .word-token.pos-助動詞 { color: var(--grammar-verb) !important; }
+.word-token.pos-形容詞, .word-token.pos-形状詞 { color: var(--grammar-adjective) !important; }
+.word-token.pos-助詞 { color: var(--grammar-particle) !important; }
+.word-token.pos-副詞 { color: var(--grammar-adverb) !important; }
 
 ruby { 
   ruby-position: over; 
@@ -536,8 +592,8 @@ rb {
 }
 
 #wordDetailInlineContainer {
-  background-color: #f7f2fa; /* 浅紫色背景 */
-  border: 1px solid #e0e0e0;
+  background-color: var(--grammar-background); /* Use Japanese beige background */
+  border: 1px solid var(--outline);
   border-radius: 10px;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -576,15 +632,16 @@ rb {
 .read-aloud-button {
   background: none;
   border: none;
-  color: #007AFF;
+  color: var(--grammar-verb);
   cursor: pointer;
   font-size: 1.1em; 
   padding: 0 0.3em;
   margin-left: 0.3em;
   vertical-align: middle;
+  transition: color 0.2s ease;
 }
 .read-aloud-button:hover {
-  color: #005ecb;
+  color: var(--grammar-auxiliary);
 }
 
 @keyframes slideDownFadeIn {
@@ -614,23 +671,24 @@ rb {
   }
 }
 
-.detail-pos-tag.pos-名詞 { border-color: #89CFF0; }
-.detail-pos-tag.pos-動詞 { border-color: #77DD77; }
-.detail-pos-tag.pos-形容詞 { border-color: #FFB347; }
-.detail-pos-tag.pos-副詞 { border-color: #C3B1E1; }
-.detail-pos-tag.pos-助詞 { border-color: #FF6961; }
-.detail-pos-tag.pos-助動詞 { border-color: #FF8FAB; }
-.detail-pos-tag.pos-接続詞 { border-color: #D2B48C; }
-.detail-pos-tag.pos-感動詞 { border-color: #AEC6CF; }
-.detail-pos-tag.pos-連体詞 { border-color: #7FFFD4; }
-.detail-pos-tag.pos-代名詞 { border-color: #ADD8E6; }
-.detail-pos-tag.pos-形状詞 { border-color: #FDFD96; }
-.detail-pos-tag.pos-記号 { border-color: #B2BEB5; }
-.detail-pos-tag.pos-接頭辞 { border-color: #DCDCDC; }
-.detail-pos-tag.pos-接尾辞 { border-color: #E6E6FA; }
-.detail-pos-tag.pos-フィラー { border-color: #F5F5F5; }
-.detail-pos-tag.pos-その他 { border-color: #C0C0C0; }
-.detail-pos-tag.pos-default { border-color: #E0E0E0; }
+/* Updated detail POS tags with new Japanese color palette */
+.detail-pos-tag.pos-名詞 { border-color: var(--grammar-noun); color: var(--grammar-noun); }
+.detail-pos-tag.pos-動詞 { border-color: var(--grammar-verb); color: var(--grammar-verb); }
+.detail-pos-tag.pos-形容詞 { border-color: var(--grammar-adjective); color: var(--grammar-adjective); }
+.detail-pos-tag.pos-副詞 { border-color: var(--grammar-adverb); color: var(--grammar-adverb); }
+.detail-pos-tag.pos-助詞 { border-color: var(--grammar-particle); color: var(--grammar-particle); }
+.detail-pos-tag.pos-助動詞 { border-color: var(--grammar-auxiliary); color: var(--grammar-auxiliary); }
+.detail-pos-tag.pos-接続詞 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-感動詞 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-連体詞 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-代名詞 { border-color: var(--grammar-noun); color: var(--grammar-noun); }
+.detail-pos-tag.pos-形状詞 { border-color: var(--grammar-adjective); color: var(--grammar-adjective); }
+.detail-pos-tag.pos-記号 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-接頭辞 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-接尾辞 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-フィラー { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-その他 { border-color: var(--grammar-other); color: var(--grammar-other); }
+.detail-pos-tag.pos-default { border-color: var(--grammar-other); color: var(--grammar-other); }
 
 .tooltip { 
 }
@@ -689,7 +747,7 @@ rb {
   align-items: center;
 }
 .settings-modal-content {
-  background-color: #f7f2fa; /* 浅紫色背景 */
+  background-color: var(--grammar-background); /* Use Japanese beige background */
   margin: auto;
   padding: 25px;
   border-radius: 10px;
@@ -697,6 +755,7 @@ rb {
   width: 90%;
   max-width: 450px; /* Adjusted width */
   animation: fadeInModal 0.3s;
+  border: 1px solid var(--outline);
 }
 
 @media (max-width: 640px) {
@@ -805,7 +864,8 @@ input[type="text"],
 
 /* Safari专用类 */
 html.safari textarea,
-html.safari input[type="text"] {
+html.safari input[type="text"],
+html.safari input[type="password"] {
   -webkit-text-fill-color: black !important;
   color: black !important;
   opacity: 1 !important;
@@ -844,7 +904,7 @@ html.safari #japaneseInput {
 }
 
 .word-detail-modal-content {
-  background-color: #f7f2fa; /* 浅紫色背景 */
+  background-color: var(--grammar-background); /* Use Japanese beige background */
   border-radius: 12px;
   padding: 20px;
   width: 100%;
@@ -855,6 +915,7 @@ html.safari #japaneseInput {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   animation: zoomInModal 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
   will-change: transform, opacity;
+  border: 1px solid var(--outline);
 }
 
 @keyframes zoomInModal {
@@ -932,8 +993,8 @@ html.safari #japaneseInput {
 
 /* 暗色模式下的premium卡片 - 优化背景和边框 */
 .dark .premium-card {
-  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
-  border: 1px solid #374151;
+  background-color: var(--grammar-background); /* Use Japanese dark mode background */
+  border: 1px solid var(--outline);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
@@ -968,8 +1029,15 @@ html.safari #japaneseInput {
 
 /* 暗色模式下的文本优化 */
 .dark .word-token {
-  color: #e5e7eb;
+  color: var(--on-surface);
 }
+
+/* Dark mode grammar color overrides */
+.dark .word-token.pos-名詞, .dark .word-token.pos-代名詞 { color: var(--grammar-noun) !important; }
+.dark .word-token.pos-動詞, .dark .word-token.pos-助動詞 { color: var(--grammar-verb) !important; }
+.dark .word-token.pos-形容詞, .dark .word-token.pos-形状詞 { color: var(--grammar-adjective) !important; }
+.dark .word-token.pos-助詞 { color: var(--grammar-particle) !important; }
+.dark .word-token.pos-副詞 { color: var(--grammar-adverb) !important; }
 
 /* 暗色模式下的输入框 - 重点优化 */
 .dark input,
@@ -1046,9 +1114,9 @@ html.safari #japaneseInput {
 /* 暗色模式下的模态框 */
 .dark .settings-modal-content,
 .dark .word-detail-modal-content {
-  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
-  border: 1px solid #374151;
-  color: #f9fafb;
+  background-color: var(--grammar-background); /* Use Japanese dark mode background */
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
 }
 
 /* 暗色模式下的关闭按钮 */
@@ -1068,9 +1136,9 @@ html.safari #japaneseInput {
 
 /* 暗色模式下的内联详情容器 */
 .dark #wordDetailInlineContainer {
-  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
-  border: 1px solid #374151;
-  color: #f9fafb;
+  background-color: var(--grammar-background); /* Use Japanese dark mode background */
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
 }
 
 /* 暗色模式下的选择框和下拉菜单 */
@@ -1125,7 +1193,8 @@ html.safari #japaneseInput {
 
 /* Safari专用暗色模式修复 - 重点优化 */
 .dark html.safari textarea,
-.dark html.safari input[type="text"] {
+.dark html.safari input[type="text"],
+.dark html.safari input[type="password"] {
   -webkit-text-fill-color: #f9fafb !important;
   color: #f9fafb !important;
   background-color: #374151 !important;
@@ -1160,37 +1229,36 @@ html.safari #japaneseInput {
 }
 
 .dark .bg-gray-50 {
-  background-color: #2b1d33 !important; /* 深紫色背景用于暗色模式 */
+  background-color: var(--grammar-background) !important; /* Use Japanese dark mode background */
 }
 
 /* 暗色模式下的 bg-gray-100 */
 .dark .bg-gray-100 {
-  background-color: #2b1d33 !important; /* 深紫色背景用于暗色模式 */
+  background-color: var(--grammar-background) !important; /* Use Japanese dark mode background */
 }
 
 /* 暗色模式下的词汇详解背景 */
 .dark .word-detail-explanation {
-  background-color: #2b1d33 !important; /* 深紫色背景用于暗色模式 */
+  background-color: var(--grammar-background) !important; /* Use Japanese dark mode background */
 }
 
 /* 暗色模式下的分析结果输出区域 */
 .dark #analyzedSentenceOutput {
-  background-color: #2b1d33; /* 深紫色背景用于暗色模式 */
+  background-color: var(--grammar-background); /* Use Japanese dark mode background */
 }
 
-/* 浅色模式下的灰色背景改为浅紫色，与卡片背景统一 */
+/* Use Japanese color system for backgrounds */
 .bg-gray-50 {
-  background-color: #f7f2fa !important; /* 与卡片背景统一的浅紫色 */
+  background-color: var(--grammar-background) !important; /* Use Japanese beige background */
 }
 
-/* 浅色模式下的 bg-gray-100 也改为浅紫色，与卡片背景统一 */
 .bg-gray-100 {
-  background-color: #f7f2fa !important; /* 与卡片背景统一的浅紫色 */
+  background-color: var(--grammar-background) !important; /* Use Japanese beige background */
 }
 
 /* 词汇详解背景样式，与卡片背景统一 */
 .word-detail-explanation {
-  background-color: #f7f2fa !important; /* 与卡片背景统一的浅紫色 */
+  background-color: var(--grammar-background) !important; /* Use Japanese beige background */
 }
 
 .dark .border-red-500 {
@@ -1241,4 +1309,240 @@ html.safari #japaneseInput {
 
 .dark .border-gray-300 {
   border-color: #4b5563 !important;
+}
+
+/* Japanese Text Analysis Layout Tokens */
+.tokens-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+  white-space: pre-wrap;
+  line-height: 1.2;
+  width: 100%; /* Ensure container takes full width for line breaks */
+}
+
+.tokens-container .token {
+  flex-shrink: 0;
+}
+
+/* Layout token styles */
+.layout-token-linebreak {
+  width: 100%;
+  height: 1.2em; /* Match line-height for proper spacing */
+  flex-basis: 100%;
+  display: block;
+}
+
+.layout-token-space {
+  width: 8px;
+  height: 1px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Enhanced Translation Section Styles */
+.translation-section {
+  position: relative;
+}
+
+.translation-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.translation-card.expanded {
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+/* Translation Mode Selector Animations */
+.translation-mode-selector button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.translation-mode-selector button:hover {
+  transform: translateY(-1px);
+}
+
+.translation-mode-selector button:active {
+  transform: translateY(0);
+}
+
+/* Confidence Indicator Animations */
+.confidence-indicator .h-2 > div,
+.confidence-indicator .h-1\.5 > div {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Token Translation Table Styles */
+.token-translation-table {
+  position: relative;
+}
+
+.token-translation-table tr {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.token-translation-table tr:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* History Panel Animations */
+.history-panel {
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.history-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.history-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Translation Actions Animations */
+.translation-actions button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.translation-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.translation-actions button:active {
+  transform: scale(0.95);
+}
+
+/* Progressive Loading Animations */
+.translation-skeleton {
+  background: linear-gradient(90deg, 
+    var(--surface-container) 25%, 
+    var(--surface-container-low) 50%, 
+    var(--surface-container) 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Translation Panels */
+@media (max-width: 768px) {
+  .translation-panels {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .translation-card.expanded {
+    transform: none;
+  }
+  
+  .token-translation-table .hidden {
+    display: block;
+  }
+  
+  .token-translation-table .md\:block {
+    display: none;
+  }
+}
+
+/* Dark mode enhancements for translation components */
+.dark .translation-skeleton {
+  background: linear-gradient(90deg, 
+    var(--surface-container) 25%, 
+    var(--surface-container-low) 50%, 
+    var(--surface-container) 75%);
+}
+
+.dark .translation-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .translation-card.expanded {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .translation-card,
+  .translation-mode-selector button,
+  .confidence-indicator .h-2 > div,
+  .confidence-indicator .h-1\.5 > div,
+  .token-translation-table tr,
+  .history-item,
+  .translation-actions button {
+    transition: none;
+  }
+  
+  .translation-skeleton {
+    animation: none;
+    background: var(--surface-container);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .translation-card {
+    border-width: 2px;
+  }
+  
+  .confidence-indicator .h-2,
+  .confidence-indicator .h-1\.5 {
+    border: 1px solid var(--outline);
+  }
+}
+
+/* Focus styles for better keyboard navigation */
+.translation-mode-selector button:focus-visible,
+.history-item:focus-visible,
+.translation-actions button:focus-visible {
+  outline: 2px solid var(--grammar-verb);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+/* Print styles */
+@media print {
+  .translation-actions,
+  .history-panel,
+  .translation-mode-selector {
+    display: none;
+  }
+  
+  .translation-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
 }

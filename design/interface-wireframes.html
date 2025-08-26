@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Interface Wireframes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #42433B;
+            background: #DAC8C0;
+        }
+        
+        .wireframe-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .wireframe-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .wireframe-section {
+            margin-bottom: 4rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            background: #DF3307;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .wireframe-content {
+            padding: 2rem;
+        }
+        
+        /* Desktop Layout Wireframes */
+        .desktop-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            grid-template-rows: 60px 1fr;
+            height: 700px;
+            border: 2px solid #9FAEB3;
+            background: #DAC8C0;
+            gap: 1px;
+        }
+        
+        .header-bar {
+            grid-column: 1 / -1;
+            background: #DF3307;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            font-weight: 500;
+        }
+        
+        .left-panel {
+            background: white;
+            border-right: 1px solid #9FAEB3;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .center-panel {
+            background: white;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .right-panel {
+            background: #DAC8C0;
+            border-left: 1px solid #9FAEB3;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        /* Input Section Mockup */
+        .input-section {
+            border: 2px dashed #9FAEB3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        .input-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            border: 1px solid #9FAEB3;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .tab.active {
+            background: #DF3307;
+            color: white;
+            border-color: #DF3307;
+        }
+        
+        .input-area {
+            width: 100%;
+            min-height: 60px;
+            border: 1px solid #9FAEB3;
+            border-radius: 4px;
+            padding: 0.5rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .input-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #8F7E74;
+        }
+        
+        .analyze-button {
+            background: #DF3307;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        /* Analysis Results Mockup */
+        .analysis-viewport {
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            min-height: 400px;
+            padding: 1rem;
+            background: white;
+        }
+        
+        .sentence-container {
+            line-height: 2.5;
+            font-size: 1.125rem;
+        }
+        
+        .token {
+            display: inline-block;
+            margin: 0.125rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            vertical-align: top;
+        }
+        
+        .token.noun {
+            background: #f5f5f4;
+            border: 1px solid #42433B;
+        }
+        
+        .token.verb {
+            background: #fef2f2;
+            border: 1px solid #DF3307;
+        }
+        
+        .token.adjective {
+            background: #faf7f4;
+            border: 1px solid #8F7E74;
+        }
+        
+        .token.particle {
+            background: #faf7f4;
+            border: 1px solid #8F7E74;
+        }
+        
+        .token:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .furigana {
+            font-size: 0.75rem;
+            color: #8F7E74;
+            display: block;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: 0.125rem;
+        }
+        
+        .word {
+            display: block;
+            font-weight: 500;
+        }
+        
+        .romaji {
+            font-size: 0.7rem;
+            color: #9FAEB3;
+            display: block;
+            text-align: center;
+            line-height: 1;
+            margin-top: 0.125rem;
+        }
+        
+        /* Analysis Controls */
+        .analysis-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        
+        .control-button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #9FAEB3;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .control-button.active {
+            background: #DF3307;
+            color: white;
+            border-color: #DF3307;
+        }
+        
+        /* Detail Panel Mockup */
+        .detail-panel {
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #9FAEB3;
+        }
+        
+        .word-info {
+            margin-bottom: 1rem;
+        }
+        
+        .word-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #DF3307;
+        }
+        
+        .word-details {
+            display: grid;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 0.5rem;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #8F7E74;
+        }
+        
+        .tts-button {
+            background: #DF3307;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        /* Mobile Layout */
+        .mobile-layout {
+            width: 375px;
+            height: 667px;
+            border: 2px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+            background: white;
+            margin: 0 auto;
+        }
+        
+        .mobile-header {
+            background: #DF3307;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .mobile-content {
+            padding: 1rem;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+        
+        .mobile-input {
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            width: 100%;
+            resize: none;
+        }
+        
+        .mobile-analyze {
+            background: #DF3307;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .mobile-tokens {
+            line-height: 2;
+        }
+        
+        .mobile-token {
+            display: inline-block;
+            margin: 0.125rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: #f5f5f4;
+            border: 1px solid #42433B;
+        }
+        
+        /* Learning Mode Interface */
+        .learning-mode {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .mode-button {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #9FAEB3;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .mode-button.active {
+            background: #DF3307;
+            color: white;
+            border-color: #DF3307;
+        }
+        
+        .difficulty-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #8F7E74;
+            margin-bottom: 1rem;
+        }
+        
+        .difficulty-stars {
+            color: #DF3307;
+        }
+        
+        /* Progressive Disclosure */
+        .disclosure-level {
+            border: 1px solid #9FAEB3;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .disclosure-header {
+            background: #DAC8C0;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .disclosure-content {
+            padding: 1rem;
+            border-top: 1px solid #9FAEB3;
+        }
+        
+        .annotations {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .annotation-item {
+            padding: 0.25rem 0.5rem;
+            background: #DAC8C0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="wireframe-container">
+        <div class="wireframe-header">
+            <h1>Japanese Sentence Analyzer - Interface Wireframes</h1>
+            <p>Comprehensive design specifications for improved learning experience</p>
+        </div>
+
+        <!-- Desktop Layout -->
+        <div class="wireframe-section">
+            <div class="section-title">Desktop Layout - Three-Panel Interface</div>
+            <div class="wireframe-content">
+                <div class="desktop-layout">
+                    <div class="header-bar">
+                        <span>Japanese Sentence Analyzer (日本語文章解析器)</span>
+                        <div>Settings | Theme | Help</div>
+                    </div>
+                    
+                    <div class="left-panel">
+                        <h3>Input & Controls</h3>
+                        
+                        <div class="learning-mode">
+                            <h4>Learning Mode</h4>
+                            <div class="mode-selector">
+                                <div class="mode-button active">初心者</div>
+                                <div class="mode-button">中级</div>
+                                <div class="mode-button">高级</div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-section">
+                            <div class="input-tabs">
+                                <div class="tab active">Text</div>
+                                <div class="tab">OCR</div>
+                                <div class="tab">Voice</div>
+                            </div>
+                            <textarea class="input-area" placeholder="Enter Japanese text to analyze...&#10;Example: 今日は良い天気ですね。"></textarea>
+                            <div class="input-controls">
+                                <span>0/500 characters</span>
+                                <span>~2s analysis</span>
+                            </div>
+                        </div>
+                        
+                        <button class="analyze-button">Analyze Sentence (分析)</button>
+                        
+                        <div class="difficulty-indicator">
+                            <span>Difficulty:</span>
+                            <span class="difficulty-stars">★★☆☆☆</span>
+                            <span>Beginner</span>
+                        </div>
+                    </div>
+                    
+                    <div class="center-panel">
+                        <h3>Analysis Results</h3>
+                        
+                        <div class="analysis-controls">
+                            <div class="control-button active">Tokens</div>
+                            <div class="control-button">Grammar</div>
+                            <div class="control-button">Translation</div>
+                            <div class="control-button">Pronunciation</div>
+                        </div>
+                        
+                        <div class="analysis-viewport">
+                            <div class="sentence-container">
+                                <div class="token noun">
+                                    <div class="furigana">きょう</div>
+                                    <div class="word">今日</div>
+                                    <div class="romaji">kyou</div>
+                                </div>
+                                <div class="token particle">
+                                    <div class="furigana">は</div>
+                                    <div class="word">は</div>
+                                    <div class="romaji">wa</div>
+                                </div>
+                                <div class="token adjective">
+                                    <div class="furigana">いい</div>
+                                    <div class="word">良い</div>
+                                    <div class="romaji">ii</div>
+                                </div>
+                                <div class="token noun">
+                                    <div class="furigana">てんき</div>
+                                    <div class="word">天気</div>
+                                    <div class="romaji">tenki</div>
+                                </div>
+                                <div class="token verb">
+                                    <div class="furigana">です</div>
+                                    <div class="word">です</div>
+                                    <div class="romaji">desu</div>
+                                </div>
+                                <div class="token particle">
+                                    <div class="furigana">ね</div>
+                                    <div class="word">ね</div>
+                                    <div class="romaji">ne</div>
+                                </div>
+                            </div>
+                            
+                            <div class="annotations">
+                                <div class="annotation-item">Subject: 今日は</div>
+                                <div class="annotation-item">Predicate: 良い天気です</div>
+                                <div class="annotation-item">Particle: ね (softening)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="right-panel">
+                        <h3>Word Details</h3>
+                        
+                        <div class="detail-panel">
+                            <div class="detail-header">
+                                <h4>Selected: 天気</h4>
+                                <button class="tts-button">🔊 Play</button>
+                            </div>
+                            
+                            <div class="word-info">
+                                <h3>天気 (てんき)</h3>
+                                <div class="word-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Chinese:</span>
+                                        <span>天气</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">POS:</span>
+                                        <span>Noun</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">JLPT:</span>
+                                        <span>N5</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Frequency:</span>
+                                        <span>Very Common</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="disclosure-level">
+                                <div class="disclosure-header">
+                                    <span>Basic Explanation</span>
+                                    <span>▼</span>
+                                </div>
+                                <div class="disclosure-content">
+                                    Weather; atmospheric conditions. Same characters as Chinese 天气 but pronounced differently.
+                                </div>
+                            </div>
+                            
+                            <div class="disclosure-level">
+                                <div class="disclosure-header">
+                                    <span>Usage Examples</span>
+                                    <span>▶</span>
+                                </div>
+                            </div>
+                            
+                            <div class="disclosure-level">
+                                <div class="disclosure-header">
+                                    <span>Cultural Context</span>
+                                    <span>▶</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding: 1rem; background: #faf7f4; border-radius: 6px; font-size: 0.875rem; color: #8F7E74;">
+                            <strong>💡 Learning Tip:</strong> Weather is a common conversation starter in Japanese culture, similar to Chinese.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Layout -->
+        <div class="wireframe-section">
+            <div class="section-title">Mobile Layout - Responsive Design</div>
+            <div class="wireframe-content">
+                <div class="mobile-layout">
+                    <div class="mobile-header">
+                        日本語解析器
+                    </div>
+                    <div class="mobile-content">
+                        <textarea class="mobile-input" placeholder="Enter Japanese text...&#10;今日は良い天気ですね。"></textarea>
+                        <button class="mobile-analyze">Analyze (分析)</button>
+                        
+                        <div class="mobile-tokens">
+                            <div class="mobile-token">今日<br><small>kyou</small></div>
+                            <div class="mobile-token">は<br><small>wa</small></div>
+                            <div class="mobile-token">良い<br><small>ii</small></div>
+                            <div class="mobile-token">天気<br><small>tenki</small></div>
+                            <div class="mobile-token">です<br><small>desu</small></div>
+                            <div class="mobile-token">ね<br><small>ne</small></div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 8px; font-size: 0.875rem;">
+                            <strong>Translation:</strong><br>
+                            Today is nice weather, isn't it?<br>
+                            <strong>Chinese:</strong> 今天天气很好呢。
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h4>Mobile Interaction Patterns</h4>
+                    <ul style="margin-top: 1rem; padding-left: 2rem; line-height: 1.8; color: #42433B;">
+                        <li><strong>Tap:</strong> Select word for quick translation</li>
+                        <li><strong>Long press:</strong> Open detailed analysis panel</li>
+                        <li><strong>Swipe left/right:</strong> Navigate between analysis modes</li>
+                        <li><strong>Pull down:</strong> Refresh or clear analysis</li>
+                        <li><strong>Pinch to zoom:</strong> Adjust text size for readability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progressive Disclosure Interface -->
+        <div class="wireframe-section">
+            <div class="section-title">Progressive Disclosure - Learning Complexity Management</div>
+            <div class="wireframe-content">
+                <h4>Analysis Depth Levels</h4>
+                <p style="margin-bottom: 2rem; color: #8F7E74;">Users can progressively reveal more complex information based on their learning needs.</p>
+                
+                <div class="disclosure-level">
+                    <div class="disclosure-header">
+                        <span>Level 1: Basic Translation & Key Words</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="disclosure-content">
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 6px;">
+                            <strong>Translation:</strong> Today is nice weather, isn't it?<br>
+                            <strong>Key Words:</strong> 今日 (today), 天気 (weather), 良い (good)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="disclosure-level">
+                    <div class="disclosure-header">
+                        <span>Level 2: Grammar Structure & Parts of Speech</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="disclosure-content">
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 6px;">
+                            <strong>Sentence Pattern:</strong> [Topic]は [Adjective][Noun]です[Particle]<br>
+                            <strong>Grammar Points:</strong> は-particle (topic marker), です (polite copula), ね (confirmation seeking)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="disclosure-level">
+                    <div class="disclosure-header">
+                        <span>Level 3: Cultural Context & Advanced Usage</span>
+                        <span>▶</span>
+                    </div>
+                    <div class="disclosure-content">
+                        <div style="background: #faf7f4; padding: 1rem; border-radius: 6px;">
+                            <strong>Cultural Note:</strong> Weather discussion is a common ice-breaker in Japanese culture<br>
+                            <strong>Politeness Level:</strong> Casual but polite (です/ます form)<br>
+                            <strong>Regional Variations:</strong> Can vary with dialect-specific endings
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Component States -->
+        <div class="wireframe-section">
+            <div class="section-title">Component Interaction States</div>
+            <div class="wireframe-content">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div>
+                        <h4>Token States</h4>
+                        <div style="margin: 1rem 0;">
+                            <div class="token noun" style="margin: 0.5rem;">Default State</div>
+                            <div class="token noun" style="margin: 0.5rem; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15);">Hover State</div>
+                            <div class="token noun" style="margin: 0.5rem; background: #DF3307; color: white; border-color: #DF3307;">Selected State</div>
+                            <div class="token noun" style="margin: 0.5rem; opacity: 0.5;">Disabled State</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4>Button States</h4>
+                        <div style="margin: 1rem 0;">
+                            <button class="analyze-button" style="margin-bottom: 0.5rem; width: auto; padding: 0.5rem 1rem;">Default</button><br>
+                            <button class="analyze-button" style="margin-bottom: 0.5rem; width: auto; padding: 0.5rem 1rem; background: #c62d06;">Hover</button><br>
+                            <button class="analyze-button" style="margin-bottom: 0.5rem; width: auto; padding: 0.5rem 1rem; background: #b82a05;">Active</button><br>
+                            <button class="analyze-button" style="margin-bottom: 0.5rem; width: auto; padding: 0.5rem 1rem; opacity: 0.6; cursor: not-allowed;">Loading</button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4>Input States</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="text" placeholder="Default state" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid #9FAEB3; border-radius: 4px;"><br>
+                            <input type="text" placeholder="Focus state" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 2px solid #DF3307; border-radius: 4px; outline: none;"><br>
+                            <input type="text" placeholder="Error state" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 2px solid #DF3307; border-radius: 4px; background: #fef2f2;"><br>
+                            <input type="text" placeholder="Disabled state" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid #9FAEB3; border-radius: 4px; background: #DAC8C0;" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

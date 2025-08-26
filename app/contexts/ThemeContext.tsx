@@ -4,10 +4,23 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
+// Japanese Color Theme Interface
+interface JapaneseColorTheme {
+  noun: string;
+  verb: string;
+  adjective: string;
+  particle: string;
+  adverb: string;
+  auxiliary: string;
+  other: string;
+  background: string;
+}
+
 interface ThemeContextType {
   theme: Theme;
   actualTheme: 'light' | 'dark';
   setTheme: (theme: Theme) => void;
+  japaneseColors: JapaneseColorTheme;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -60,8 +73,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('theme', newTheme);
   };
 
+  // Get Japanese color theme based on current theme
+  const japaneseColors: JapaneseColorTheme = {
+    noun: actualTheme === 'dark' ? '#E5E7EB' : '#42433B',        // Light gray for dark mode, dark charcoal for light
+    verb: actualTheme === 'dark' ? '#FF6B4A' : '#DF3307',        // Lighter red for dark mode, primary red for light
+    adjective: actualTheme === 'dark' ? '#D4C4B0' : '#8F7E74',   // Lighter brown for dark mode, warm brown for light
+    particle: actualTheme === 'dark' ? '#D4C4B0' : '#8F7E74',    // Same as adjective
+    adverb: actualTheme === 'dark' ? '#B0C4DE' : '#9FAEB3',      // Lighter blue-gray for dark mode
+    auxiliary: actualTheme === 'dark' ? '#FF6B4A' : '#DF3307',   // Same as verb
+    other: actualTheme === 'dark' ? '#B0C4DE' : '#9FAEB3',       // Same as adverb
+    background: actualTheme === 'dark' ? '#2B1D33' : '#DAC8C0',  // Dark purple for dark mode, light beige for light
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, actualTheme, setTheme: handleSetTheme }}>
+    <ThemeContext.Provider value={{ theme, actualTheme, setTheme: handleSetTheme, japaneseColors }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -73,4 +98,10 @@ export function useTheme() {
     throw new Error('useTheme必须在ThemeProvider内部使用');
   }
   return context;
+}
+
+// Hook for getting Japanese grammar colors
+export function useJapaneseColors(): JapaneseColorTheme {
+  const { japaneseColors } = useTheme();
+  return japaneseColors;
 } 

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Design Tokens</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #42433B;
+            background: #DAC8C0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .token-section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #DF3307, #c62d06);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 2rem;
+        }
+        
+        /* Color Tokens */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .color-group {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .color-group-header {
+            background: #f5f5f5;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .color-swatch {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .color-info {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .color-values {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        /* Typography Tokens */
+        .typography-showcase {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .type-sample {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .type-demo {
+            padding: 2rem;
+            background: white;
+        }
+        
+        .type-specs {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.875rem;
+            font-family: monospace;
+        }
+        
+        /* Spacing Tokens */
+        .spacing-demo {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .spacing-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .spacing-visual {
+            background: #DF3307;
+            border-radius: 2px;
+        }
+        
+        .spacing-label {
+            font-weight: 600;
+            min-width: 80px;
+        }
+        
+        .spacing-value {
+            font-family: monospace;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        
+        /* Shadow Tokens */
+        .shadow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .shadow-demo {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1rem;
+            text-align: center;
+        }
+        
+        .shadow-label {
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        
+        .shadow-value {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        /* Border Radius Tokens */
+        .radius-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .radius-demo {
+            background: #DF3307;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .radius-info {
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .radius-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .radius-value {
+            font-family: monospace;
+            color: #666;
+            font-size: 0.75rem;
+        }
+        
+        /* Learning-Specific Color Tokens */
+        .pos-colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        
+        .pos-color {
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .pos-color.noun {
+            background: linear-gradient(135deg, #42433B, #363730);
+        }
+        
+        .pos-color.verb {
+            background: linear-gradient(135deg, #DF3307, #c62d06);
+        }
+        
+        .pos-color.adjective {
+            background: linear-gradient(135deg, #8F7E74, #7a6b5f);
+        }
+        
+        .pos-color.particle {
+            background: linear-gradient(135deg, #8F7E74, #7a6b5f);
+        }
+        
+        .pos-color.adverb {
+            background: linear-gradient(135deg, #9FAEB3, #8a9ca3);
+        }
+        
+        .pos-color.other {
+            background: linear-gradient(135deg, #9FAEB3, #8a9ca3);
+        }
+        
+        /* Semantic Color Tokens */
+        .semantic-colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        
+        .semantic-color {
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .semantic-color.success {
+            background: linear-gradient(135deg, #8F7E74, #7a6b5f);
+        }
+        
+        .semantic-color.warning {
+            background: linear-gradient(135deg, #DF3307, #c62d06);
+        }
+        
+        .semantic-color.error {
+            background: linear-gradient(135deg, #DF3307, #c62d06);
+        }
+        
+        .semantic-color.info {
+            background: linear-gradient(135deg, #9FAEB3, #8a9ca3);
+        }
+        
+        /* CSS Custom Properties Output */
+        .css-variables {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 2rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+        
+        .variable-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .variable-comment {
+            color: #68d391;
+            margin-bottom: 0.5rem;
+        }
+        
+        .variable-line {
+            margin-left: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .variable-name {
+            color: #63b3ed;
+        }
+        
+        .variable-value {
+            color: #fbb6ce;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Analyzer - Design Tokens</h1>
+            <p>Comprehensive design system tokens for consistent and accessible interface design</p>
+        </div>
+
+        <!-- Color Tokens -->
+        <div class="token-section">
+            <div class="section-header">Color Tokens</div>
+            <div class="section-content">
+                <h3>Primary Brand Colors</h3>
+                <div class="color-grid">
+                    <div class="color-group">
+                        <div class="color-group-header">Primary Red</div>
+                        <div class="color-swatch" style="background: #DF3307;">Primary 500</div>
+                        <div class="color-info">
+                            <div class="color-name">Primary</div>
+                            <div class="color-values">
+                                #DF3307<br>
+                                rgb(223, 51, 7)<br>
+                                hsl(12, 94%, 45%)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Dark Charcoal</div>
+                        <div class="color-swatch" style="background: #42433B;">Secondary 500</div>
+                        <div class="color-info">
+                            <div class="color-name">Dark Charcoal</div>
+                            <div class="color-values">
+                                #42433B<br>
+                                rgb(66, 67, 59)<br>
+                                hsl(68, 6%, 25%)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Cool Blue-Gray</div>
+                        <div class="color-swatch" style="background: #9FAEB3;">Accent 500</div>
+                        <div class="color-info">
+                            <div class="color-name">Blue-Gray</div>
+                            <div class="color-values">
+                                #9FAEB3<br>
+                                rgb(159, 174, 179)<br>
+                                hsl(195, 12%, 66%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Parts of Speech Color System</h3>
+                <div class="pos-colors">
+                    <div class="pos-color noun">
+                        Nouns<br>
+                        <small style="opacity: 0.8;">#42433B</small>
+                    </div>
+                    <div class="pos-color verb">
+                        Verbs<br>
+                        <small style="opacity: 0.8;">#DF3307</small>
+                    </div>
+                    <div class="pos-color adjective">
+                        Adjectives<br>
+                        <small style="opacity: 0.8;">#8F7E74</small>
+                    </div>
+                    <div class="pos-color particle">
+                        Particles<br>
+                        <small style="opacity: 0.8;">#8F7E74</small>
+                    </div>
+                    <div class="pos-color adverb">
+                        Adverbs<br>
+                        <small style="opacity: 0.8;">#9FAEB3</small>
+                    </div>
+                    <div class="pos-color other">
+                        Other<br>
+                        <small style="opacity: 0.8;">#9FAEB3</small>
+                    </div>
+                </div>
+
+                <h3>Semantic Colors</h3>
+                <div class="semantic-colors">
+                    <div class="semantic-color success">
+                        Success<br>
+                        <small style="opacity: 0.8;">#8F7E74</small>
+                    </div>
+                    <div class="semantic-color warning">
+                        Warning<br>
+                        <small style="opacity: 0.8;">#DF3307</small>
+                    </div>
+                    <div class="semantic-color error">
+                        Error<br>
+                        <small style="opacity: 0.8;">#DF3307</small>
+                    </div>
+                    <div class="semantic-color info">
+                        Info<br>
+                        <small style="opacity: 0.8;">#9FAEB3</small>
+                    </div>
+                </div>
+
+                <h3>Core Color Palette</h3>
+                <div class="color-grid">
+                    <div class="color-group">
+                        <div class="color-group-header">Light Beige</div>
+                        <div class="color-swatch" style="background: #DAC8C0; color: #42433B;">Background</div>
+                        <div class="color-info">
+                            <div class="color-name">Light Beige</div>
+                            <div class="color-values">#DAC8C0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Warm Brown</div>
+                        <div class="color-swatch" style="background: #8F7E74; color: white;">Secondary</div>
+                        <div class="color-info">
+                            <div class="color-name">Warm Brown</div>
+                            <div class="color-values">#8F7E74</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Cool Blue-Gray</div>
+                        <div class="color-swatch" style="background: #9FAEB3; color: white;">Supporting</div>
+                        <div class="color-info">
+                            <div class="color-name">Blue-Gray</div>
+                            <div class="color-values">#9FAEB3</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Dark Charcoal</div>
+                        <div class="color-swatch" style="background: #42433B; color: white;">Primary Text</div>
+                        <div class="color-info">
+                            <div class="color-name">Dark Charcoal</div>
+                            <div class="color-values">#42433B</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Primary Red</div>
+                        <div class="color-swatch" style="background: #DF3307; color: white;">Accent</div>
+                        <div class="color-info">
+                            <div class="color-name">Primary Red</div>
+                            <div class="color-values">#DF3307</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-group">
+                        <div class="color-group-header">Pure White</div>
+                        <div class="color-swatch" style="background: #FFFFFF; color: #42433B; border: 1px solid #9FAEB3;">Surface</div>
+                        <div class="color-info">
+                            <div class="color-name">White</div>
+                            <div class="color-values">#FFFFFF</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography Tokens -->
+        <div class="token-section">
+            <div class="section-header">Typography Tokens</div>
+            <div class="section-content">
+                <div class="typography-showcase">
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <h1 style="font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin: 0;">Heading 1 - 大見出し</h1>
+                        </div>
+                        <div class="type-specs">
+                            font-size: 2.5rem (40px) | font-weight: 700 | line-height: 1.2 | letter-spacing: -0.02em
+                        </div>
+                    </div>
+                    
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <h2 style="font-size: 2rem; font-weight: 600; line-height: 1.3; margin: 0;">Heading 2 - 中見出し</h2>
+                        </div>
+                        <div class="type-specs">
+                            font-size: 2rem (32px) | font-weight: 600 | line-height: 1.3 | letter-spacing: -0.01em
+                        </div>
+                    </div>
+                    
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <h3 style="font-size: 1.5rem; font-weight: 600; line-height: 1.4; margin: 0;">Heading 3 - 小見出し</h3>
+                        </div>
+                        <div class="type-specs">
+                            font-size: 1.5rem (24px) | font-weight: 600 | line-height: 1.4
+                        </div>
+                    </div>
+                    
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <p style="font-size: 1rem; font-weight: 400; line-height: 1.6; margin: 0;">Body Text - 本文。これは日本語の文章解析アプリケーションのためのタイポグラフィシステムです。読みやすさと美しさを両立させています。</p>
+                        </div>
+                        <div class="type-specs">
+                            font-size: 1rem (16px) | font-weight: 400 | line-height: 1.6
+                        </div>
+                    </div>
+                    
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <p style="font-size: 0.875rem; font-weight: 400; line-height: 1.5; margin: 0; color: #666;">Small Text - 補助的なテキスト。注釈や説明文に使用します。</p>
+                        </div>
+                        <div class="type-specs">
+                            font-size: 0.875rem (14px) | font-weight: 400 | line-height: 1.5 | color: #666
+                        </div>
+                    </div>
+                    
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <p style="font-size: 0.75rem; font-weight: 500; line-height: 1.4; margin: 0; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Caption - ラベルテキスト</p>
+                        </div>
+                        <div class="type-specs">
+                            font-size: 0.75rem (12px) | font-weight: 500 | line-height: 1.4 | text-transform: uppercase | letter-spacing: 0.05em
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Japanese-Specific Typography</h3>
+                <div class="typography-showcase">
+                    <div class="type-sample">
+                        <div class="type-demo">
+                            <div style="font-size: 1.5rem; line-height: 2.5; margin: 0;">
+                                <span style="display: inline-block; text-align: center; margin: 0 0.25rem;">
+                                    <span style="display: block; font-size: 0.7rem; color: #666;">きょう</span>
+                                    <span style="font-weight: 600;">今日</span>
+                                    <span style="display: block; font-size: 0.65rem; color: #999; font-style: italic;">kyou</span>
+                                </span>
+                                <span style="display: inline-block; text-align: center; margin: 0 0.25rem;">
+                                    <span style="display: block; font-size: 0.7rem; color: #666;">は</span>
+                                    <span style="font-weight: 600;">は</span>
+                                    <span style="display: block; font-size: 0.65rem; color: #999; font-style: italic;">wa</span>
+                                </span>
+                                <span style="display: inline-block; text-align: center; margin: 0 0.25rem;">
+                                    <span style="display: block; font-size: 0.7rem; color: #666;">いい</span>
+                                    <span style="font-weight: 600;">良い</span>
+                                    <span style="display: block; font-size: 0.65rem; color: #999; font-style: italic;">ii</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="type-specs">
+                            Token Text: base 1.5rem | Furigana: 0.7rem | Romaji: 0.65rem italic | Line-height: 2.5
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacing Tokens -->
+        <div class="token-section">
+            <div class="section-header">Spacing Tokens</div>
+            <div class="section-content">
+                <div class="spacing-demo">
+                    <div class="spacing-item">
+                        <div class="spacing-visual" style="width: 4px; height: 20px;"></div>
+                        <div class="spacing-label">XS</div>
+                        <div class="spacing-value">0.25rem (4px)</div>
+                        <div>Minimal spacing for tight layouts</div>
+                    </div>
+                    
+                    <div class="spacing-item">
+                        <div class="spacing-visual" style="width: 8px; height: 20px;"></div>
+                        <div class="spacing-label">SM</div>
+                        <div class="spacing-value">0.5rem (8px)</div>
+                        <div>Small spacing between related elements</div>
+                    </div>
+                    
+                    <div class="spacing-item">
+                        <div class="spacing-visual" style="width: 16px; height: 20px;"></div>
+                        <div class="spacing-label">MD</div>
+                        <div class="spacing-value">1rem (16px)</div>
+                        <div>Default spacing for most components</div>
+                    </div>
+                    
+                    <div class="spacing-item">
+                        <div class="spacing-visual" style="width: 24px; height: 20px;"></div>
+                        <div class="spacing-label">LG</div>
+                        <div class="spacing-value">1.5rem (24px)</div>
+                        <div>Large spacing for section separation</div>
+                    </div>
+                    
+                    <div class="spacing-item">
+                        <div class="spacing-visual" style="width: 32px; height: 20px;"></div>
+                        <div class="spacing-label">XL</div>
+                        <div class="spacing-value">2rem (32px)</div>
+                        <div>Extra large spacing for major sections</div>
+                    </div>
+                    
+                    <div class="spacing-item">
+                        <div class="spacing-visual" style="width: 48px; height: 20px;"></div>
+                        <div class="spacing-label">2XL</div>
+                        <div class="spacing-value">3rem (48px)</div>
+                        <div>Maximum spacing for layout separation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shadow Tokens -->
+        <div class="token-section">
+            <div class="section-header">Shadow Tokens</div>
+            <div class="section-content">
+                <div class="shadow-grid">
+                    <div class="shadow-demo" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div class="shadow-label">Small</div>
+                        <div class="shadow-value">0 1px 3px rgba(0,0,0,0.1)</div>
+                    </div>
+                    
+                    <div class="shadow-demo" style="box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div class="shadow-label">Medium</div>
+                        <div class="shadow-value">0 2px 8px rgba(0,0,0,0.1)</div>
+                    </div>
+                    
+                    <div class="shadow-demo" style="box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                        <div class="shadow-label">Large</div>
+                        <div class="shadow-value">0 4px 16px rgba(0,0,0,0.1)</div>
+                    </div>
+                    
+                    <div class="shadow-demo" style="box-shadow: 0 8px 32px rgba(0,0,0,0.15);">
+                        <div class="shadow-label">XLarge</div>
+                        <div class="shadow-value">0 8px 32px rgba(0,0,0,0.15)</div>
+                    </div>
+                    
+                    <div class="shadow-demo" style="box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div class="shadow-label">Inset</div>
+                        <div class="shadow-value">inset 0 2px 4px rgba(0,0,0,0.1)</div>
+                    </div>
+                    
+                    <div class="shadow-demo" style="box-shadow: 0 0 0 3px rgba(25,118,210,0.1);">
+                        <div class="shadow-label">Focus</div>
+                        <div class="shadow-value">0 0 0 3px rgba(25,118,210,0.1)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Border Radius Tokens -->
+        <div class="token-section">
+            <div class="section-header">Border Radius Tokens</div>
+            <div class="section-content">
+                <div class="radius-grid">
+                    <div>
+                        <div class="radius-demo" style="border-radius: 0;">Sharp</div>
+                        <div class="radius-info">
+                            <div class="radius-name">None</div>
+                            <div class="radius-value">0</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="radius-demo" style="border-radius: 4px;">Small</div>
+                        <div class="radius-info">
+                            <div class="radius-name">Small</div>
+                            <div class="radius-value">4px</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="radius-demo" style="border-radius: 6px;">Medium</div>
+                        <div class="radius-info">
+                            <div class="radius-name">Medium</div>
+                            <div class="radius-value">6px</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="radius-demo" style="border-radius: 8px;">Default</div>
+                        <div class="radius-info">
+                            <div class="radius-name">Default</div>
+                            <div class="radius-value">8px</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="radius-demo" style="border-radius: 12px;">Large</div>
+                        <div class="radius-info">
+                            <div class="radius-name">Large</div>
+                            <div class="radius-value">12px</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="radius-demo" style="border-radius: 50%;">Circle</div>
+                        <div class="radius-info">
+                            <div class="radius-name">Circle</div>
+                            <div class="radius-value">50%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS Custom Properties -->
+        <div class="token-section">
+            <div class="section-header">CSS Custom Properties Implementation</div>
+            <div class="section-content">
+                <div class="css-variables">
+<div class="variable-group">
+<div class="variable-comment">/* Color Tokens */</div>
+<div class="variable-line"><span class="variable-name">--color-primary-500</span>: <span class="variable-value">#DF3307</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-secondary-500</span>: <span class="variable-value">#42433B</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-accent-500</span>: <span class="variable-value">#9FAEB3</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-error-500</span>: <span class="variable-value">#DF3307</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-warning-500</span>: <span class="variable-value">#DF3307</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-success-500</span>: <span class="variable-value">#8F7E74</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Parts of Speech Colors */</div>
+<div class="variable-line"><span class="variable-name">--color-pos-noun</span>: <span class="variable-value">#42433B</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-pos-verb</span>: <span class="variable-value">#DF3307</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-pos-adjective</span>: <span class="variable-value">#8F7E74</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-pos-particle</span>: <span class="variable-value">#8F7E74</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-pos-adverb</span>: <span class="variable-value">#9FAEB3</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-pos-other</span>: <span class="variable-value">#9FAEB3</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Core Palette */</div>
+<div class="variable-line"><span class="variable-name">--color-background</span>: <span class="variable-value">#DAC8C0</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-surface</span>: <span class="variable-value">#FFFFFF</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-warm-brown</span>: <span class="variable-value">#8F7E74</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-blue-gray</span>: <span class="variable-value">#9FAEB3</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-text-secondary</span>: <span class="variable-value">#8F7E74</span>;</div>
+<div class="variable-line"><span class="variable-name">--color-text-primary</span>: <span class="variable-value">#42433B</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Typography */</div>
+<div class="variable-line"><span class="variable-name">--font-size-xs</span>: <span class="variable-value">0.75rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-sm</span>: <span class="variable-value">0.875rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-base</span>: <span class="variable-value">1rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-lg</span>: <span class="variable-value">1.125rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-xl</span>: <span class="variable-value">1.25rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-2xl</span>: <span class="variable-value">1.5rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-3xl</span>: <span class="variable-value">2rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--font-size-4xl</span>: <span class="variable-value">2.5rem</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Spacing */</div>
+<div class="variable-line"><span class="variable-name">--spacing-xs</span>: <span class="variable-value">0.25rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--spacing-sm</span>: <span class="variable-value">0.5rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--spacing-md</span>: <span class="variable-value">1rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--spacing-lg</span>: <span class="variable-value">1.5rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--spacing-xl</span>: <span class="variable-value">2rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--spacing-2xl</span>: <span class="variable-value">3rem</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Shadows */</div>
+<div class="variable-line"><span class="variable-name">--shadow-sm</span>: <span class="variable-value">0 1px 3px rgba(0,0,0,0.1)</span>;</div>
+<div class="variable-line"><span class="variable-name">--shadow-md</span>: <span class="variable-value">0 2px 8px rgba(0,0,0,0.1)</span>;</div>
+<div class="variable-line"><span class="variable-name">--shadow-lg</span>: <span class="variable-value">0 4px 16px rgba(0,0,0,0.1)</span>;</div>
+<div class="variable-line"><span class="variable-name">--shadow-xl</span>: <span class="variable-value">0 8px 32px rgba(0,0,0,0.15)</span>;</div>
+<div class="variable-line"><span class="variable-name">--shadow-focus</span>: <span class="variable-value">0 0 0 3px rgba(223,51,7,0.1)</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Border Radius */</div>
+<div class="variable-line"><span class="variable-name">--radius-none</span>: <span class="variable-value">0</span>;</div>
+<div class="variable-line"><span class="variable-name">--radius-sm</span>: <span class="variable-value">4px</span>;</div>
+<div class="variable-line"><span class="variable-name">--radius-md</span>: <span class="variable-value">6px</span>;</div>
+<div class="variable-line"><span class="variable-name">--radius-lg</span>: <span class="variable-value">8px</span>;</div>
+<div class="variable-line"><span class="variable-name">--radius-xl</span>: <span class="variable-value">12px</span>;</div>
+<div class="variable-line"><span class="variable-name">--radius-full</span>: <span class="variable-value">50%</span>;</div>
+</div>
+
+<div class="variable-group">
+<div class="variable-comment">/* Japanese-specific tokens */</div>
+<div class="variable-line"><span class="variable-name">--token-line-height</span>: <span class="variable-value">2.5</span>;</div>
+<div class="variable-line"><span class="variable-name">--furigana-size</span>: <span class="variable-value">0.7rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--romaji-size</span>: <span class="variable-value">0.65rem</span>;</div>
+<div class="variable-line"><span class="variable-name">--token-min-width</span>: <span class="variable-value">60px</span>;</div>
+<div class="variable-line"><span class="variable-name">--token-padding</span>: <span class="variable-value">0.75rem</span>;</div>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

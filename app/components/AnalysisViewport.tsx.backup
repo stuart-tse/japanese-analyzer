@@ -1,0 +1,419 @@
+'use client';
+
+import { useMemo } from 'react';
+import { TokenData } from '../services/api';
+import { getGrammarColorClass, getGrammarColor, containsKanji } from '../utils/helpers';
+
+export type AnalysisMode = 'tokens' | 'grammar' | 'translation' | 'pronunciation';
+
+interface AnalysisViewportProps {
+  tokens: TokenData[];
+  originalSentence: string;
+  selectedTokenIndex: number | null;
+  onTokenSelect: (index: number, token: TokenData) => void;
+  showFurigana: boolean;
+  onShowFuriganaChange: (show: boolean) => void;
+  analysisMode: AnalysisMode;
+  onAnalysisModeChange: (mode: AnalysisMode) => void;
+  learningMode: 'beginner' | 'intermediate' | 'advanced';
+}
+
+export default function AnalysisViewport({
+  tokens,
+  originalSentence: _originalSentence, // eslint-disable-line @typescript-eslint/no-unused-vars
+  selectedTokenIndex,
+  onTokenSelect,
+  showFurigana,
+  onShowFuriganaChange,
+  analysisMode,
+  onAnalysisModeChange,
+  learningMode
+}: AnalysisViewportProps) {
+  
+  const analysisModes = [
+    { id: 'tokens' as AnalysisMode, label: 'Tokens', description: 'Word breakdown' },
+    { id: 'grammar' as AnalysisMode, label: 'Grammar', description: 'Sentence structure' },
+    { id: 'translation' as AnalysisMode, label: 'Translation', description: 'Chinese meaning' },
+    { id: 'pronunciation' as AnalysisMode, label: 'Pronunciation', description: 'Phonetic guide' }
+  ];
+
+  // Generate grammar annotations based on analysis mode
+  const grammarAnnotations = useMemo(() => {
+    if (analysisMode !== 'grammar' || tokens.length === 0) return [];
+
+    const annotations = [];
+    
+    // Find subject (usually marked with は or が)
+    const subjectIndex = tokens.findIndex(token => token.pos === '助詞' && (token.word === 'は' || token.word === 'が'));
+    if (subjectIndex > 0) {
+      const subjectTokens = tokens.slice(0, subjectIndex + 1);
+      annotations.push({
+        type: 'Subject',
+        tokens: subjectTokens,
+        description: 'Main topic of the sentence'
+      });
+    }
+
+    // Find predicate (verbs, adjectives)
+    const predicateTokens = tokens.filter(token => 
+      token.pos === '動詞' || token.pos === '形容詞' || token.pos === '助動詞'
+    );
+    if (predicateTokens.length > 0) {
+      annotations.push({
+        type: 'Predicate',
+        tokens: predicateTokens,
+        description: 'What is being said about the subject'
+      });
+    }
+
+    // Find particles and their functions
+    const particles = tokens.filter(token => token.pos === '助詞');
+    particles.forEach(particle => {
+      let function_desc = '';
+      switch (particle.word) {
+        case 'は': function_desc = 'Topic marker'; break;
+        case 'が': function_desc = 'Subject marker'; break;
+        case 'を': function_desc = 'Object marker'; break;
+        case 'に': function_desc = 'Direction/time'; break;
+        case 'で': function_desc = 'Location/method'; break;
+        case 'の': function_desc = 'Possession/modification'; break;
+        case 'ね': function_desc = 'Seeking confirmation'; break;
+        default: function_desc = 'Grammatical particle';
+      }
+      
+      annotations.push({
+        type: 'Particle',
+        tokens: [particle],
+        description: `${particle.word} (${function_desc})`
+      });
+    });
+
+    return annotations;
+  }, [tokens, analysisMode]);
+
+  const renderToken = (token: TokenData, index: number) => {
+    const isSelected = selectedTokenIndex === index;
+    const colorClass = getGrammarColorClass(token.pos);
+    const color = getGrammarColor(token.pos);
+    
+    return (
+      <div
+        key={index}
+        onClick={() => onTokenSelect(index, token)}
+        className={`
+          token inline-block m-1 p-2 rounded-md cursor-pointer transition-all duration-200 border-2
+          ${isSelected ? 'transform -translate-y-1 shadow-lg' : 'hover:transform hover:-translate-y-0.5 hover:shadow-md'}
+          ${colorClass}
+        `}
+        style={{
+          backgroundColor: isSelected ? color : `${color}20`,
+          borderColor: isSelected ? color : `${color}60`,
+          color: isSelected ? 'white' : 'var(--on-surface)',
+        }}
+      >
+        {/* Furigana */}
+        {showFurigana && token.furigana && containsKanji(token.word) && (
+          <div className="furigana text-xs text-center leading-none mb-1 opacity-80">
+            {token.furigana}
+          </div>
+        )}
+        
+        {/* Main word */}
+        <div className="word text-base font-medium leading-none">
+          {token.word}
+        </div>
+        
+        {/* Romaji - only show in beginner mode or pronunciation mode */}
+        {(learningMode === 'beginner' || analysisMode === 'pronunciation') && token.romaji && (
+          <div className="romaji text-xs text-center leading-none mt-1 opacity-70">
+            {token.romaji}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="analysis-viewport h-full flex flex-col">
+      {/* Analysis Controls */}
+      <div className="analysis-controls mb-4">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-medium transition-colors duration-200" style={{ color: 'var(--on-surface)' }}>
+            Analysis View
+          </h3>
+          <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--on-surface-variant)' }}>
+            <input
+              type="checkbox"
+              checked={showFurigana}
+              onChange={(e) => onShowFuriganaChange(e.target.checked)}
+              className="rounded transition-colors duration-200"
+              style={{ accentColor: 'var(--grammar-verb)' }}
+            />
+            Show Furigana
+          </label>
+        </div>
+        
+        <div className="flex gap-1 p-1 rounded-lg overflow-x-auto" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+          {analysisModes.map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => onAnalysisModeChange(mode.id)}
+              className={`
+                flex-shrink-0 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 whitespace-nowrap
+                ${analysisMode === mode.id 
+                  ? 'text-white shadow-sm' 
+                  : 'hover:shadow-sm'
+                }
+              `}
+              style={{
+                backgroundColor: analysisMode === mode.id 
+                  ? 'var(--grammar-verb)' 
+                  : 'transparent',
+                color: analysisMode === mode.id 
+                  ? 'white' 
+                  : 'var(--on-surface-variant)',
+              }}
+            >
+              <div className="text-center">
+                <div>{mode.label}</div>
+                <div className="text-xs opacity-80">{mode.description}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Analysis Area */}
+      <div className="analysis-area flex-1 p-4 rounded-lg border" style={{ backgroundColor: 'var(--surface-container)', borderColor: 'var(--outline)' }}>
+        {tokens.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <div className="mb-8">
+              <div className="text-6xl mb-4" style={{ color: 'var(--grammar-verb)' }}>
+                日本語
+              </div>
+              <div className="text-2xl font-medium mb-2" style={{ color: 'var(--on-surface)' }}>
+                Japanese Sentence Analyzer
+              </div>
+              <div className="text-lg mb-6" style={{ color: 'var(--on-surface-variant)' }}>
+                AI-powered Japanese text analysis for Chinese learners
+              </div>
+            </div>
+            
+            <div className="max-w-md space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: 'var(--grammar-verb)' }}>
+                  1
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-sm" style={{ color: 'var(--on-surface)' }}>
+                    Enter Japanese Text
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--on-surface-variant)' }}>
+                    Type, paste, or upload an image with Japanese text
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: 'var(--grammar-verb)' }}>
+                  2
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-sm" style={{ color: 'var(--on-surface)' }}>
+                    Choose Learning Level
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--on-surface-variant)' }}>
+                    Select beginner, intermediate, or advanced mode
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: 'var(--grammar-verb)' }}>
+                  3
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-sm" style={{ color: 'var(--on-surface)' }}>
+                    Analyze & Learn
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--on-surface-variant)' }}>
+                    View tokenized text, grammar, and detailed explanations
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 p-4 rounded-lg border-2 border-dashed" style={{ borderColor: 'var(--outline)', backgroundColor: 'var(--surface-container-low)' }}>
+              <div className="text-sm font-medium mb-2" style={{ color: 'var(--on-surface)' }}>
+                💡 Try this example:
+              </div>
+              <div className="text-lg font-japanese mb-1" style={{ color: 'var(--grammar-verb)' }}>
+                今日は良い天気ですね。
+              </div>
+              <div className="text-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                &quot;Today is nice weather, isn&apos;t it?&quot;
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <div className="mb-8">
+              <div className="text-6xl mb-4" style={{ color: 'var(--grammar-verb)' }}>
+                日本語
+              </div>
+              <div className="text-2xl font-medium mb-2" style={{ color: 'var(--on-surface)' }}>
+                Japanese Sentence Analyzer
+              </div>
+              <div className="text-lg mb-6" style={{ color: 'var(--on-surface-variant)' }}>
+                AI-powered Japanese text analysis for Chinese learners
+              </div>
+            </div>
+            
+            <div className="max-w-md space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: 'var(--grammar-verb)' }}>
+                  1
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-sm" style={{ color: 'var(--on-surface)' }}>
+                    Enter Japanese Text
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--on-surface-variant)' }}>
+                    Type, paste, or upload an image with Japanese text
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: 'var(--grammar-verb)' }}>
+                  2
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-sm" style={{ color: 'var(--on-surface)' }}>
+                    Choose Learning Level
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--on-surface-variant)' }}>
+                    Select beginner, intermediate, or advanced mode
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium text-white" style={{ backgroundColor: 'var(--grammar-verb)' }}>
+                  3
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-sm" style={{ color: 'var(--on-surface)' }}>
+                    Analyze & Learn
+                  </div>
+                  <div className="text-xs" style={{ color: 'var(--on-surface-variant)' }}>
+                    View tokenized text, grammar, and detailed explanations
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 p-4 rounded-lg border-2 border-dashed" style={{ borderColor: 'var(--outline)', backgroundColor: 'var(--surface-container-low)' }}>
+              <div className="text-sm font-medium mb-2" style={{ color: 'var(--on-surface)' }}>
+                💡 Try this example:
+              </div>
+              <div className="text-lg font-japanese mb-1" style={{ color: 'var(--grammar-verb)' }}>
+                今日は良い天気ですね。
+              </div>
+              <div className="text-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                &quot;Today is nice weather, isn&apos;t it?&quot;
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="sentence-container">
+            {/* Token display */}
+            <div className="tokens-display mb-6" style={{ lineHeight: '2.5', fontSize: '1.125rem' }}>
+              {tokens.map((token, index) => renderToken(token, index))}
+            </div>
+
+            {/* Grammar annotations - only show in grammar mode */}
+            {analysisMode === 'grammar' && grammarAnnotations.length > 0 && (
+              <div className="grammar-annotations">
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--on-surface)' }}>
+                  Sentence Structure
+                </h4>
+                <div className="space-y-2">
+                  {grammarAnnotations.map((annotation, index) => (
+                    <div 
+                      key={index} 
+                      className="annotation-item flex items-center gap-3 p-2 rounded-md text-sm"
+                      style={{ backgroundColor: 'var(--surface-container-low)' }}
+                    >
+                      <span 
+                        className="annotation-type px-2 py-1 rounded text-xs font-medium"
+                        style={{ backgroundColor: 'var(--grammar-verb)', color: 'white' }}
+                      >
+                        {annotation.type}
+                      </span>
+                      <span style={{ color: 'var(--on-surface)' }}>
+                        {annotation.tokens.map(t => t.word).join('')}
+                      </span>
+                      <span style={{ color: 'var(--on-surface-variant)' }}>
+                        {annotation.description}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Translation display - only show in translation mode */}
+            {analysisMode === 'translation' && (
+              <div className="translation-display">
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--on-surface)' }}>
+                  Translation
+                </h4>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
+                  <div className="text-base mb-2" style={{ color: 'var(--on-surface)' }}>
+                    Chinese: 今天天气很好呢。
+                  </div>
+                  <div className="text-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                    English: Today is nice weather, isn&apos;t it?
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Pronunciation guide - only show in pronunciation mode */}
+            {analysisMode === 'pronunciation' && (
+              <div className="pronunciation-display">
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--on-surface)' }}>
+                  Pronunciation Guide
+                </h4>
+                <div className="space-y-2">
+                  {tokens.map((token, index) => (
+                    <div 
+                      key={index}
+                      className="pronunciation-item flex items-center gap-4 p-2 rounded-md text-sm"
+                      style={{ backgroundColor: 'var(--surface-container-low)' }}
+                    >
+                      <span className="font-medium" style={{ color: 'var(--on-surface)' }}>
+                        {token.word}
+                      </span>
+                      {token.furigana && (
+                        <span style={{ color: 'var(--on-surface-variant)' }}>
+                          [{token.furigana}]
+                        </span>
+                      )}
+                      {token.romaji && (
+                        <span style={{ color: 'var(--on-surface-variant)' }}>
+                          {token.romaji}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

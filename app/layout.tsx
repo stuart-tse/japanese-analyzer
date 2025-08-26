@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./styles/material-theme.css";
 import Script from "next/script";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
-// 使用Inter字体
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
   title: "日本語文章解析器 - AI驱动",
   description: "AI驱动・深入理解日语句子结构与词义",
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#1f2937' }
@@ -76,26 +76,17 @@ export default function RootLayout({
             document.documentElement.classList.add(actualTheme);
           })();
         `}} />
-        {/* Safari输入修复脚本 */}
+        {/* Safari浏览器检测脚本 - 仅添加CSS类，不修改样式 */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             if (isSafari) {
               document.documentElement.classList.add('safari');
-              // 修复Safari中的输入问题
-              document.addEventListener('DOMContentLoaded', function() {
-                var inputs = document.querySelectorAll('input, textarea');
-                inputs.forEach(function(input) {
-                  var isDark = document.documentElement.classList.contains('dark');
-                  input.style.webkitTextFillColor = isDark ? '#f9fafb' : 'black';
-                  input.style.opacity = '1';
-                });
-              });
             }
           })();
         `}} />
       </head>
-      <body className={`${inter.className} antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-200`}>
+      <body className="antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-200" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <ThemeProvider>
           {children}
         </ThemeProvider>

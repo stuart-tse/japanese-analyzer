@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Component Library</title>
+    <style>
+        :root {
+            /* Color Tokens */
+            --color-primary-500: #DF3307;
+            --color-secondary-500: #42433B;
+            --color-accent-500: #9FAEB3;
+            --color-error-500: #DF3307;
+            --color-warning-500: #DF3307;
+            --color-success-500: #8F7E74;
+            
+            /* Parts of Speech Colors */
+            --color-pos-noun: #42433B;
+            --color-pos-verb: #DF3307;
+            --color-pos-adjective: #8F7E74;
+            --color-pos-particle: #8F7E74;
+            --color-pos-adverb: #9FAEB3;
+            --color-pos-other: #9FAEB3;
+            
+            /* Core Palette */
+            --color-background: #DAC8C0;
+            --color-surface: #FFFFFF;
+            --color-warm-brown: #8F7E74;
+            --color-blue-gray: #9FAEB3;
+            --color-text-secondary: #8F7E74;
+            --color-text-primary: #42433B;
+            
+            /* Typography */
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 2rem;
+            --font-size-4xl: 2.5rem;
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
+            --shadow-xl: 0 8px 32px rgba(0,0,0,0.15);
+            --shadow-focus: 0 0 0 3px rgba(25,118,210,0.1);
+            
+            /* Border Radius */
+            --radius-none: 0;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --radius-full: 50%;
+            
+            /* Japanese-specific tokens */
+            --token-line-height: 2.5;
+            --furigana-size: 0.7rem;
+            --romaji-size: 0.65rem;
+            --token-min-width: 60px;
+            --token-padding: 0.75rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: var(--color-background);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+            padding: var(--spacing-xl);
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .component-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, var(--color-primary-500), #c62d06);
+            color: white;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: var(--spacing-xl);
+        }
+        
+        .component-showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .component-demo {
+            border: 2px solid var(--color-blue-gray);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            background: var(--color-surface);
+        }
+        
+        .component-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: var(--font-size-sm);
+            overflow-x: auto;
+        }
+        
+        /* Button Components */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            min-height: 44px; /* Touch target */
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary-500), #c62d06);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--color-secondary-500), #363730);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: var(--color-primary-500);
+            border: 2px solid var(--color-primary-500);
+        }
+        
+        .btn-outline:hover {
+            background: var(--color-primary-500);
+            color: white;
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-text-secondary);
+            border: 1px solid var(--color-blue-gray);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--color-background);
+        }
+        
+        .btn-sm {
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-size-sm);
+            min-height: 36px;
+        }
+        
+        .btn-lg {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            font-size: var(--font-size-lg);
+            min-height: 52px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Input Components */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .input-label {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .input-field {
+            padding: var(--spacing-md);
+            border: 2px solid var(--color-blue-gray);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            background: var(--color-surface);
+            transition: all 0.2s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary-500);
+            box-shadow: var(--shadow-focus);
+        }
+        
+        .input-field:invalid {
+            border-color: var(--color-error-500);
+        }
+        
+        .textarea-field {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .input-hint {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+        }
+        
+        .input-error {
+            font-size: var(--font-size-xs);
+            color: var(--color-error-500);
+        }
+        
+        /* Card Components */
+        .card {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            padding: var(--spacing-lg);
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-blue-gray);
+        }
+        
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+        
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+        
+        .card-footer {
+            padding: var(--spacing-lg);
+            background: var(--color-background);
+            border-top: 1px solid var(--color-blue-gray);
+        }
+        
+        /* Badge Components */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .badge-primary {
+            background: var(--color-primary-500);
+            color: white;
+        }
+        
+        .badge-secondary {
+            background: var(--color-secondary-500);
+            color: white;
+        }
+        
+        .badge-warning {
+            background: var(--color-warning-500);
+            color: white;
+        }
+        
+        .badge-error {
+            background: var(--color-error-500);
+            color: white;
+        }
+        
+        .badge-outline {
+            background: transparent;
+            border: 1px solid var(--color-blue-gray);
+            color: var(--color-text-secondary);
+        }
+        
+        /* Japanese Token Components */
+        .token {
+            display: inline-block;
+            margin: var(--spacing-xs);
+            padding: var(--token-padding);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            vertical-align: top;
+            min-width: var(--token-min-width);
+            text-align: center;
+            line-height: var(--token-line-height);
+        }
+        
+        .token:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .token-noun {
+            background: linear-gradient(135deg, #f5f5f4, #e7e5e4);
+            border: 2px solid var(--color-pos-noun);
+            color: var(--color-pos-noun);
+        }
+        
+        .token-verb {
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+            border: 2px solid var(--color-pos-verb);
+            color: var(--color-pos-verb);
+        }
+        
+        .token-adjective {
+            background: linear-gradient(135deg, #faf7f4, #f3eeea);
+            border: 2px solid var(--color-pos-adjective);
+            color: var(--color-pos-adjective);
+        }
+        
+        .token-particle {
+            background: linear-gradient(135deg, #faf7f4, #f3eeea);
+            border: 2px solid var(--color-pos-particle);
+            color: var(--color-pos-particle);
+        }
+        
+        .token-adverb {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border: 2px solid var(--color-pos-adverb);
+            color: var(--color-pos-adverb);
+        }
+        
+        .token-other {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border: 2px solid var(--color-pos-other);
+            color: var(--color-pos-other);
+        }
+        
+        .token-furigana {
+            font-size: var(--furigana-size);
+            line-height: 1;
+            margin-bottom: var(--spacing-xs);
+            opacity: 0.8;
+        }
+        
+        .token-main {
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            line-height: 1;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .token-romaji {
+            font-size: var(--romaji-size);
+            line-height: 1;
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .token-pos-label {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--color-text-secondary);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        
+        .token:hover .token-pos-label {
+            opacity: 1;
+        }
+        
+        /* Tab Components */
+        .tab-container {
+            border-bottom: 2px solid var(--color-blue-gray);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .tab-list {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: -2px;
+        }
+        
+        .tab-button {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-button.active {
+            color: var(--color-primary-500);
+            border-bottom-color: var(--color-primary-500);
+        }
+        
+        .tab-button:hover:not(.active) {
+            color: var(--color-text-primary);
+            background: var(--color-background);
+        }
+        
+        /* Alert Components */
+        .alert {
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: #faf7f4;
+            border-color: var(--color-success-500);
+            color: var(--color-success-500);
+        }
+        
+        .alert-warning {
+            background: #fef2f2;
+            border-color: var(--color-warning-500);
+            color: var(--color-warning-500);
+        }
+        
+        .alert-error {
+            background: #fef2f2;
+            border-color: var(--color-error-500);
+            color: var(--color-error-500);
+        }
+        
+        .alert-info {
+            background: #f8fafc;
+            border-color: var(--color-accent-500);
+            color: var(--color-accent-500);
+        }
+        
+        /* Loading Components */
+        .loading-skeleton {
+            background: linear-gradient(90deg, var(--color-background) 25%, var(--color-blue-gray) 50%, var(--color-background) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--color-blue-gray);
+            border-top: 3px solid var(--color-primary-500);
+            border-radius: var(--radius-full);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modal Components */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .modal-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-blue-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            padding: var(--spacing-sm);
+        }
+        
+        .modal-body {
+            padding: var(--spacing-lg);
+        }
+        
+        .modal-footer {
+            padding: var(--spacing-lg);
+            border-top: 1px solid var(--color-blue-gray);
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+        }
+        
+        /* Responsive Grid */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+        
+        .grid-cols-1 { grid-template-columns: 1fr; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        @media (max-width: 768px) {
+            .component-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-cols-2,
+            .grid-cols-3,
+            .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: var(--spacing-md);
+            }
+        }
+        
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-medium { font-weight: 500; }
+        
+        .text-xs { font-size: var(--font-size-xs); }
+        .text-sm { font-size: var(--font-size-sm); }
+        .text-base { font-size: var(--font-size-base); }
+        .text-lg { font-size: var(--font-size-lg); }
+        .text-xl { font-size: var(--font-size-xl); }
+        
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: var(--spacing-xs); }
+        .mb-2 { margin-bottom: var(--spacing-sm); }
+        .mb-4 { margin-bottom: var(--spacing-md); }
+        .mb-6 { margin-bottom: var(--spacing-lg); }
+        .mb-8 { margin-bottom: var(--spacing-xl); }
+        
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: var(--spacing-xs); }
+        .mt-2 { margin-top: var(--spacing-sm); }
+        .mt-4 { margin-top: var(--spacing-md); }
+        .mt-6 { margin-top: var(--spacing-lg); }
+        .mt-8 { margin-top: var(--spacing-xl); }
+        
+        .hidden { display: none; }
+        .block { display: block; }
+        .inline-block { display: inline-block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Analyzer - Component Library</h1>
+            <p>Reusable UI components designed for optimal Japanese language learning experience</p>
+        </div>
+
+        <!-- Button Components -->
+        <div class="component-section">
+            <div class="section-header">Button Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <h3 class="mb-4">Button Variants</h3>
+                        <div class="grid grid-cols-2" style="gap: var(--spacing-md);">
+                            <button class="btn btn-primary">Primary Button</button>
+                            <button class="btn btn-secondary">Secondary Button</button>
+                            <button class="btn btn-outline">Outline Button</button>
+                            <button class="btn btn-ghost">Ghost Button</button>
+                        </div>
+                        
+                        <h4 class="mt-6 mb-4">Button Sizes</h4>
+                        <div class="flex" style="gap: var(--spacing-md); align-items: center;">
+                            <button class="btn btn-primary btn-sm">Small</button>
+                            <button class="btn btn-primary">Default</button>
+                            <button class="btn btn-primary btn-lg">Large</button>
+                        </div>
+                        
+                        <h4 class="mt-6 mb-4">States</h4>
+                        <div class="flex" style="gap: var(--spacing-md);">
+                            <button class="btn btn-primary">Normal</button>
+                            <button class="btn btn-primary" disabled>Disabled</button>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-primary"</span><span style="color: #66d9ef;">&gt;</span>
+  Primary Button
+<span style="color: #66d9ef;">&lt;/button&gt;</span>
+
+<span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-secondary"</span><span style="color: #66d9ef;">&gt;</span>
+  Secondary Button
+<span style="color: #66d9ef;">&lt;/button&gt;</span>
+
+<span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-outline"</span><span style="color: #66d9ef;">&gt;</span>
+  Outline Button
+<span style="color: #66d9ef;">&lt;/button&gt;</span>
+
+<span style="color: #75715e;">/* Size variants */</span>
+<span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-primary btn-sm"</span><span style="color: #66d9ef;">&gt;</span>Small<span style="color: #66d9ef;">&lt;/button&gt;</span>
+<span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-primary btn-lg"</span><span style="color: #66d9ef;">&gt;</span>Large<span style="color: #66d9ef;">&lt;/button&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Components -->
+        <div class="component-section">
+            <div class="section-header">Input Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <div class="input-group">
+                            <label class="input-label">Japanese Text Input</label>
+                            <input type="text" class="input-field" placeholder="今日は良い天気ですね。">
+                            <span class="input-hint">Enter Japanese text for analysis</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Large Text Area</label>
+                            <textarea class="input-field textarea-field" placeholder="Enter longer Japanese text here...&#10;Multiple lines supported."></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Input with Error</label>
+                            <input type="text" class="input-field" style="border-color: var(--color-error-500); background: #fef2f2;" value="Invalid input">
+                            <span class="input-error">Please enter valid Japanese text</span>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-group"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;label</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-label"</span><span style="color: #66d9ef;">&gt;</span>Label<span style="color: #66d9ef;">&lt;/label&gt;</span>
+  <span style="color: #66d9ef;">&lt;input</span> <span style="color: #a6e22e;">type</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"text"</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-field"</span> 
+         <span style="color: #a6e22e;">placeholder</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"Placeholder text"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-hint"</span><span style="color: #66d9ef;">&gt;</span>Helper text<span style="color: #66d9ef;">&lt;/span&gt;</span>
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #75715e;">/* Textarea variant */</span>
+<span style="color: #66d9ef;">&lt;textarea</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"input-field textarea-field"</span><span style="color: #66d9ef;">&gt;</span>
+<span style="color: #66d9ef;">&lt;/textarea&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Japanese Token Components -->
+        <div class="component-section">
+            <div class="section-header">Japanese Token Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <h3 class="mb-4">Token Types</h3>
+                        <div style="line-height: var(--token-line-height);">
+                            <div class="token token-noun">
+                                <div class="token-furigana">きょう</div>
+                                <div class="token-main">今日</div>
+                                <div class="token-romaji">kyou</div>
+                                <div class="token-pos-label">名詞</div>
+                            </div>
+                            <div class="token token-particle">
+                                <div class="token-furigana">は</div>
+                                <div class="token-main">は</div>
+                                <div class="token-romaji">wa</div>
+                                <div class="token-pos-label">助詞</div>
+                            </div>
+                            <div class="token token-adjective">
+                                <div class="token-furigana">いい</div>
+                                <div class="token-main">良い</div>
+                                <div class="token-romaji">ii</div>
+                                <div class="token-pos-label">形容詞</div>
+                            </div>
+                            <div class="token token-noun">
+                                <div class="token-furigana">てんき</div>
+                                <div class="token-main">天気</div>
+                                <div class="token-romaji">tenki</div>
+                                <div class="token-pos-label">名詞</div>
+                            </div>
+                            <div class="token token-verb">
+                                <div class="token-furigana">です</div>
+                                <div class="token-main">です</div>
+                                <div class="token-romaji">desu</div>
+                                <div class="token-pos-label">動詞</div>
+                            </div>
+                            <div class="token token-particle">
+                                <div class="token-furigana">ね</div>
+                                <div class="token-main">ね</div>
+                                <div class="token-romaji">ne</div>
+                                <div class="token-pos-label">助詞</div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mt-6 mb-4">Individual Token Types</h4>
+                        <div class="grid grid-cols-3" style="gap: var(--spacing-md);">
+                            <div class="token token-noun">名詞 Noun</div>
+                            <div class="token token-verb">動詞 Verb</div>
+                            <div class="token token-adjective">形容詞 Adj</div>
+                            <div class="token token-particle">助詞 Particle</div>
+                            <div class="token token-adverb">副詞 Adverb</div>
+                            <div class="token token-other">その他 Other</div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token token-noun"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-furigana"</span><span style="color: #66d9ef;">&gt;</span>きょう<span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-main"</span><span style="color: #66d9ef;">&gt;</span>今日<span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-romaji"</span><span style="color: #66d9ef;">&gt;</span>kyou<span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token-pos-label"</span><span style="color: #66d9ef;">&gt;</span>名詞<span style="color: #66d9ef;">&lt;/div&gt;</span>
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #75715e;">/* Available token classes */</span>
+<span style="color: #f8f8f2;">token-noun      </span><span style="color: #75715e;">/* Blue - Nouns */</span>
+<span style="color: #f8f8f2;">token-verb      </span><span style="color: #75715e;">/* Green - Verbs */</span>
+<span style="color: #f8f8f2;">token-adjective </span><span style="color: #75715e;">/* Orange - Adjectives */</span>
+<span style="color: #f8f8f2;">token-particle  </span><span style="color: #75715e;">/* Pink - Particles */</span>
+<span style="color: #f8f8f2;">token-adverb    </span><span style="color: #75715e;">/* Purple - Adverbs */</span>
+<span style="color: #f8f8f2;">token-other     </span><span style="color: #75715e;">/* Gray - Other */</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Components -->
+        <div class="component-section">
+            <div class="section-header">Card Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Word Details</div>
+                                <div class="card-subtitle">天気 (てんき)</div>
+                            </div>
+                            <div class="card-body">
+                                <p>Weather; atmospheric conditions. Same characters as Chinese 天气 but with different pronunciation.</p>
+                                <div class="mt-4">
+                                    <span class="badge badge-primary">N5</span>
+                                    <span class="badge badge-secondary">Common</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-outline btn-sm">More Details</button>
+                                <button class="btn btn-primary btn-sm">🔊 Listen</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"card"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"card-header"</span><span style="color: #66d9ef;">&gt;</span>
+    <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"card-title"</span><span style="color: #66d9ef;">&gt;</span>Title<span style="color: #66d9ef;">&lt;/div&gt;</span>
+    <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"card-subtitle"</span><span style="color: #66d9ef;">&gt;</span>Subtitle<span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"card-body"</span><span style="color: #66d9ef;">&gt;</span>
+    Content goes here
+  <span style="color: #66d9ef;">&lt;/div&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"card-footer"</span><span style="color: #66d9ef;">&gt;</span>
+    <span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-primary"</span><span style="color: #66d9ef;">&gt;</span>Action<span style="color: #66d9ef;">&lt;/button&gt;</span>
+  <span style="color: #66d9ef;">&lt;/div&gt;</span>
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge Components -->
+        <div class="component-section">
+            <div class="section-header">Badge Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <h3 class="mb-4">Badge Variants</h3>
+                        <div class="flex" style="gap: var(--spacing-md); flex-wrap: wrap;">
+                            <span class="badge badge-primary">Primary</span>
+                            <span class="badge badge-secondary">Secondary</span>
+                            <span class="badge badge-warning">Warning</span>
+                            <span class="badge badge-error">Error</span>
+                            <span class="badge badge-outline">Outline</span>
+                        </div>
+                        
+                        <h4 class="mt-6 mb-4">JLPT Level Badges</h4>
+                        <div class="flex" style="gap: var(--spacing-md);">
+                            <span class="badge badge-error">N1</span>
+                            <span class="badge badge-warning">N2</span>
+                            <span class="badge badge-primary">N3</span>
+                            <span class="badge badge-secondary">N4</span>
+                            <span class="badge" style="background: var(--color-success-500); color: white;">N5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"badge badge-primary"</span><span style="color: #66d9ef;">&gt;</span>Primary<span style="color: #66d9ef;">&lt;/span&gt;</span>
+<span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"badge badge-secondary"</span><span style="color: #66d9ef;">&gt;</span>Secondary<span style="color: #66d9ef;">&lt;/span&gt;</span>
+<span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"badge badge-outline"</span><span style="color: #66d9ef;">&gt;</span>Outline<span style="color: #66d9ef;">&lt;/span&gt;</span>
+
+<span style="color: #75715e;">/* Usage with tokens */</span>
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"token token-noun"</span><span style="color: #66d9ef;">&gt;</span>
+  今日
+  <span style="color: #66d9ef;">&lt;span</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"badge badge-primary"</span><span style="color: #66d9ef;">&gt;</span>N5<span style="color: #66d9ef;">&lt;/span&gt;</span>
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Components -->
+        <div class="component-section">
+            <div class="section-header">Tab Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <div class="tab-container">
+                            <div class="tab-list">
+                                <button class="tab-button active">Analysis</button>
+                                <button class="tab-button">Translation</button>
+                                <button class="tab-button">Grammar</button>
+                                <button class="tab-button">Examples</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p>Tab content would appear here. The active tab shows the current content panel.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"tab-container"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"tab-list"</span><span style="color: #66d9ef;">&gt;</span>
+    <span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"tab-button active"</span><span style="color: #66d9ef;">&gt;</span>Tab 1<span style="color: #66d9ef;">&lt;/button&gt;</span>
+    <span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"tab-button"</span><span style="color: #66d9ef;">&gt;</span>Tab 2<span style="color: #66d9ef;">&lt;/button&gt;</span>
+    <span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"tab-button"</span><span style="color: #66d9ef;">&gt;</span>Tab 3<span style="color: #66d9ef;">&lt;/button&gt;</span>
+  <span style="color: #66d9ef;">&lt;/div&gt;</span>
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #75715e;">/* Tab content panels */</span>
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"tab-panel"</span><span style="color: #66d9ef;">&gt;</span>
+  Content for active tab
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Components -->
+        <div class="component-section">
+            <div class="section-header">Alert Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <div class="alert alert-success">
+                            <strong>Success!</strong> Analysis completed successfully.
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>Info:</strong> This sentence uses polite form (です/ます).
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>Warning:</strong> Some characters may have multiple readings.
+                        </div>
+                        <div class="alert alert-error">
+                            <strong>Error:</strong> Unable to analyze the input text.
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"alert alert-success"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;strong&gt;</span>Success!<span style="color: #66d9ef;">&lt;/strong&gt;</span> Operation completed.
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"alert alert-warning"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;strong&gt;</span>Warning:<span style="color: #66d9ef;">&lt;/strong&gt;</span> Please check input.
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"alert alert-error"</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;strong&gt;</span>Error:<span style="color: #66d9ef;">&lt;/strong&gt;</span> Something went wrong.
+<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Components -->
+        <div class="component-section">
+            <div class="section-header">Loading Components</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <h3 class="mb-4">Loading Skeleton</h3>
+                        <div style="margin-bottom: var(--spacing-lg);">
+                            <div class="loading-skeleton" style="height: 20px; margin-bottom: var(--spacing-sm);"></div>
+                            <div class="loading-skeleton" style="height: 20px; width: 80%; margin-bottom: var(--spacing-sm);"></div>
+                            <div class="loading-skeleton" style="height: 20px; width: 60%;"></div>
+                        </div>
+                        
+                        <h4 class="mb-4">Spinner</h4>
+                        <div class="flex" style="align-items: center; gap: var(--spacing-md);">
+                            <div class="spinner"></div>
+                            <span>Loading analysis...</span>
+                        </div>
+                        
+                        <h4 class="mt-6 mb-4">Token Loading</h4>
+                        <div style="line-height: var(--token-line-height);">
+                            <div class="loading-skeleton" style="width: 60px; height: 80px; display: inline-block; margin: var(--spacing-xs); border-radius: var(--radius-lg);"></div>
+                            <div class="loading-skeleton" style="width: 40px; height: 80px; display: inline-block; margin: var(--spacing-xs); border-radius: var(--radius-lg);"></div>
+                            <div class="loading-skeleton" style="width: 70px; height: 80px; display: inline-block; margin: var(--spacing-xs); border-radius: var(--radius-lg);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #75715e;">/* Loading skeleton */</span>
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"loading-skeleton"</span> 
+     <span style="color: #a6e22e;">style</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"height: 20px;"</span><span style="color: #66d9ef;">&gt;&lt;/div&gt;</span>
+
+<span style="color: #75715e;">/* Spinner */</span>
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"spinner"</span><span style="color: #66d9ef;">&gt;&lt;/div&gt;</span>
+
+<span style="color: #75715e;">/* Loading button */</span>
+<span style="color: #66d9ef;">&lt;button</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"btn btn-primary"</span> <span style="color: #a6e22e;">disabled</span><span style="color: #66d9ef;">&gt;</span>
+  <span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"spinner"</span><span style="color: #66d9ef;">&gt;&lt;/div&gt;</span>
+  Loading...
+<span style="color: #66d9ef;">&lt;/button&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utility Classes -->
+        <div class="component-section">
+            <div class="section-header">Utility Classes</div>
+            <div class="section-content">
+                <div class="component-showcase">
+                    <div class="component-demo">
+                        <h3 class="mb-4">Typography Utilities</h3>
+                        <p class="text-xs mb-2">Extra small text (12px)</p>
+                        <p class="text-sm mb-2">Small text (14px)</p>
+                        <p class="text-base mb-2">Base text (16px)</p>
+                        <p class="text-lg mb-2">Large text (18px)</p>
+                        <p class="text-xl mb-4">Extra large text (20px)</p>
+                        
+                        <h4 class="mb-4">Font Weights</h4>
+                        <p class="font-medium mb-2">Medium weight text</p>
+                        <p class="font-semibold mb-2">Semibold weight text</p>
+                        <p class="font-bold mb-4">Bold weight text</p>
+                        
+                        <h4 class="mb-4">Text Alignment</h4>
+                        <p class="text-left mb-2">Left aligned text</p>
+                        <p class="text-center mb-2">Center aligned text</p>
+                        <p class="text-right mb-2">Right aligned text</p>
+                    </div>
+                    
+                    <div class="component-code">
+<span style="color: #75715e;">/* Typography utilities */</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"text-xs"</span><span style="color: #66d9ef;">&gt;</span>Extra small<span style="color: #66d9ef;">&lt;/p&gt;</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"text-sm"</span><span style="color: #66d9ef;">&gt;</span>Small<span style="color: #66d9ef;">&lt;/p&gt;</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"text-base"</span><span style="color: #66d9ef;">&gt;</span>Base<span style="color: #66d9ef;">&lt;/p&gt;</span>
+
+<span style="color: #75715e;">/* Font weights */</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"font-medium"</span><span style="color: #66d9ef;">&gt;</span>Medium<span style="color: #66d9ef;">&lt;/p&gt;</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"font-semibold"</span><span style="color: #66d9ef;">&gt;</span>Semibold<span style="color: #66d9ef;">&lt;/p&gt;</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"font-bold"</span><span style="color: #66d9ef;">&gt;</span>Bold<span style="color: #66d9ef;">&lt;/p&gt;</span>
+
+<span style="color: #75715e;">/* Alignment */</span>
+<span style="color: #66d9ef;">&lt;p</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"text-center"</span><span style="color: #66d9ef;">&gt;</span>Centered<span style="color: #66d9ef;">&lt;/p&gt;</span>
+
+<span style="color: #75715e;">/* Spacing utilities */</span>
+<span style="color: #66d9ef;">&lt;div</span> <span style="color: #a6e22e;">class</span><span style="color: #f8f8f2;">=</span><span style="color: #e6db74;">"mb-4 mt-8"</span><span style="color: #66d9ef;">&gt;</span>Spaced element<span style="color: #66d9ef;">&lt;/div&gt;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

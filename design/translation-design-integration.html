@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Design Integration Guide</title>
+    <style>
+        :root {
+            /* Japanese Color Palette - Light Mode */
+            --japanese-red-primary: #DF3307;
+            --japanese-charcoal-dark: #42433B;
+            --japanese-brown-warm: #8F7E74;
+            --japanese-beige-light: #DAC8C0;
+            --japanese-blue-gray-cool: #9FAEB3;
+            
+            /* Japanese Grammar Colors */
+            --grammar-noun: var(--japanese-charcoal-dark);
+            --grammar-verb: var(--japanese-red-primary);
+            --grammar-adjective: var(--japanese-brown-warm);
+            --grammar-particle: var(--japanese-brown-warm);
+            --grammar-adverb: var(--japanese-blue-gray-cool);
+            --grammar-auxiliary: var(--japanese-red-primary);
+            --grammar-other: var(--japanese-blue-gray-cool);
+            --grammar-background: var(--japanese-beige-light);
+            
+            /* Material Design 3 Integration */
+            --surface: var(--japanese-beige-light);
+            --surface-variant: #E7E0EC;
+            --surface-container: #F3EDF7;
+            --surface-container-low: #F7F2FA;
+            --surface-container-high: #ECE6F0;
+            --on-surface: var(--japanese-charcoal-dark);
+            --on-surface-variant: var(--japanese-brown-warm);
+            --outline: var(--japanese-blue-gray-cool);
+            --outline-variant: #CAC4D0;
+            
+            /* Elevation shadows */
+            --elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+            --elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+            --elevation-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark {
+            /* Japanese Color Palette - Dark Mode */
+            --japanese-red-primary: #FF6B4A;
+            --japanese-charcoal-dark: #E5E7EB;
+            --japanese-brown-warm: #D4C4B0;
+            --japanese-beige-light: #2B1D33;
+            --japanese-blue-gray-cool: #B0C4DE;
+            
+            /* Grammar colors update for dark mode */
+            --grammar-noun: var(--japanese-charcoal-dark);
+            --grammar-verb: var(--japanese-red-primary);
+            --grammar-adjective: var(--japanese-brown-warm);
+            --grammar-particle: var(--japanese-brown-warm);
+            --grammar-adverb: var(--japanese-blue-gray-cool);
+            --grammar-auxiliary: var(--japanese-red-primary);
+            --grammar-other: var(--japanese-blue-gray-cool);
+            --grammar-background: var(--japanese-beige-light);
+            
+            /* Surface colors for dark mode */
+            --surface: var(--japanese-beige-light);
+            --surface-variant: #49454f;
+            --on-surface: var(--japanese-charcoal-dark);
+            --on-surface-variant: var(--japanese-brown-warm);
+            --outline: var(--japanese-blue-gray-cool);
+            --outline-variant: #49454f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--elevation-2);
+        }
+
+        .dark .container {
+            background: var(--surface-container);
+        }
+
+        h1, h2, h3 {
+            color: var(--japanese-charcoal-dark);
+        }
+
+        h1 {
+            border-bottom: 3px solid var(--japanese-red-primary);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--japanese-red-primary);
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--japanese-red-primary);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            box-shadow: var(--elevation-2);
+            transform: translateY(-1px);
+        }
+
+        /* Integration Demo Sections */
+        .integration-demo {
+            margin-bottom: 50px;
+            padding: 30px;
+            border: 2px solid var(--outline-variant);
+            border-radius: 12px;
+            background: var(--surface-container-low);
+            transition: all 0.3s ease;
+        }
+
+        /* Color Palette Demo */
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .color-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--outline-variant);
+            transition: all 0.3s ease;
+        }
+
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            border: 3px solid white;
+            box-shadow: var(--elevation-1);
+        }
+
+        .color-red { background: var(--japanese-red-primary); }
+        .color-charcoal { background: var(--japanese-charcoal-dark); }
+        .color-brown { background: var(--japanese-brown-warm); }
+        .color-beige { background: var(--japanese-beige-light); }
+        .color-blue-gray { background: var(--japanese-blue-gray-cool); }
+
+        /* Translation Interface Demo */
+        .translation-demo {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: var(--elevation-1);
+            border: 1px solid var(--outline-variant);
+        }
+
+        .demo-tabs {
+            display: flex;
+            background: var(--surface-container);
+            border-radius: 28px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .demo-tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .demo-tab.active {
+            background: var(--japanese-red-primary);
+            color: white;
+            box-shadow: var(--elevation-1);
+        }
+
+        .demo-tab:not(.active) {
+            color: var(--on-surface-variant);
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        .demo-card {
+            background: var(--surface-container-low);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--outline-variant);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--japanese-red-primary), var(--japanese-brown-warm));
+        }
+
+        .demo-card:hover {
+            box-shadow: var(--elevation-2);
+            transform: translateY(-2px);
+        }
+
+        .demo-tokens {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .demo-token {
+            padding: 8px 12px;
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .demo-token:hover {
+            border-color: var(--japanese-red-primary);
+            box-shadow: var(--elevation-1);
+            transform: translateY(-1px);
+        }
+
+        .demo-token.selected {
+            background: var(--japanese-red-primary);
+            color: white;
+            border-color: var(--japanese-red-primary);
+        }
+
+        /* Button Styles */
+        .demo-button {
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .demo-button.primary {
+            background: var(--japanese-red-primary);
+            color: white;
+            box-shadow: var(--elevation-1);
+        }
+
+        .demo-button.primary:hover {
+            box-shadow: var(--elevation-2);
+            transform: translateY(-1px);
+        }
+
+        .demo-button.outlined {
+            background: transparent;
+            color: var(--japanese-red-primary);
+            border: 1px solid var(--japanese-red-primary);
+        }
+
+        .demo-button.outlined:hover {
+            background: rgba(223, 51, 7, 0.08);
+        }
+
+        /* Code Integration Examples */
+        .code-integration {
+            background: var(--japanese-charcoal-dark);
+            color: #E5E7EB;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.6;
+        }
+
+        .dark .code-integration {
+            background: #1F2937;
+        }
+
+        .code-comment { color: #9CA3AF; }
+        .code-keyword { color: #60A5FA; }
+        .code-string { color: #34D399; }
+        .code-property { color: #F472B6; }
+
+        /* Responsive Demo */
+        .responsive-showcase {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+            min-height: 400px;
+        }
+
+        .device-preview {
+            background: var(--surface-container);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--outline-variant);
+        }
+
+        .device-preview h4 {
+            text-align: center;
+            margin-top: 0;
+            color: var(--japanese-red-primary);
+        }
+
+        .mobile-preview {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .desktop-preview {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 8px;
+            height: 300px;
+        }
+
+        .panel-preview {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid var(--outline-variant);
+            font-size: 10px;
+        }
+
+        /* Implementation Checklist */
+        .implementation-section {
+            background: var(--surface-container-low);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            border-left: 4px solid var(--japanese-red-primary);
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .checklist li::before {
+            content: '✓';
+            background: #4CAF50;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checklist li.pending::before {
+            content: '○';
+            background: var(--outline);
+            color: white;
+        }
+
+        .checklist li.warning::before {
+            content: '!';
+            background: #FF9800;
+        }
+
+        /* File Structure Visualization */
+        .file-structure {
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            margin: 16px 0;
+        }
+
+        .file-tree {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .file-tree li {
+            padding: 2px 0;
+            position: relative;
+        }
+
+        .file-tree .folder::before {
+            content: '📁 ';
+            color: var(--japanese-brown-warm);
+        }
+
+        .file-tree .file::before {
+            content: '📄 ';
+            color: var(--japanese-blue-gray-cool);
+        }
+
+        .file-tree .file.modified::before {
+            content: '📝 ';
+            color: var(--japanese-red-primary);
+        }
+
+        .file-tree .nested {
+            padding-left: 20px;
+        }
+
+        /* Migration Guide Table */
+        .migration-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--elevation-1);
+        }
+
+        .migration-table th {
+            background: var(--japanese-red-primary);
+            color: white;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .migration-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--outline-variant);
+            vertical-align: top;
+        }
+
+        .migration-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .migration-table .before {
+            background: #ffebee;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .migration-table .after {
+            background: #e8f5e8;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .dark .migration-table .before {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .dark .migration-table .after {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .responsive-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-palette {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+
+    <div class="container">
+        <h1>🎨 Translation Design Integration Guide</h1>
+        
+        <p><strong>Project:</strong> Japanese Sentence Analyzer - Complete Design System Integration</p>
+        <p><strong>Objective:</strong> Seamless integration of enhanced translation interface with existing Japanese color palette and Material Design 3 theme system.</p>
+
+        <h2>🎯 Design System Overview</h2>
+        
+        <div class="integration-demo">
+            <h3>Japanese Cultural Color Palette Integration</h3>
+            
+            <div class="color-palette">
+                <div class="color-card">
+                    <div class="color-swatch color-red"></div>
+                    <h4>Japanese Red</h4>
+                    <code>#DF3307</code>
+                    <p>Primary actions, verbs, focus states</p>
+                </div>
+                
+                <div class="color-card">
+                    <div class="color-swatch color-charcoal"></div>
+                    <h4>Japanese Charcoal</h4>
+                    <code>#42433B</code>
+                    <p>Primary text, nouns, high contrast elements</p>
+                </div>
+                
+                <div class="color-card">
+                    <div class="color-swatch color-brown"></div>
+                    <h4>Japanese Brown</h4>
+                    <code>#8F7E74</code>
+                    <p>Secondary text, adjectives, particles</p>
+                </div>
+                
+                <div class="color-card">
+                    <div class="color-swatch color-beige"></div>
+                    <h4>Japanese Beige</h4>
+                    <code>#DAC8C0</code>
+                    <p>Backgrounds, surfaces, subtle elements</p>
+                </div>
+                
+                <div class="color-card">
+                    <div class="color-swatch color-blue-gray"></div>
+                    <h4>Japanese Blue-Gray</h4>
+                    <code>#9FAEB3</code>
+                    <p>Borders, dividers, adverbs, supporting info</p>
+                </div>
+            </div>
+
+            <div class="implementation-section">
+                <h4>Color System Implementation</h4>
+                <p>The Japanese color palette is mapped to Material Design 3 semantic tokens while maintaining cultural significance:</p>
+                
+                <div class="code-integration">
+<span class="code-comment">/* CSS Custom Properties Integration */</span>
+:root {
+  <span class="code-comment">/* Japanese Cultural Colors */</span>
+  <span class="code-property">--japanese-red-primary</span>: <span class="code-string">#DF3307</span>;
+  <span class="code-property">--japanese-charcoal-dark</span>: <span class="code-string">#42433B</span>;
+  <span class="code-property">--japanese-brown-warm</span>: <span class="code-string">#8F7E74</span>;
+  <span class="code-property">--japanese-beige-light</span>: <span class="code-string">#DAC8C0</span>;
+  <span class="code-property">--japanese-blue-gray-cool</span>: <span class="code-string">#9FAEB3</span>;
+  
+  <span class="code-comment">/* Material Design 3 Mapping */</span>
+  <span class="code-property">--surface</span>: <span class="code-keyword">var</span>(<span class="code-property">--japanese-beige-light</span>);
+  <span class="code-property">--on-surface</span>: <span class="code-keyword">var</span>(<span class="code-property">--japanese-charcoal-dark</span>);
+  <span class="code-property">--primary</span>: <span class="code-keyword">var</span>(<span class="code-property">--japanese-red-primary</span>);
+  <span class="code-property">--outline</span>: <span class="code-keyword">var</span>(<span class="code-property">--japanese-blue-gray-cool</span>);
+}
+
+<span class="code-comment">/* Dark Mode Adaptations */</span>
+.dark {
+  <span class="code-property">--japanese-red-primary</span>: <span class="code-string">#FF6B4A</span>;
+  <span class="code-property">--japanese-charcoal-dark</span>: <span class="code-string">#E5E7EB</span>;
+  <span class="code-property">--japanese-beige-light</span>: <span class="code-string">#2B1D33</span>;
+}
+                </div>
+            </div>
+        </div>
+
+        <h2>🔄 Enhanced Translation Interface Demo</h2>
+        
+        <div class="integration-demo">
+            <h3>Complete Translation Workflow</h3>
+            
+            <div class="translation-demo">
+                <div class="demo-tabs">
+                    <div class="demo-tab">Quick Translation</div>
+                    <div class="demo-tab active">Detailed Analysis</div>
+                    <div class="demo-tab">Comparison Mode</div>
+                    <div class="demo-tab">Alternative Versions</div>
+                </div>
+
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                            <span>📝</span>
+                            <h4 style="margin: 0;">Original Japanese</h4>
+                        </div>
+                        <div style="font-size: 18px; margin: 16px 0; line-height: 1.4;">今日は良い天気ですね。</div>
+                        <div class="demo-tokens">
+                            <span class="demo-token">今日</span>
+                            <span class="demo-token selected">は</span>
+                            <span class="demo-token">良い</span>
+                            <span class="demo-token">天気</span>
+                            <span class="demo-token">です</span>
+                            <span class="demo-token">ね</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 16px;">
+                            <button class="demo-button primary">🔊 Pronounce</button>
+                            <button class="demo-button outlined">📋 Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="demo-card">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                            <span>🇨🇳</span>
+                            <h4 style="margin: 0;">Chinese Translation</h4>
+                        </div>
+                        <div style="font-size: 18px; margin: 16px 0; line-height: 1.4;">今天天气真好啊。</div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin: 16px 0; padding: 12px; background: var(--surface-container); border-radius: 8px;">
+                            <span style="font-size: 14px; font-weight: 500;">Confidence:</span>
+                            <div style="flex: 1; height: 6px; background: var(--outline-variant); border-radius: 3px;">
+                                <div style="width: 94%; height: 100%; background: linear-gradient(90deg, var(--japanese-red-primary), #4CAF50); border-radius: 3px;"></div>
+                            </div>
+                            <span style="background: var(--japanese-red-primary); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">94%</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 16px;">
+                            <button class="demo-button primary">🔊 Pronounce</button>
+                            <button class="demo-button outlined">📋 Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 24px;">
+                    <button class="demo-button primary">⚡ Quick Translate</button>
+                    <button class="demo-button outlined" style="margin-left: 8px;">🔄 Alternative Translations</button>
+                    <button class="demo-button outlined" style="margin-left: 8px;">💾 Save Translation</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>📱 Responsive Integration</h2>
+        
+        <div class="integration-demo">
+            <h3>Multi-Device Layout Adaptation</h3>
+            
+            <div class="responsive-showcase">
+                <div class="device-preview">
+                    <h4>📱 Mobile</h4>
+                    <div class="mobile-preview">
+                        <div style="background: var(--japanese-red-primary); color: white; padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 10px; text-align: center;">
+                            Japanese Analyzer
+                        </div>
+                        <div style="background: var(--surface-container); padding: 4px; border-radius: 8px; margin-bottom: 6px;">
+                            <div style="background: var(--japanese-red-primary); color: white; padding: 4px; border-radius: 6px; font-size: 8px; text-align: center;">Analysis</div>
+                        </div>
+                        <div style="background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 6px; padding: 8px; margin-bottom: 6px; font-size: 8px;">
+                            <div style="margin-bottom: 4px;">📝 Original Text</div>
+                            <div style="font-size: 6px; background: var(--surface-container); padding: 2px; border-radius: 2px;">今日は良い天気</div>
+                        </div>
+                        <div style="background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 6px; padding: 8px; font-size: 8px;">
+                            <div style="margin-bottom: 4px;">🇨🇳 Translation</div>
+                            <div style="font-size: 6px; background: var(--surface-container); padding: 2px; border-radius: 2px;">今天天气真好</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="device-preview">
+                    <h4>💻 Desktop</h4>
+                    <div class="desktop-preview">
+                        <div class="panel-preview">
+                            <div style="margin-bottom: 8px; font-weight: bold;">Input Panel</div>
+                            <div style="background: var(--surface-container); height: 40px; border-radius: 4px; margin-bottom: 4px;"></div>
+                            <div style="background: var(--japanese-red-primary); color: white; padding: 4px; border-radius: 4px; text-align: center;">Analyze</div>
+                        </div>
+                        
+                        <div class="panel-preview">
+                            <div style="margin-bottom: 8px; font-weight: bold;">Translation View</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px;">
+                                <div style="background: var(--surface-container); height: 60px; border-radius: 4px;"></div>
+                                <div style="background: var(--surface-container); height: 60px; border-radius: 4px;"></div>
+                            </div>
+                            <div style="background: var(--japanese-red-primary); color: white; padding: 2px; border-radius: 4px; text-align: center; font-size: 8px;">Actions</div>
+                        </div>
+                        
+                        <div class="panel-preview">
+                            <div style="margin-bottom: 8px; font-weight: bold;">Word Details</div>
+                            <div style="background: var(--surface-container); height: 80px; border-radius: 4px; margin-bottom: 4px;"></div>
+                            <div style="text-align: center; font-size: 8px; color: var(--on-surface-variant);">Select a token</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="device-preview">
+                    <h4>📟 Tablet</h4>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; height: 200px;">
+                        <div style="background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 6px; padding: 8px;">
+                            <div style="background: var(--surface-container); height: 20px; border-radius: 4px; margin-bottom: 8px;"></div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                                <div style="background: var(--surface-container-low); height: 60px; border-radius: 4px;"></div>
+                                <div style="background: var(--surface-container-low); height: 60px; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <div style="background: var(--surface-container-low); border-radius: 6px; padding: 8px;">
+                            <div style="font-size: 8px; margin-bottom: 4px;">Word Panel</div>
+                            <div style="background: var(--surface); height: 40px; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>🔧 Implementation Roadmap</h2>
+        
+        <div class="integration-demo">
+            <h3>Step-by-Step Integration Process</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h4>Phase 1: Foundation Integration</h4>
+                    <ul class="checklist">
+                        <li>Update CSS custom properties with Japanese color system</li>
+                        <li>Implement dark mode color adaptations</li>
+                        <li>Add Material Design 3 elevation system</li>
+                        <li>Integrate responsive breakpoint system</li>
+                        <li>Update existing theme context provider</li>
+                    </ul>
+                    
+                    <h4>Phase 2: Component Updates</h4>
+                    <ul class="checklist">
+                        <li>Enhance TranslationSection component</li>
+                        <li>Update AnalysisViewport translation mode</li>
+                        <li>Implement new button and card styles</li>
+                        <li>Add progressive disclosure patterns</li>
+                        <li>Integrate accessibility improvements</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>Phase 3: Advanced Features</h4>
+                    <ul class="checklist">
+                        <li>Implement token interaction enhancements</li>
+                        <li>Add confidence indicators and progress bars</li>
+                        <li>Integrate ARIA live regions</li>
+                        <li>Add keyboard navigation support</li>
+                        <li>Implement mobile-specific gestures</li>
+                    </ul>
+                    
+                    <h4>Phase 4: Testing & Optimization</h4>
+                    <ul class="checklist">
+                        <li>WCAG 2.1 AA compliance testing</li>
+                        <li>Cross-browser compatibility verification</li>
+                        <li>Performance optimization and monitoring</li>
+                        <li>User acceptance testing with Japanese learners</li>
+                        <li>Final integration and deployment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>📁 File Structure & Integration Points</h2>
+        
+        <div class="integration-demo">
+            <h3>Required File Updates</h3>
+            
+            <div class="file-structure">
+                <ul class="file-tree">
+                    <li class="folder">app/
+                        <ul class="nested">
+                            <li class="file modified">globals.css - Enhanced with new translation styles</li>
+                            <li class="file modified">layout.tsx - Updated theme provider integration</li>
+                            <li class="folder">components/
+                                <ul class="nested">
+                                    <li class="file modified">AnalysisViewport.tsx - Enhanced translation mode</li>
+                                    <li class="file modified">TranslationSection.tsx - Complete redesign</li>
+                                    <li class="file">TranslationModeSelector.tsx - New component</li>
+                                    <li class="file">TranslationCard.tsx - New component</li>
+                                    <li class="file">TranslationProgress.tsx - New component</li>
+                                    <li class="file modified">WordDetailPanel.tsx - Enhanced integration</li>
+                                    <li class="file modified">InputPanel.tsx - Mobile optimizations</li>
+                                </ul>
+                            </li>
+                            <li class="folder">contexts/
+                                <ul class="nested">
+                                    <li class="file modified">ThemeContext.tsx - Japanese color integration</li>
+                                </ul>
+                            </li>
+                            <li class="folder">types/
+                                <ul class="nested">
+                                    <li class="file modified">theme.ts - Extended type definitions</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="folder">design/
+                        <ul class="nested">
+                            <li class="file">translation-redesign-wireframes.html</li>
+                            <li class="file">translation-component-designs.html</li>
+                            <li class="file">translation-interaction-patterns.html</li>
+                            <li class="file">translation-mobile-responsive.html</li>
+                            <li class="file">translation-accessibility-guide.html</li>
+                            <li class="file">translation-design-integration.html</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🔄 Migration Guide</h2>
+        
+        <div class="integration-demo">
+            <h3>Key Implementation Changes</h3>
+            
+            <table class="migration-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Current Implementation</th>
+                        <th>Enhanced Implementation</th>
+                        <th>Benefits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Translation Mode</strong></td>
+                        <td class="before">Simple token-by-token table display</td>
+                        <td class="after">Progressive disclosure with cards, confidence indicators, and interactive tokens</td>
+                        <td>Better UX, mobile-friendly, accessible</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Loading States</strong></td>
+                        <td class="before">Basic spinner with text</td>
+                        <td class="after">Skeleton screens, progress bars, live announcements</td>
+                        <td>Perceived performance, accessibility</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Button Design</strong></td>
+                        <td class="before">Simple background colors</td>
+                        <td class="after">Material Design 3 with elevation, hover states, ripple effects</td>
+                        <td>Modern feel, better feedback</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile Layout</strong></td>
+                        <td class="before">Responsive but not optimized</td>
+                        <td class="after">Mobile-first with collapsible sections, gesture support</td>
+                        <td>Better mobile experience</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Accessibility</strong></td>
+                        <td class="before">Basic keyboard support</td>
+                        <td class="after">Full WCAG 2.1 AA compliance with ARIA</td>
+                        <td>Inclusive design, legal compliance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>⚡ Performance Considerations</h2>
+        
+        <div class="implementation-section">
+            <h4>Optimization Strategies</h4>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <h5>🎨 CSS Optimization</h5>
+                    <ul style="font-size: 14px;">
+                        <li>Use CSS custom properties for theming</li>
+                        <li>Implement efficient transform-based animations</li>
+                        <li>Minimize layout thrashing with proper CSS</li>
+                        <li>Use contain property for isolated components</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <h5>⚛️ React Optimization</h5>
+                    <ul style="font-size: 14px;">
+                        <li>Implement React.memo for expensive components</li>
+                        <li>Use useMemo for computed values</li>
+                        <li>Debounce translation updates</li>
+                        <li>Lazy load non-critical components</li>
+                    </ul>
+                </div>
+                
+                <div style="padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <h5>📱 Mobile Optimization</h5>
+                    <ul style="font-size: 14px;">
+                        <li>Touch event optimization</li>
+                        <li>Reduced motion support</li>
+                        <li>Efficient scroll handling</li>
+                        <li>Battery-conscious animations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>🎯 Success Metrics</h2>
+        
+        <div class="implementation-section">
+            <h4>Measurable Improvements Expected</h4>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div style="text-align: center; padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <div style="font-size: 32px; font-weight: bold; color: var(--japanese-red-primary);">+45%</div>
+                    <div style="font-size: 14px; margin-top: 8px;">User Engagement</div>
+                    <div style="font-size: 12px; color: var(--on-surface-variant);">Time spent in translation mode</div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <div style="font-size: 32px; font-weight: bold; color: var(--japanese-red-primary);">+60%</div>
+                    <div style="font-size: 14px; margin-top: 8px;">Mobile Usability</div>
+                    <div style="font-size: 12px; color: var(--on-surface-variant);">Task completion on mobile</div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <div style="font-size: 32px; font-weight: bold; color: var(--japanese-red-primary);">100%</div>
+                    <div style="font-size: 14px; margin-top: 8px;">WCAG Compliance</div>
+                    <div style="font-size: 12px; color: var(--on-surface-variant);">AA accessibility standard</div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; border: 1px solid var(--outline-variant); border-radius: 8px;">
+                    <div style="font-size: 32px; font-weight: bold; color: var(--japanese-red-primary);">+35%</div>
+                    <div style="font-size: 14px; margin-top: 8px;">Feature Discovery</div>
+                    <div style="font-size: 12px; color: var(--on-surface-variant);">Translation feature usage</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 24px; background: var(--surface-container-low); border-radius: 12px; text-align: center; border-left: 4px solid var(--japanese-red-primary);">
+            <h3 style="margin-top: 0; color: var(--japanese-red-primary);">🚀 Ready for Implementation</h3>
+            <p style="margin-bottom: 20px;">This comprehensive integration guide provides everything needed to enhance the Japanese Sentence Analyzer's translation interface. The design system maintains cultural authenticity while delivering modern, accessible, and performant user experiences across all devices.</p>
+            
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="demo-button primary">📋 Copy Integration Checklist</button>
+                <button class="demo-button outlined">📊 View Implementation Timeline</button>
+                <button class="demo-button outlined">🔧 Access Component Library</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDarkMode = false;
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark', isDarkMode);
+            
+            const toggleButton = document.querySelector('.theme-toggle');
+            toggleButton.textContent = isDarkMode ? '☀️ Light Mode' : '🌓 Dark Mode';
+        }
+
+        // Initialize theme based on system preference
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                toggleTheme();
+            }
+        });
+
+        // Demo interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Token selection demo
+            const tokens = document.querySelectorAll('.demo-token');
+            tokens.forEach(token => {
+                token.addEventListener('click', function() {
+                    tokens.forEach(t => t.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Tab switching demo
+            const tabs = document.querySelectorAll('.demo-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Button interaction feedback
+            const buttons = document.querySelectorAll('.demo-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Create ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255, 255, 255, 0.3);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

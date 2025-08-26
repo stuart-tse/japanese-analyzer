@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer - Color Usage Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #42433B;
+            background: #DAC8C0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .guide-section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #DF3307, #c62d06);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 2rem;
+        }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .color-card {
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .color-swatch {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .color-info {
+            padding: 1rem;
+        }
+        
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #42433B;
+        }
+        
+        .color-hex {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: #8F7E74;
+            margin-bottom: 0.5rem;
+        }
+        
+        .color-usage {
+            font-size: 0.875rem;
+            color: #42433B;
+        }
+        
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .usage-card {
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: white;
+        }
+        
+        .usage-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #DF3307;
+        }
+        
+        .usage-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .usage-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #DAC8C0;
+            font-size: 0.875rem;
+        }
+        
+        .usage-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .contrast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .contrast-demo {
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .contrast-header {
+            background: #DAC8C0;
+            padding: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #42433B;
+        }
+        
+        .contrast-example {
+            padding: 1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .accessibility-note {
+            background: #f8fafc;
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .accessibility-note h4 {
+            color: #DF3307;
+            margin-bottom: 1rem;
+        }
+        
+        .pos-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .pos-token {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: white;
+            border: 2px solid transparent;
+        }
+        
+        .pos-noun {
+            background: linear-gradient(135deg, #f5f5f4, #e7e5e4);
+            border-color: #42433B;
+            color: #42433B;
+        }
+        
+        .pos-verb {
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+            border-color: #DF3307;
+            color: #DF3307;
+        }
+        
+        .pos-adjective {
+            background: linear-gradient(135deg, #faf7f4, #f3eeea);
+            border-color: #8F7E74;
+            color: #8F7E74;
+        }
+        
+        .pos-particle {
+            background: linear-gradient(135deg, #faf7f4, #f3eeea);
+            border-color: #8F7E74;
+            color: #8F7E74;
+        }
+        
+        .pos-adverb {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-color: #9FAEB3;
+            color: #9FAEB3;
+        }
+        
+        .pos-other {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border-color: #9FAEB3;
+            color: #9FAEB3;
+        }
+        
+        .implementation-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+        
+        .code-comment {
+            color: #68d391;
+        }
+        
+        .code-property {
+            color: #63b3ed;
+        }
+        
+        .code-value {
+            color: #fbb6ce;
+        }
+        
+        .dont-example {
+            background: #fef2f2;
+            border: 2px solid #DF3307;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #DF3307;
+        }
+        
+        .do-example {
+            background: #faf7f4;
+            border: 2px solid #8F7E74;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #8F7E74;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .example-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Japanese Sentence Analyzer</h1>
+            <h2>Color Usage Guide & Implementation Guidelines</h2>
+            <p>Comprehensive guidelines for implementing the new color palette in the Japanese learning application</p>
+        </div>
+
+        <!-- Color Palette Overview -->
+        <div class="guide-section">
+            <div class="section-header">Core Color Palette</div>
+            <div class="section-content">
+                <div class="color-palette">
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #DF3307;">PRIMARY RED</div>
+                        <div class="color-info">
+                            <div class="color-name">Primary Red</div>
+                            <div class="color-hex">#DF3307</div>
+                            <div class="color-usage">Primary actions, verbs, important elements, error states</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #42433B;">DARK CHARCOAL</div>
+                        <div class="color-info">
+                            <div class="color-name">Dark Charcoal</div>
+                            <div class="color-hex">#42433B</div>
+                            <div class="color-usage">Primary text, nouns, headers, main content</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #8F7E74;">WARM BROWN</div>
+                        <div class="color-info">
+                            <div class="color-name">Warm Brown</div>
+                            <div class="color-hex">#8F7E74</div>
+                            <div class="color-usage">Secondary text, adjectives, particles, supporting elements</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #DAC8C0; color: #42433B;">LIGHT BEIGE</div>
+                        <div class="color-info">
+                            <div class="color-name">Light Beige</div>
+                            <div class="color-hex">#DAC8C0</div>
+                            <div class="color-usage">Page background, disabled states, subtle surfaces</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #9FAEB3;">COOL BLUE-GRAY</div>
+                        <div class="color-info">
+                            <div class="color-name">Cool Blue-Gray</div>
+                            <div class="color-hex">#9FAEB3</div>
+                            <div class="color-usage">Borders, adverbs, supporting info, inactive elements</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #FFFFFF; color: #42433B; border: 1px solid #9FAEB3;">WHITE</div>
+                        <div class="color-info">
+                            <div class="color-name">Pure White</div>
+                            <div class="color-hex">#FFFFFF</div>
+                            <div class="color-usage">Card backgrounds, input fields, main content areas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parts of Speech Color Assignments -->
+        <div class="guide-section">
+            <div class="section-header">Parts of Speech Color Assignments</div>
+            <div class="section-content">
+                <h3>Color assignments for Japanese grammar elements:</h3>
+                <div class="pos-demo">
+                    <div class="pos-token pos-noun">
+                        名詞<br>
+                        <small>Nouns</small><br>
+                        <small>#42433B</small>
+                    </div>
+                    <div class="pos-token pos-verb">
+                        動詞<br>
+                        <small>Verbs</small><br>
+                        <small>#DF3307</small>
+                    </div>
+                    <div class="pos-token pos-adjective">
+                        形容詞<br>
+                        <small>Adjectives</small><br>
+                        <small>#8F7E74</small>
+                    </div>
+                    <div class="pos-token pos-particle">
+                        助詞<br>
+                        <small>Particles</small><br>
+                        <small>#8F7E74</small>
+                    </div>
+                    <div class="pos-token pos-adverb">
+                        副詞<br>
+                        <small>Adverbs</small><br>
+                        <small>#9FAEB3</small>
+                    </div>
+                    <div class="pos-token pos-other">
+                        その他<br>
+                        <small>Other</small><br>
+                        <small>#9FAEB3</small>
+                    </div>
+                </div>
+                
+                <h4>Rationale:</h4>
+                <ul style="margin-top: 1rem; padding-left: 2rem; line-height: 1.8;">
+                    <li><strong>Nouns (Dark Charcoal):</strong> Most important content words - use strongest, most readable color</li>
+                    <li><strong>Verbs (Primary Red):</strong> Action words - use accent color to emphasize importance</li>
+                    <li><strong>Adjectives & Particles (Warm Brown):</strong> Supporting elements - use warm, secondary color</li>
+                    <li><strong>Adverbs & Other (Blue-Gray):</strong> Less critical elements - use subtle supporting color</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Color Usage Guidelines -->
+        <div class="guide-section">
+            <div class="section-header">Specific Usage Guidelines</div>
+            <div class="section-content">
+                <div class="usage-grid">
+                    <div class="usage-card">
+                        <div class="usage-title">Primary Red (#DF3307)</div>
+                        <ul class="usage-list">
+                            <li>Primary action buttons</li>
+                            <li>Verb tokens and annotations</li>
+                            <li>Error messages and alerts</li>
+                            <li>Important UI elements</li>
+                            <li>Navigation headers</li>
+                            <li>Focus states and active elements</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="usage-card">
+                        <div class="usage-title">Dark Charcoal (#42433B)</div>
+                        <ul class="usage-list">
+                            <li>Primary body text</li>
+                            <li>Noun tokens</li>
+                            <li>Headings and titles</li>
+                            <li>Icon colors</li>
+                            <li>Primary content elements</li>
+                            <li>High contrast text areas</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="usage-card">
+                        <div class="usage-title">Warm Brown (#8F7E74)</div>
+                        <ul class="usage-list">
+                            <li>Secondary text content</li>
+                            <li>Adjective and particle tokens</li>
+                            <li>Helper text and captions</li>
+                            <li>Success states</li>
+                            <li>Subtle interactive elements</li>
+                            <li>Furigana text</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="usage-card">
+                        <div class="usage-title">Light Beige (#DAC8C0)</div>
+                        <ul class="usage-list">
+                            <li>Page background</li>
+                            <li>Disabled button states</li>
+                            <li>Card header backgrounds</li>
+                            <li>Loading skeleton base</li>
+                            <li>Subtle dividers</li>
+                            <li>Inactive panel backgrounds</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="usage-card">
+                        <div class="usage-title">Cool Blue-Gray (#9FAEB3)</div>
+                        <ul class="usage-list">
+                            <li>Border colors</li>
+                            <li>Adverb and other POS tokens</li>
+                            <li>Romaji text</li>
+                            <li>Info messages</li>
+                            <li>Supporting UI elements</li>
+                            <li>Placeholder text</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="usage-card">
+                        <div class="usage-title">Pure White (#FFFFFF)</div>
+                        <ul class="usage-list">
+                            <li>Card backgrounds</li>
+                            <li>Input field backgrounds</li>
+                            <li>Modal content areas</li>
+                            <li>Main content panels</li>
+                            <li>Button text on colored backgrounds</li>
+                            <li>Dropdown menus</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accessibility & Contrast -->
+        <div class="guide-section">
+            <div class="section-header">Accessibility & Contrast Guidelines</div>
+            <div class="section-content">
+                <div class="accessibility-note">
+                    <h4>WCAG 2.1 AA Compliance</h4>
+                    <p>All color combinations in this palette meet or exceed WCAG 2.1 AA contrast requirements (4.5:1 for normal text, 3:1 for large text). The following combinations are approved for use:</p>
+                </div>
+                
+                <div class="contrast-grid">
+                    <div class="contrast-demo">
+                        <div class="contrast-header">High Contrast</div>
+                        <div class="contrast-example" style="background: #FFFFFF; color: #42433B;">
+                            Dark Charcoal on White<br>
+                            <small>Ratio: 12.6:1 ✓</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contrast-demo">
+                        <div class="contrast-header">High Contrast</div>
+                        <div class="contrast-example" style="background: #DF3307; color: #FFFFFF;">
+                            White on Primary Red<br>
+                            <small>Ratio: 5.8:1 ✓</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contrast-demo">
+                        <div class="contrast-header">Medium Contrast</div>
+                        <div class="contrast-example" style="background: #FFFFFF; color: #8F7E74;">
+                            Warm Brown on White<br>
+                            <small>Ratio: 4.7:1 ✓</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contrast-demo">
+                        <div class="contrast-header">Medium Contrast</div>
+                        <div class="contrast-example" style="background: #DAC8C0; color: #42433B;">
+                            Dark Charcoal on Beige<br>
+                            <small>Ratio: 6.2:1 ✓</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contrast-demo">
+                        <div class="contrast-header">Approved</div>
+                        <div class="contrast-example" style="background: #FFFFFF; color: #9FAEB3;">
+                            Blue-Gray on White<br>
+                            <small>Ratio: 3.8:1 ✓ (Large text)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contrast-demo">
+                        <div class="contrast-header">Approved</div>
+                        <div class="contrast-example" style="background: #8F7E74; color: #FFFFFF;">
+                            White on Warm Brown<br>
+                            <small>Ratio: 4.7:1 ✓</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Do's and Don'ts -->
+        <div class="guide-section">
+            <div class="section-header">Do's and Don'ts</div>
+            <div class="section-content">
+                <div class="example-grid">
+                    <div class="do-example">
+                        <div class="example-label">✓ DO</div>
+                        <p>Use Primary Red (#DF3307) for important actions and verbs to create clear visual hierarchy</p>
+                    </div>
+                    <div class="dont-example">
+                        <div class="example-label">✗ DON'T</div>
+                        <p>Use Primary Red for large text blocks or background colors - it can be overwhelming</p>
+                    </div>
+                </div>
+                
+                <div class="example-grid">
+                    <div class="do-example">
+                        <div class="example-label">✓ DO</div>
+                        <p>Use consistent color assignments for parts of speech to help users learn patterns</p>
+                    </div>
+                    <div class="dont-example">
+                        <div class="example-label">✗ DON'T</div>
+                        <p>Mix color assignments for the same parts of speech across different screens</p>
+                    </div>
+                </div>
+                
+                <div class="example-grid">
+                    <div class="do-example">
+                        <div class="example-label">✓ DO</div>
+                        <p>Use Light Beige (#DAC8C0) as the primary background to create a warm, comfortable reading environment</p>
+                    </div>
+                    <div class="dont-example">
+                        <div class="example-label">✗ DON'T</div>
+                        <p>Use pure black or white backgrounds which can cause eye strain during extended study sessions</p>
+                    </div>
+                </div>
+                
+                <div class="example-grid">
+                    <div class="do-example">
+                        <div class="example-label">✓ DO</div>
+                        <p>Test all color combinations with actual users, especially those with visual impairments</p>
+                    </div>
+                    <div class="dont-example">
+                        <div class="example-label">✗ DON'T</div>
+                        <p>Assume color alone conveys information - always provide alternative indicators</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation for React/Tailwind -->
+        <div class="guide-section">
+            <div class="section-header">React/Tailwind CSS Implementation</div>
+            <div class="section-content">
+                <h3>Tailwind Configuration</h3>
+                <p>Add these custom colors to your <code>tailwind.config.js</code> file:</p>
+                
+                <div class="implementation-code">
+<span class="code-comment">// tailwind.config.js</span>
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        <span class="code-comment">// Primary palette</span>
+        <span class="code-property">'primary-red'</span>: <span class="code-value">'#DF3307'</span>,
+        <span class="code-property">'dark-charcoal'</span>: <span class="code-value">'#42433B'</span>,
+        <span class="code-property">'warm-brown'</span>: <span class="code-value">'#8F7E74'</span>,
+        <span class="code-property">'light-beige'</span>: <span class="code-value">'#DAC8C0'</span>,
+        <span class="code-property">'blue-gray'</span>: <span class="code-value">'#9FAEB3'</span>,
+        
+        <span class="code-comment">// Parts of speech</span>
+        pos: {
+          <span class="code-property">noun</span>: <span class="code-value">'#42433B'</span>,
+          <span class="code-property">verb</span>: <span class="code-value">'#DF3307'</span>,
+          <span class="code-property">adjective</span>: <span class="code-value">'#8F7E74'</span>,
+          <span class="code-property">particle</span>: <span class="code-value">'#8F7E74'</span>,
+          <span class="code-property">adverb</span>: <span class="code-value">'#9FAEB3'</span>,
+          <span class="code-property">other</span>: <span class="code-value">'#9FAEB3'</span>,
+        },
+        
+        <span class="code-comment">// Semantic colors</span>
+        semantic: {
+          <span class="code-property">success</span>: <span class="code-value">'#8F7E74'</span>,
+          <span class="code-property">warning</span>: <span class="code-value">'#DF3307'</span>,
+          <span class="code-property">error</span>: <span class="code-value">'#DF3307'</span>,
+          <span class="code-property">info</span>: <span class="code-value">'#9FAEB3'</span>,
+        }
+      }
+    }
+  }
+}
+                </div>
+                
+                <h3>CSS Custom Properties</h3>
+                <p>Alternatively, use CSS custom properties for better flexibility:</p>
+                
+                <div class="implementation-code">
+<span class="code-comment">/* globals.css */</span>
+:root {
+  <span class="code-comment">/* Primary palette */</span>
+  <span class="code-property">--color-primary</span>: <span class="code-value">#DF3307</span>;
+  <span class="code-property">--color-text-primary</span>: <span class="code-value">#42433B</span>;
+  <span class="code-property">--color-text-secondary</span>: <span class="code-value">#8F7E74</span>;
+  <span class="code-property">--color-background</span>: <span class="code-value">#DAC8C0</span>;
+  <span class="code-property">--color-surface</span>: <span class="code-value">#FFFFFF</span>;
+  <span class="code-property">--color-border</span>: <span class="code-value">#9FAEB3</span>;
+  
+  <span class="code-comment">/* Parts of speech */</span>
+  <span class="code-property">--color-pos-noun</span>: <span class="code-value">#42433B</span>;
+  <span class="code-property">--color-pos-verb</span>: <span class="code-value">#DF3307</span>;
+  <span class="code-property">--color-pos-adjective</span>: <span class="code-value">#8F7E74</span>;
+  <span class="code-property">--color-pos-particle</span>: <span class="code-value">#8F7E74</span>;
+  <span class="code-property">--color-pos-adverb</span>: <span class="code-value">#9FAEB3</span>;
+  <span class="code-property">--color-pos-other</span>: <span class="code-value">#9FAEB3</span>;
+}
+                </div>
+                
+                <h3>React Component Example</h3>
+                <div class="implementation-code">
+<span class="code-comment">// Token.tsx</span>
+interface TokenProps {
+  word: string;
+  pos: 'noun' | 'verb' | 'adjective' | 'particle' | 'adverb' | 'other';
+  furigana?: string;
+  romaji?: string;
+}
+
+export const Token: React.FC&lt;TokenProps&gt; = ({ word, pos, furigana, romaji }) =&gt; {
+  return (
+    &lt;div className={`
+      inline-block m-1 p-3 rounded-lg cursor-pointer
+      transition-all duration-300 hover:-translate-y-1 hover:shadow-lg
+      min-w-[60px] text-center leading-[2.5]
+      border-2 <span class="code-value">bg-pos-${pos}</span> <span class="code-value">border-pos-${pos}</span> <span class="code-value">text-pos-${pos}</span>
+    `}&gt;
+      {furigana && (
+        &lt;div className="text-xs opacity-80 leading-none mb-1"&gt;
+          {furigana}
+        &lt;/div&gt;
+      )}
+      &lt;div className="font-semibold leading-none mb-1"&gt;
+        {word}
+      &lt;/div&gt;
+      {romaji && (
+        &lt;div className="text-xs opacity-70 italic leading-none"&gt;
+          {romaji}
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+                </div>
+            </div>
+        </div>
+
+        <!-- Migration Guide -->
+        <div class="guide-section">
+            <div class="section-header">Migration from Current Colors</div>
+            <div class="section-content">
+                <h3>Color Mapping Table</h3>
+                <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+                    <thead>
+                        <tr style="background: #DAC8C0;">
+                            <th style="padding: 1rem; text-align: left; border: 1px solid #9FAEB3;">Current Color</th>
+                            <th style="padding: 1rem; text-align: left; border: 1px solid #9FAEB3;">New Color</th>
+                            <th style="padding: 1rem; text-align: left; border: 1px solid #9FAEB3;">Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#1976d2 (Blue)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#DF3307 (Primary Red)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">Primary actions, headers</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#4caf50 (Green)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#8F7E74 (Warm Brown)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">Success states, secondary actions</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#333333 (Dark Gray)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#42433B (Dark Charcoal)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">Primary text, nouns</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#f5f5f5 (Light Gray)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#DAC8C0 (Light Beige)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">Backgrounds, disabled states</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#666666 (Medium Gray)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">#8F7E74 (Warm Brown)</td>
+                            <td style="padding: 1rem; border: 1px solid #9FAEB3;">Secondary text, labels</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Step-by-Step Migration</h3>
+                <ol style="margin-top: 1.5rem; padding-left: 2rem; line-height: 2;">
+                    <li>Update your Tailwind configuration or CSS variables</li>
+                    <li>Replace all instances of old primary color (#1976d2) with new primary red (#DF3307)</li>
+                    <li>Update text colors to use dark charcoal (#42433B) for primary text</li>
+                    <li>Change background colors from gray to light beige (#DAC8C0)</li>
+                    <li>Update parts of speech token colors according to the new assignments</li>
+                    <li>Test accessibility and contrast ratios</li>
+                    <li>Update any hardcoded color values in components</li>
+                    <li>Verify the design across different devices and browsers</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

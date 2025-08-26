@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Mobile-First Responsive Design</title>
+    <style>
+        :root {
+            /* Japanese Color Palette */
+            --japanese-red: #DF3307;
+            --japanese-charcoal: #42433B;
+            --japanese-brown: #8F7E74;
+            --japanese-beige: #DAC8C0;
+            --japanese-blue-gray: #9FAEB3;
+            
+            /* Material Design 3 */
+            --surface: #FFFBFE;
+            --surface-variant: #E7E0EC;
+            --surface-container: #F3EDF7;
+            --surface-container-low: #F7F2FA;
+            --on-surface: var(--japanese-charcoal);
+            --on-surface-variant: var(--japanese-brown);
+            --outline: var(--japanese-blue-gray);
+            --outline-variant: #CAC4D0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--surface);
+            color: var(--on-surface);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+        }
+
+        h1, h2, h3 {
+            color: var(--japanese-charcoal);
+        }
+
+        h1 {
+            border-bottom: 3px solid var(--japanese-red);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--japanese-red);
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        /* Device Mockups */
+        .device-mockup {
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            background: #000;
+            position: relative;
+        }
+
+        .device-screen {
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mobile-mockup {
+            width: 375px;
+            border: 8px solid #000;
+        }
+
+        .tablet-mockup {
+            width: 768px;
+            border: 12px solid #000;
+        }
+
+        .desktop-mockup {
+            width: 100%;
+            max-width: 1200px;
+            border: 15px solid #000;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 24px;
+            background: #000;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Mobile Layout Components */
+        .mobile-header {
+            background: var(--japanese-red);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-header h1 {
+            font-size: 18px;
+            margin: 0;
+            border: none;
+            color: white;
+        }
+
+        .mobile-tabs {
+            display: flex;
+            background: var(--surface-container);
+            margin: 8px;
+            border-radius: 20px;
+            padding: 4px;
+        }
+
+        .mobile-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mobile-tab.active {
+            background: var(--japanese-red);
+            color: white;
+        }
+
+        .mobile-card {
+            margin: 12px;
+            background: var(--surface-container-low);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .mobile-card-header {
+            background: var(--surface-container);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .mobile-card-content {
+            padding: 16px;
+            border-top: 1px solid var(--outline-variant);
+        }
+
+        .mobile-token-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 0;
+        }
+
+        .mobile-token {
+            padding: 6px 10px;
+            background: var(--surface);
+            border: 1px solid var(--outline-variant);
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-token:active {
+            background: var(--japanese-red);
+            color: white;
+            transform: scale(0.95);
+        }
+
+        .mobile-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--japanese-red);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .mobile-button.secondary {
+            background: transparent;
+            color: var(--japanese-red);
+            border: 1px solid var(--japanese-red);
+        }
+
+        /* Tablet Layout */
+        .tablet-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            height: 600px;
+        }
+
+        .tablet-main {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .tablet-sidebar {
+            background: var(--surface-container-low);
+            padding: 20px;
+            border-left: 1px solid var(--outline-variant);
+        }
+
+        /* Desktop Layout */
+        .desktop-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            height: 700px;
+        }
+
+        .desktop-sidebar {
+            background: var(--surface-container-low);
+            padding: 24px;
+            border-right: 1px solid var(--outline-variant);
+        }
+
+        .desktop-main {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .desktop-details {
+            background: var(--surface-container-low);
+            padding: 24px;
+            border-left: 1px solid var(--outline-variant);
+        }
+
+        /* Responsive Typography */
+        .responsive-text {
+            font-size: clamp(14px, 2.5vw, 18px);
+            line-height: 1.4;
+        }
+
+        .responsive-title {
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: 600;
+        }
+
+        /* Breakpoint Indicators */
+        .breakpoint-indicator {
+            background: var(--japanese-red);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: inline-block;
+        }
+
+        /* Gesture Indicators */
+        .gesture-demo {
+            position: relative;
+            padding: 20px;
+            border: 2px dashed var(--outline);
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .gesture-arrow {
+            position: absolute;
+            font-size: 24px;
+            color: var(--japanese-red);
+            animation: swipe 2s infinite;
+        }
+
+        @keyframes swipe {
+            0%, 100% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(20px); opacity: 0.5; }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: var(--japanese-red);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        /* Progressive Enhancement Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            padding: 20px;
+            border: 1px solid var(--outline-variant);
+            border-radius: 12px;
+            background: var(--surface-container-low);
+        }
+
+        .feature-card h4 {
+            color: var(--japanese-red);
+            margin-top: 0;
+        }
+
+        /* Responsive Tables */
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .responsive-table th,
+        .responsive-table td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .responsive-table th {
+            background: var(--surface-container);
+            font-weight: 600;
+        }
+
+        /* Specification Tables */
+        .spec-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .spec-table th {
+            background: var(--japanese-red);
+            color: white;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .spec-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--outline-variant);
+        }
+
+        .spec-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--japanese-charcoal);
+            color: #E5E7EB;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .spec-note {
+            background: var(--surface-container-low);
+            border-left: 4px solid var(--japanese-red);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Animation for demo purposes */
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 300px;
+        }
+
+        /* Media Query Demonstrations */
+        @media (max-width: 480px) {
+            .mobile-only { display: block; }
+            .tablet-up { display: none; }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .tablet-only { display: block; }
+            .mobile-only { display: none; }
+            .desktop-only { display: none; }
+        }
+
+        @media (min-width: 769px) {
+            .desktop-only { display: block; }
+            .mobile-only { display: none; }
+            .tablet-only { display: none; }
+        }
+
+        .mobile-only { display: none; }
+        .tablet-only { display: none; }
+        .desktop-only { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Translation Mobile-First Responsive Design</h1>
+        
+        <p><strong>Project:</strong> Japanese Sentence Analyzer - Mobile-First Translation Interface</p>
+        <p><strong>Approach:</strong> Progressive enhancement from mobile to desktop with optimal touch interactions and space utilization.</p>
+
+        <h2>📱 Mobile Layout (320px - 480px)</h2>
+        
+        <div class="device-mockup mobile-mockup">
+            <div class="status-bar">
+                <span>9:41 AM</span>
+                <span>100%</span>
+            </div>
+            <div class="device-screen">
+                <div class="mobile-header">
+                    <h1>Japanese Analyzer</h1>
+                    <button style="background: none; border: none; color: white; font-size: 18px;">⚙️</button>
+                </div>
+                
+                <div class="mobile-tabs">
+                    <div class="mobile-tab">Quick</div>
+                    <div class="mobile-tab active">Analysis</div>
+                    <div class="mobile-tab">Compare</div>
+                </div>
+
+                <div class="mobile-card">
+                    <div class="mobile-card-header" onclick="toggleMobileSection(this)">
+                        <span>📝 Original Japanese</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="mobile-card-content collapsible-content expanded">
+                        <div class="responsive-text" style="margin-bottom: 12px;">今日は良い天気ですね。</div>
+                        <div class="mobile-token-grid">
+                            <span class="mobile-token">今日</span>
+                            <span class="mobile-token">は</span>
+                            <span class="mobile-token">良い</span>
+                            <span class="mobile-token">天気</span>
+                            <span class="mobile-token">です</span>
+                            <span class="mobile-token">ね</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button style="flex: 1; padding: 8px; background: var(--japanese-red); color: white; border: none; border-radius: 6px; font-size: 12px;">🔊</button>
+                            <button style="flex: 1; padding: 8px; background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red); border-radius: 6px; font-size: 12px;">📋</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mobile-card">
+                    <div class="mobile-card-header" onclick="toggleMobileSection(this)">
+                        <span>🇨🇳 Chinese Translation</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="mobile-card-content collapsible-content expanded">
+                        <div class="responsive-text" style="margin-bottom: 12px;">今天天气真好啊。</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 12px;">
+                            <span>Confidence:</span>
+                            <div style="flex: 1; height: 4px; background: var(--outline-variant); border-radius: 2px;">
+                                <div style="width: 94%; height: 100%; background: var(--japanese-red); border-radius: 2px;"></div>
+                            </div>
+                            <span style="font-weight: bold;">94%</span>
+                        </div>
+                        <button class="mobile-button">⚡ Quick Actions</button>
+                    </div>
+                </div>
+
+                <div style="padding: 16px;">
+                    <button class="mobile-button">🔄 Alternative Translations</button>
+                    <button class="mobile-button secondary">💾 Save Translation</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="spec-note">
+            <strong>Mobile Design Principles:</strong>
+            <ul>
+                <li><strong>Thumb-Friendly:</strong> All interactive elements within thumb reach zone</li>
+                <li><strong>Collapsible Sections:</strong> Space-efficient content organization</li>
+                <li><strong>Full-Width Buttons:</strong> Easy touch targets with clear actions</li>
+                <li><strong>Vertical Layout:</strong> Single-column design optimized for scrolling</li>
+                <li><strong>Reduced Cognitive Load:</strong> Progressive disclosure of information</li>
+            </ul>
+        </div>
+
+        <h2>🖥️ Tablet Layout (481px - 768px)</h2>
+        
+        <div class="device-mockup tablet-mockup">
+            <div class="device-screen">
+                <div style="background: var(--japanese-red); color: white; padding: 16px;">
+                    <h2 style="margin: 0; color: white; border: none;">Japanese Sentence Analyzer</h2>
+                </div>
+                
+                <div class="tablet-layout">
+                    <div class="tablet-main">
+                        <div style="display: flex; background: var(--surface-container); border-radius: 20px; padding: 4px; margin-bottom: 20px;">
+                            <div style="flex: 1; padding: 8px 16px; text-align: center; background: var(--japanese-red); color: white; border-radius: 16px; font-size: 14px;">Detailed Analysis</div>
+                            <div style="flex: 1; padding: 8px 16px; text-align: center; font-size: 14px;">Quick Translation</div>
+                            <div style="flex: 1; padding: 8px 16px; text-align: center; font-size: 14px;">Comparison</div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div style="background: var(--surface-container-low); padding: 20px; border-radius: 12px;">
+                                <h4 style="margin-top: 0;">📝 Original Text</h4>
+                                <div style="font-size: 18px; margin: 12px 0;">今日は良い天気ですね。</div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0;">
+                                    <span style="padding: 6px 10px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 6px; font-size: 14px;">今日</span>
+                                    <span style="padding: 6px 10px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 6px; font-size: 14px;">は</span>
+                                    <span style="padding: 6px 10px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 6px; font-size: 14px;">良い</span>
+                                </div>
+                            </div>
+
+                            <div style="background: var(--surface-container-low); padding: 20px; border-radius: 12px;">
+                                <h4 style="margin-top: 0;">🇨🇳 Translation</h4>
+                                <div style="font-size: 18px; margin: 12px 0;">今天天气真好啊。</div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin: 12px 0;">
+                                    <span style="font-size: 14px;">Confidence:</span>
+                                    <div style="flex: 1; height: 6px; background: var(--outline-variant); border-radius: 3px;">
+                                        <div style="width: 94%; height: 100%; background: var(--japanese-red); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="font-size: 14px; font-weight: bold;">94%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button style="padding: 12px 24px; background: var(--japanese-red); color: white; border: none; border-radius: 20px; margin: 0 8px;">⚡ Translate</button>
+                            <button style="padding: 12px 24px; background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red); border-radius: 20px; margin: 0 8px;">🔄 Alternatives</button>
+                        </div>
+                    </div>
+
+                    <div class="tablet-sidebar">
+                        <h4>📖 Word Details</h4>
+                        <div style="background: var(--surface); padding: 16px; border-radius: 8px; border: 1px solid var(--outline-variant);">
+                            <div style="text-align: center; color: var(--on-surface-variant); font-size: 14px;">
+                                Select a token to see detailed analysis
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="spec-note">
+            <strong>Tablet Design Principles:</strong>
+            <ul>
+                <li><strong>Two-Column Layout:</strong> Efficient use of horizontal space</li>
+                <li><strong>Larger Touch Targets:</strong> Optimized for finger and stylus input</li>
+                <li><strong>Side Panel:</strong> Persistent word details without modal overlays</li>
+                <li><strong>Grid System:</strong> Flexible content arrangement</li>
+                <li><strong>Enhanced Typography:</strong> Larger text for comfortable reading</li>
+            </ul>
+        </div>
+
+        <h2>🖥️ Desktop Layout (769px+)</h2>
+        
+        <div class="device-mockup desktop-mockup">
+            <div class="device-screen">
+                <div style="background: var(--japanese-red); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0; color: white; border: none;">Japanese Sentence Analyzer (日本語文章解析器)</h2>
+                    <button style="background: none; border: none; color: white; font-size: 16px;">Settings</button>
+                </div>
+                
+                <div class="desktop-layout">
+                    <div class="desktop-sidebar">
+                        <h3 style="margin-top: 0;">Input & Controls</h3>
+                        <textarea style="width: 100%; height: 120px; padding: 12px; border: 1px solid var(--outline-variant); border-radius: 8px; font-size: 14px; resize: vertical;" placeholder="Enter Japanese text here..."></textarea>
+                        
+                        <div style="margin: 16px 0;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Learning Mode:</label>
+                            <select style="width: 100%; padding: 8px; border: 1px solid var(--outline-variant); border-radius: 6px;">
+                                <option>Beginner</option>
+                                <option>Intermediate</option>
+                                <option>Advanced</option>
+                            </select>
+                        </div>
+
+                        <button style="width: 100%; padding: 12px; background: var(--japanese-red); color: white; border: none; border-radius: 8px; font-weight: 500; margin: 8px 0;">Analyze Text</button>
+                        <button style="width: 100%; padding: 12px; background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red); border-radius: 8px; font-weight: 500;">Upload Image</button>
+                    </div>
+
+                    <div class="desktop-main">
+                        <div style="display: flex; background: var(--surface-container); border-radius: 24px; padding: 4px; margin-bottom: 24px;">
+                            <div style="flex: 1; padding: 10px 20px; text-align: center; font-size: 14px;">Tokens</div>
+                            <div style="flex: 1; padding: 10px 20px; text-align: center; background: var(--japanese-red); color: white; border-radius: 20px; font-size: 14px;">Translation</div>
+                            <div style="flex: 1; padding: 10px 20px; text-align: center; font-size: 14px;">Grammar</div>
+                            <div style="flex: 1; padding: 10px 20px; text-align: center; font-size: 14px;">Pronunciation</div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
+                            <div style="background: var(--surface-container-low); padding: 24px; border-radius: 16px; border: 1px solid var(--outline-variant);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                                    <span>📝</span>
+                                    <h4 style="margin: 0;">Original Japanese</h4>
+                                </div>
+                                <div style="font-size: 20px; margin: 16px 0; line-height: 1.4;">今日は良い天気ですね。</div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0;">
+                                    <span style="padding: 8px 12px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 8px; cursor: pointer;">今日</span>
+                                    <span style="padding: 8px 12px; background: var(--japanese-red); color: white; border: 1px solid var(--japanese-red); border-radius: 8px; cursor: pointer;">は</span>
+                                    <span style="padding: 8px 12px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 8px; cursor: pointer;">良い</span>
+                                    <span style="padding: 8px 12px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: 8px; cursor: pointer;">天気</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button style="padding: 8px 16px; background: var(--japanese-red); color: white; border: none; border-radius: 16px; font-size: 14px;">🔊 Pronounce</button>
+                                    <button style="padding: 8px 16px; background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red); border-radius: 16px; font-size: 14px;">📋 Copy</button>
+                                </div>
+                            </div>
+
+                            <div style="background: var(--surface-container-low); padding: 24px; border-radius: 16px; border: 1px solid var(--outline-variant);">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                                    <span>🇨🇳</span>
+                                    <h4 style="margin: 0;">Chinese Translation</h4>
+                                </div>
+                                <div style="font-size: 20px; margin: 16px 0; line-height: 1.4;">今天天气真好啊。</div>
+                                <div style="display: flex; align-items: center; gap: 12px; margin: 16px 0; padding: 12px; background: var(--surface-container); border-radius: 8px;">
+                                    <span style="font-size: 14px; font-weight: 500;">Translation Confidence:</span>
+                                    <div style="flex: 1; height: 6px; background: var(--outline-variant); border-radius: 3px;">
+                                        <div style="width: 94%; height: 100%; background: linear-gradient(90deg, var(--japanese-red), #4CAF50); border-radius: 3px;"></div>
+                                    </div>
+                                    <span style="background: var(--japanese-red); color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold;">94%</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button style="padding: 8px 16px; background: var(--japanese-red); color: white; border: none; border-radius: 16px; font-size: 14px;">🔊 Pronounce</button>
+                                    <button style="padding: 8px 16px; background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red); border-radius: 16px; font-size: 14px;">📋 Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin: 24px 0;">
+                            <button style="padding: 12px 24px; background: var(--japanese-red); color: white; border: none; border-radius: 20px; margin: 0 8px; font-weight: 500;">⚡ Quick Translate</button>
+                            <button style="padding: 12px 24px; background: transparent; color: var(--japanese-red); border: 1px solid var(--japanese-red); border-radius: 20px; margin: 0 8px; font-weight: 500;">🔄 Alternative Translations</button>
+                            <button style="padding: 12px 24px; background: var(--surface-container); color: var(--on-surface); border: 1px solid var(--outline-variant); border-radius: 20px; margin: 0 8px; font-weight: 500;">💾 Save Translation</button>
+                        </div>
+                    </div>
+
+                    <div class="desktop-details">
+                        <h3 style="margin-top: 0;">Word Details</h3>
+                        <div style="background: var(--surface); padding: 20px; border-radius: 12px; border: 1px solid var(--outline-variant);">
+                            <div style="text-align: center; margin-bottom: 16px;">
+                                <span style="font-size: 24px; font-weight: bold; color: var(--japanese-red);">は</span>
+                                <div style="font-size: 14px; color: var(--on-surface-variant); margin: 4px 0;">wa</div>
+                            </div>
+                            <div style="margin: 16px 0;">
+                                <div style="background: var(--japanese-brown); color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; display: inline-block;">助詞 (Particle)</div>
+                            </div>
+                            <div style="font-size: 14px; line-height: 1.5;">
+                                <strong>Chinese:</strong> (主题标记)<br>
+                                <strong>Function:</strong> Topic marker indicating the subject of the sentence.<br>
+                                <strong>Usage:</strong> Follows nouns to mark them as the topic of discussion.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="spec-note">
+            <strong>Desktop Design Principles:</strong>
+            <ul>
+                <li><strong>Three-Panel Layout:</strong> Maximum information density with clear separation</li>
+                <li><strong>Persistent Panels:</strong> Input controls and word details always visible</li>
+                <li><strong>Mouse Optimization:</strong> Hover states and precise interactions</li>
+                <li><strong>Keyboard Navigation:</strong> Full keyboard accessibility support</li>
+                <li><strong>Multi-tasking Support:</strong> Efficient workflow for power users</li>
+            </ul>
+        </div>
+
+        <h2>📐 Responsive Breakpoints & Specifications</h2>
+
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>Device Category</th>
+                    <th>Breakpoint Range</th>
+                    <th>Layout Strategy</th>
+                    <th>Key Adaptations</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Mobile Portrait</strong></td>
+                    <td>320px - 480px</td>
+                    <td>Single column, collapsible sections</td>
+                    <td>Stack all content vertically, hide secondary features</td>
+                </tr>
+                <tr>
+                    <td><strong>Mobile Landscape</strong></td>
+                    <td>481px - 767px</td>
+                    <td>Two-column grid for main content</td>
+                    <td>Side-by-side translation cards, condensed header</td>
+                </tr>
+                <tr>
+                    <td><strong>Tablet Portrait</strong></td>
+                    <td>768px - 1024px</td>
+                    <td>Two-panel layout with sidebar</td>
+                    <td>Persistent word details panel, larger touch targets</td>
+                </tr>
+                <tr>
+                    <td><strong>Desktop</strong></td>
+                    <td>1025px+</td>
+                    <td>Three-panel layout</td>
+                    <td>Full feature set, hover interactions, keyboard shortcuts</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>👆 Touch & Gesture Interactions</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>📱 Mobile Gestures</h4>
+                <div class="gesture-demo">
+                    <div class="gesture-arrow" style="left: 20px;">👆</div>
+                    <p><strong>Swipe Left/Right:</strong><br>Navigate between translation tabs</p>
+                </div>
+                <ul style="font-size: 14px;">
+                    <li>Tap: Select tokens and activate buttons</li>
+                    <li>Long press: Show contextual menu</li>
+                    <li>Pull to refresh: Reload translation</li>
+                    <li>Pinch: Adjust text size</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>⌨️ Keyboard Navigation</h4>
+                <ul style="font-size: 14px;">
+                    <li><strong>Tab:</strong> Navigate between interactive elements</li>
+                    <li><strong>Arrow keys:</strong> Navigate token grid</li>
+                    <li><strong>Enter/Space:</strong> Activate selected element</li>
+                    <li><strong>Escape:</strong> Close modals/return to parent</li>
+                    <li><strong>1-4 keys:</strong> Switch translation modes</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>🎯 Accessibility Features</h4>
+                <ul style="font-size: 14px;">
+                    <li>Minimum 44px touch targets</li>
+                    <li>High contrast mode support</li>
+                    <li>Screen reader optimizations</li>
+                    <li>Reduced motion preferences</li>
+                    <li>Focus indicators with 3px outlines</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🎨 Progressive Enhancement Strategy</h2>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>📱 Mobile Base Experience</h4>
+                <ul style="font-size: 14px;">
+                    <li>Core translation functionality</li>
+                    <li>Token-by-token analysis</li>
+                    <li>Basic pronunciation support</li>
+                    <li>Simple copy/share actions</li>
+                    <li>Offline capability for core features</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>🖥️ Desktop Enhancements</h4>
+                <ul style="font-size: 14px;">
+                    <li>Persistent panels and multi-tasking</li>
+                    <li>Advanced keyboard shortcuts</li>
+                    <li>Drag and drop file upload</li>
+                    <li>Multi-tab translation comparison</li>
+                    <li>Advanced export options</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>⚡ Performance Optimizations</h4>
+                <ul style="font-size: 14px;">
+                    <li>Lazy loading for secondary content</li>
+                    <li>Image optimization and compression</li>
+                    <li>Critical CSS inlining</li>
+                    <li>Service worker for offline support</li>
+                    <li>Preload key fonts and assets</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>📊 Implementation Guidelines</h2>
+
+        <div class="code-block">
+/* CSS Grid for Responsive Layout */
+.translation-container {
+  display: grid;
+  gap: 16px;
+  
+  /* Mobile: Single column */
+  grid-template-columns: 1fr;
+  grid-template-areas: 
+    "header"
+    "tabs"
+    "original"
+    "translation"
+    "actions";
+}
+
+/* Tablet: Two columns */
+@media (min-width: 768px) {
+  .translation-container {
+    grid-template-columns: 1fr 300px;
+    grid-template-areas: 
+      "header header"
+      "tabs tabs"
+      "main sidebar"
+      "actions sidebar";
+  }
+}
+
+/* Desktop: Three columns */
+@media (min-width: 1025px) {
+  .translation-container {
+    grid-template-columns: 300px 1fr 320px;
+    grid-template-areas: 
+      "input main details"
+      "input main details";
+  }
+}
+
+/* Touch-friendly sizing */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 12px;
+}
+
+/* Responsive typography */
+.responsive-text {
+  font-size: clamp(14px, 2.5vw, 18px);
+  line-height: clamp(1.4, 1.5vw, 1.6);
+}
+        </div>
+
+        <div class="spec-note">
+            <strong>CSS Implementation Notes:</strong>
+            <ul>
+                <li>Use CSS Grid for major layout structure</li>
+                <li>Implement touch-friendly minimum sizes</li>
+                <li>Utilize clamp() for responsive typography</li>
+                <li>Apply container queries where supported</li>
+                <li>Optimize for both pointer and touch devices</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: var(--surface-container-low); border-radius: 12px; text-align: center;">
+            <h3 style="margin-top: 0; color: var(--japanese-red);">Mobile-First Implementation Ready</h3>
+            <p>This responsive design system ensures optimal user experience across all device categories while maintaining the Japanese cultural aesthetic and Material Design 3 principles. The progressive enhancement approach delivers core functionality to all users while providing advanced features for capable devices.</p>
+            <button style="padding: 12px 24px; background: var(--japanese-red); color: white; border: none; border-radius: 20px; font-weight: 500; cursor: pointer;">🚀 Proceed to Accessibility Guide</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('span:last-child');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '▲';
+            }
+        }
+
+        // Add touch feedback for demo
+        document.addEventListener('DOMContentLoaded', function() {
+            const tokens = document.querySelectorAll('.mobile-token');
+            tokens.forEach(token => {
+                token.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                token.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
