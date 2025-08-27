@@ -4,12 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { extractTextFromImage, streamExtractTextFromImage } from '../services/api';
 import { getJapaneseTtsAudioUrl, speakJapanese } from '../utils/helpers';
 import { FaInfoCircle } from 'react-icons/fa';
+import { useTheme } from 'next-themes';
 
 // 添加内联样式
 const placeholderStyle = `
   #japaneseInput::placeholder {
-    color: rgba(0, 0, 0, 0.4) !important;
-    opacity: 0.6 !important;
+    color: var(--on-surface-variant) !important;
+    opacity: 0.7 !important;
+  }
+  #japaneseInput::-webkit-input-placeholder {
+    color: var(--on-surface-variant) !important;
+    opacity: 0.7 !important;
+  }
+  #japaneseInput::-moz-placeholder {
+    color: var(--on-surface-variant) !important;
+    opacity: 0.7 !important;
   }
 `;
 
@@ -62,6 +71,7 @@ export default function InputSection({
   onTtsProviderChange,
   isAnalyzing = false
 }: InputSectionProps) {
+  const { theme } = useTheme();
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -109,6 +119,24 @@ export default function InputSection({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showTtsDropdown]);
+
+  // Safari-specific text color fix
+  useEffect(() => {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isSafari) {
+      const textArea = document.getElementById('japaneseInput') as HTMLTextAreaElement;
+      if (textArea) {
+        const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const textColor = isDark ? '#FAFAFA' : '#2D3142';
+        
+        // Apply multiple Safari-specific properties
+        textArea.style.setProperty('color', textColor, 'important');
+        textArea.style.setProperty('-webkit-text-fill-color', textColor, 'important');
+        textArea.style.setProperty('-webkit-appearance', 'none', 'important');
+        textArea.style.setProperty('opacity', '1', 'important');
+      }
+    }
+  }, [theme]);
 
   const handleAnalyze = () => {
     if (!inputText.trim()) {
@@ -327,10 +355,21 @@ export default function InputSection({
     <div className="w-full max-w-4xl mx-auto">
       <style dangerouslySetInnerHTML={{ __html: placeholderStyle }} />
       
-      <div className="relative bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-600 rounded-3xl shadow-lg focus-within:border-purple-400 focus-within:shadow-xl transition-all duration-200">
+      <div className="relative border-2 rounded-3xl shadow-lg focus-within:shadow-xl transition-all duration-200" style={{ 
+        backgroundColor: 'var(--surface)', 
+        borderColor: 'var(--outline)',
+      }} 
+      onFocusCapture={(e) => {
+        e.currentTarget.style.borderColor = 'var(--grammar-verb)';
+      }}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          e.currentTarget.style.borderColor = 'var(--outline)';
+        }
+      }}>
         <textarea 
           id="japaneseInput" 
-          className="w-full p-6 pr-40 pb-20 resize-none japanese-text bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 border-none outline-none text-lg leading-relaxed scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent dark:scrollbar-thumb-gray-600" 
+          className="w-full p-6 pr-40 pb-20 resize-none japanese-text bg-transparent border-none outline-none text-lg leading-relaxed scrollbar-thin" 
           rows={3} 
           placeholder="输入日语句子，例：天気がいいから、散歩しましょう。或上传图片识别文字，也可直接粘贴图片。"
           value={inputText}
@@ -339,9 +378,13 @@ export default function InputSection({
           style={{ 
             fontSize: '16px',
             fontFamily: "'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif",
+            // Use dynamic color for Safari compatibility - the useEffect will override this
+            color: theme === 'dark' ? '#FAFAFA' : '#2D3142',
+            WebkitTextFillColor: theme === 'dark' ? '#FAFAFA' : '#2D3142',
+            WebkitAppearance: 'none',
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
-          }}
+            scrollbarColor: 'var(--on-surface-variant) transparent'
+          } as React.CSSProperties}
           autoCapitalize="none"
           autoComplete="off"
           autoCorrect="off"

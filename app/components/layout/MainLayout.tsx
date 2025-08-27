@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import ClientOnly from '../ClientOnly';
-import HeaderBar from './HeaderBar';
+import ModernHeader from '../ModernHeader';
+import MemberProfileModal from '../MemberProfileModal';
+import LoginModal from '../LoginModal';
 import { LoadingStates, ErrorStates } from './';
 import InputPanel from '../InputPanel';
 import AnalysisViewport from '../AnalysisViewport';
@@ -17,6 +19,10 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ onSettingsClick }: MainLayoutProps) {
+  // Modal states
+  const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
   const {
     analyzedTokens,
     isAnalyzing,
@@ -68,14 +74,47 @@ export default function MainLayout({ onSettingsClick }: MainLayoutProps) {
     setLearningMode(mode);
   };
 
+  // Modal handlers
+  const handleMemberClick = () => {
+    setIsMemberModalOpen(true);
+  };
+
+  const handleLoginClick = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleLogin = (email: string, password: string) => {
+    // TODO: Implement actual login logic
+    console.log('Login attempt:', { email, password });
+    setIsLoginModalOpen(false);
+  };
+
+  const handleRegister = (name: string, email: string, password: string) => {
+    // TODO: Implement actual registration logic
+    console.log('Register attempt:', { name, email, password });
+    setIsLoginModalOpen(false);
+  };
+
+  const handleSocialLogin = (provider: 'google' | 'github') => {
+    // TODO: Implement social login
+    console.log('Social login attempt:', provider);
+    setIsLoginModalOpen(false);
+  };
+
   return (
-    <div className="h-screen transition-colors duration-200" style={{ backgroundColor: 'var(--surface)' }}>
+    <div className="h-screen transition-colors duration-200 flex flex-col" style={{ backgroundColor: 'var(--surface)' }}>
       <ClientOnly fallback={<LoadingStates.InterfaceLoader />}>
-        <div className="main-layout grid grid-cols-1 lg:grid-cols-[330px_1fr_352px] h-screen gap-1" style={{ gridTemplateRows: '60px 1fr' }}>
-          <HeaderBar onSettingsClick={onSettingsClick} />
+        {/* Modern Header */}
+        <ModernHeader 
+          onMemberClick={handleMemberClick}
+          onLoginClick={handleLoginClick}
+          onSettingsClick={onSettingsClick}
+        />
+        
+        <div className="main-layout grid grid-cols-1 lg:grid-cols-[330px_1fr_352px] flex-1 gap-1 overflow-hidden">
 
           {/* Left Panel - Input & Controls */}
-          <div className="left-panel lg:block hidden border-r p-4 overflow-y-auto" style={{ backgroundColor: 'white', borderColor: 'var(--outline)' }}>
+          <div className="left-panel lg:block hidden border-r p-4 overflow-y-auto" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--outline)' }}>
             <InputPanel
               onAnalyze={handleAnalyzeWrapper}
               userApiKey={userApiKey}
@@ -90,7 +129,7 @@ export default function MainLayout({ onSettingsClick }: MainLayoutProps) {
           </div>
 
           {/* Center Panel - Analysis Results */}
-          <main className="center-panel p-4 overflow-y-auto" style={{ backgroundColor: 'white' }}>
+          <main className="center-panel p-4 overflow-y-auto" style={{ backgroundColor: 'var(--surface)' }}>
             {/* Mobile input section */}
             <div className="lg:hidden mb-6">
               <InputPanel
@@ -170,6 +209,20 @@ export default function MainLayout({ onSettingsClick }: MainLayoutProps) {
             />
           </div>
         </div>
+
+        {/* Modals */}
+        <MemberProfileModal 
+          isOpen={isMemberModalOpen}
+          onClose={() => setIsMemberModalOpen(false)}
+        />
+        
+        <LoginModal 
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+          onSocialLogin={handleSocialLogin}
+        />
       </ClientOnly>
     </div>
   );

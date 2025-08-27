@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { TokenData, GrammarAnalysis, analyzeGrammar, streamGrammarAnalysis } from '../services/api';
 import { getGrammarColorClass, getSelectedTokenTextColor, getColorVariant, containsKanji, filterTokensForDisplay } from '../utils/helpers';
 import TranslationSection from './TranslationSection';
+import MobileAnalysisDropdown from './MobileAnalysisDropdown';
+import DesktopAnalysisTabs from './DesktopAnalysisTabs';
 
 export type AnalysisMode = 'tokens' | 'grammar' | 'translation' | 'pronunciation';
 
@@ -290,75 +292,49 @@ export default function AnalysisViewport({
           </h4>
           <div className="flex flex-wrap justify-between gap-2 text-xs">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#2D5A27' }}></div>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--grammar-noun)' }}></div>
               <span style={{ color: 'var(--on-surface-variant)' }}>名詞 (Noun)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#C41E3A' }}></div>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--grammar-verb)' }}></div>
               <span style={{ color: 'var(--on-surface-variant)' }}>動詞 (Verb)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8B4513' }}></div>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--grammar-adjective)' }}></div>
               <span style={{ color: 'var(--on-surface-variant)' }}>形容詞 (Adj)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#DAA520' }}></div>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--grammar-particle)' }}></div>
               <span style={{ color: 'var(--on-surface-variant)' }}>助詞 (Particle)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#4682B4' }}></div>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--grammar-adverb)' }}></div>
               <span style={{ color: 'var(--on-surface-variant)' }}>副詞 (Adverb)</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: '#778899' }}></div>
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--grammar-other)' }}></div>
               <span style={{ color: 'var(--on-surface-variant)' }}>その他 (Other)</span>
             </div>
           </div>
         </div>
-        
-        <div className="grid grid-cols-4 gap-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)' }}>
-          {analysisModes.map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => onAnalysisModeChange(mode.id)}
-              className={`
-                group flex items-center justify-start p-4 text-sm font-medium rounded-lg transition-all duration-300 ease-out
-                shadow-md relative
-                ${analysisMode === mode.id 
-                  ? 'text-white shadow-xl' 
-                  : 'hover:shadow-xl hover:-translate-y-1'
-                }
-              `}
-              style={{
-                backgroundColor: analysisMode === mode.id 
-                  ? 'var(--grammar-verb)' 
-                  : 'var(--surface-container)',
-                color: analysisMode === mode.id 
-                  ? 'white' 
-                  : 'var(--on-surface-variant)',
-                minHeight: '80px',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                borderColor: analysisMode === mode.id 
-                  ? 'var(--grammar-verb)' 
-                  : 'transparent',
-                boxShadow: analysisMode === mode.id 
-                  ? '0 10px 25px rgba(196, 30, 58, 0.3), 0 4px 10px rgba(0, 0, 0, 0.1)' 
-                  : '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
-                transform: analysisMode === mode.id ? 'scale(1.02)' : 'scale(1)'
-              }}
-            >
-              <div className={`mr-3 flex-shrink-0 transition-all duration-300 ease-out ${
-                analysisMode === mode.id ? 'transform scale-110' : 'group-hover:scale-110 group-hover:rotate-6'
-              }`}>
-                {mode.icon}
-              </div>
-              <div className="text-left">
-                <div className="font-semibold transition-all duration-300 ease-out">{mode.label}</div>
-                <div className="text-xs opacity-80 mt-1 transition-all duration-300 ease-out group-hover:opacity-100">{mode.description}</div>
-              </div>
-            </button>
-          ))}
+
+        {/* Analysis Mode Selection - Responsive Tabs/Dropdown */}
+        <div className="analysis-mode-selector">
+          {/* Desktop Tabs - hidden on mobile and tablet */}
+          <DesktopAnalysisTabs
+            analysisMode={analysisMode}
+            onAnalysisModeChange={onAnalysisModeChange}
+            analysisModes={analysisModes}
+          />
+
+          {/* Mobile/Tablet Dropdown - shown on mobile, tablet, and iPad Pro */}
+          <div className="xl:hidden">
+            <MobileAnalysisDropdown
+              analysisMode={analysisMode}
+              onAnalysisModeChange={onAnalysisModeChange}
+              analysisModes={analysisModes}
+            />
+          </div>
         </div>
       </div>
 
@@ -531,7 +507,7 @@ export default function AnalysisViewport({
                 
                 {/* Error state */}
                 {grammarError && (
-                  <div className="mb-4 p-4 border-l-4 rounded-lg" style={{ backgroundColor: '#fef2f2', borderColor: 'var(--grammar-verb)' }}>
+                  <div className="mb-4 p-4 border-l-4 rounded-lg" style={{ backgroundColor: 'var(--surface-container-low)', borderColor: 'var(--grammar-verb)' }}>
                     <div className="flex items-start gap-3">
                       <svg className="w-5 h-5 mt-0.5" style={{ color: 'var(--grammar-verb)' }} fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -625,7 +601,7 @@ export default function AnalysisViewport({
                                 {sentenceAnalysis.sentence_structure.main_clause.subject && (
                                   <div className="grammar-component p-2 rounded" style={{ backgroundColor: 'var(--surface-container-low)' }}>
                                     <div className="flex items-center gap-2 mb-1">
-                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: '#2D5A27', color: 'white' }}>
+                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: 'var(--grammar-noun)', color: 'white' }}>
                                         Subject
                                       </span>
                                       <span className="text-sm font-medium" style={{ color: 'var(--on-surface)' }}>
@@ -641,7 +617,7 @@ export default function AnalysisViewport({
                                 {sentenceAnalysis.sentence_structure.main_clause.predicate && (
                                   <div className="grammar-component p-2 rounded" style={{ backgroundColor: 'var(--surface-container-low)' }}>
                                     <div className="flex items-center gap-2 mb-1">
-                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: '#C41E3A', color: 'white' }}>
+                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: 'var(--grammar-verb)', color: 'white' }}>
                                         Predicate
                                       </span>
                                       <span className="text-sm font-medium" style={{ color: 'var(--on-surface)' }}>
@@ -657,7 +633,7 @@ export default function AnalysisViewport({
                                 {sentenceAnalysis.sentence_structure.main_clause.object && (
                                   <div className="grammar-component p-2 rounded" style={{ backgroundColor: 'var(--surface-container-low)' }}>
                                     <div className="flex items-center gap-2 mb-1">
-                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: '#8B4513', color: 'white' }}>
+                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: 'var(--grammar-adjective)', color: 'white' }}>
                                         Object
                                       </span>
                                       <span className="text-sm font-medium" style={{ color: 'var(--on-surface)' }}>
@@ -681,7 +657,7 @@ export default function AnalysisViewport({
                                 <div className="space-y-1">
                                   {sentenceAnalysis.sentence_structure.particles_analysis.map((particle, pIndex) => (
                                     <div key={pIndex} className="particle-item flex items-center gap-2 p-2 rounded" style={{ backgroundColor: 'var(--surface-container-low)' }}>
-                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: '#DAA520', color: 'white' }}>
+                                      <span className="px-1 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: 'var(--grammar-particle)', color: 'white' }}>
                                         {particle.particle}
                                       </span>
                                       <div className="flex-1">

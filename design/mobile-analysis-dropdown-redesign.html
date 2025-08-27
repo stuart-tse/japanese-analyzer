@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Analysis Mode Dropdown - Design Specification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #C41E3A;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #C41E3A;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #C41E3A;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #42433B;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .design-mockup {
+            background: #f5f5f5;
+            border: 2px solid #DAC8C0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .component-demo {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .state-example {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            min-width: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .state-closed {
+            background: #f3edf7;
+            border: 2px solid #C41E3A;
+            color: #42433B;
+        }
+        
+        .state-open {
+            background: white;
+            border: 2px solid #C41E3A;
+            box-shadow: 0 8px 24px rgba(196, 30, 58, 0.2);
+        }
+        
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #DAC8C0;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-option:hover {
+            background: #f3edf7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-option.active {
+            background: #C41E3A;
+            color: white;
+            border-color: #C41E3A;
+        }
+        
+        .option-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            fill: currentColor;
+        }
+        
+        .option-content {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .option-label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .option-description {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .spec-table th {
+            background: #C41E3A;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .spec-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .spec-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #C41E3A20 0%, #C41E3A20 100%);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        
+        .material-chip {
+            display: inline-block;
+            background: #e8def8;
+            color: #1d192b;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 2px;
+        }
+        
+        .interaction-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border: 2px solid #DAC8C0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #C41E3A;
+        }
+        
+        .flow-step:last-child::after {
+            display: none;
+        }
+        
+        .responsive-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .responsive-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .device-frame {
+            border: 8px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            background: white;
+            position: relative;
+        }
+        
+        .device-frame::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+        }
+        
+        .accessibility-note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .performance-tip {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mobile Analysis Mode Dropdown Redesign</h1>
+        <p><strong>Project:</strong> Japanese Sentence Analyzer | <strong>Component:</strong> Analysis Mode Selector (Mobile) | <strong>Date:</strong> 2025-01-26</p>
+        
+        <h2>Executive Summary</h2>
+        <p>This specification details the redesign of the mobile analysis mode dropdown to match the premium Material Design aesthetic of the desktop tabs while optimizing for touch interaction and mobile usability.</p>
+        
+        <div class="design-mockup">
+            <h3>Visual Design Concept</h3>
+            <div class="component-demo">
+                <div class="state-example state-closed">
+                    <svg class="option-icon" viewBox="0 0 24 24">
+                        <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    <span>Tokens - Word breakdown ▼</span>
+                </div>
+                <br>
+                <div class="state-open">
+                    <div class="dropdown-option active">
+                        <svg class="option-icon" viewBox="0 0 24 24">
+                            <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                        <div class="option-content">
+                            <div class="option-label">Tokens</div>
+                            <div class="option-description">Word breakdown</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-option">
+                        <svg class="option-icon" viewBox="0 0 24 24">
+                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                        <div class="option-content">
+                            <div class="option-label">Grammar</div>
+                            <div class="option-description">Sentence structure</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-option">
+                        <svg class="option-icon" viewBox="0 0 24 24">
+                            <path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                        </svg>
+                        <div class="option-content">
+                            <div class="option-label">Translation</div>
+                            <div class="option-description">Chinese meaning</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-option">
+                        <svg class="option-icon" viewBox="0 0 24 24">
+                            <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                        </svg>
+                        <div class="option-content">
+                            <div class="option-label">Pronunciation</div>
+                            <div class="option-description">Phonetic guide</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Design Requirements</h2>
+        
+        <h3>Visual Consistency</h3>
+        <ul>
+            <li><span class="highlight">Match desktop aesthetic</span>: Same colors, typography, and visual hierarchy as desktop tabs</li>
+            <li><span class="highlight">Material Design 3</span>: Proper elevation, shadows, and state layers</li>
+            <li><span class="highlight">Brand alignment</span>: Use Japanese color palette (red primary: #C41E3A)</li>
+            <li><span class="highlight">Icon integration</span>: Display mode icons prominently in both closed and open states</li>
+        </ul>
+
+        <h3>Touch Optimization</h3>
+        <ul>
+            <li><span class="highlight">Large touch targets</span>: Minimum 44px height for all interactive elements</li>
+            <li><span class="highlight">Generous spacing</span>: 8px+ between options for easy selection</li>
+            <li><span class="highlight">Touch feedback</span>: Visual feedback on press with ripple effects</li>
+            <li><span class="highlight">Thumb-friendly</span>: Positioned for easy one-handed operation</li>
+        </ul>
+
+        <h2>User Interaction Flow</h2>
+        
+        <div class="interaction-flow">
+            <div class="flow-step">
+                <h4>1. Closed State</h4>
+                <p>Compact button showing current mode with icon, label, and dropdown indicator</p>
+            </div>
+            <div class="flow-step">
+                <h4>2. Touch to Open</h4>
+                <p>Smooth expansion animation reveals all options with proper Material motion</p>
+            </div>
+            <div class="flow-step">
+                <h4>3. Option Selection</h4>
+                <p>Clear visual feedback on hover/press, with option highlighting</p>
+            </div>
+            <div class="flow-step">
+                <h4>4. Confirmation</h4>
+                <p>Smooth collapse with selected state indication and mode change</p>
+            </div>
+        </div>
+
+        <h2>Technical Specifications</h2>
+        
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Component Type</td>
+                    <td>Custom Dropdown</td>
+                    <td>Replace basic HTML select with custom implementation</td>
+                </tr>
+                <tr>
+                    <td>Minimum Touch Target</td>
+                    <td>44px height</td>
+                    <td>Both closed button and open options</td>
+                </tr>
+                <tr>
+                    <td>Container Padding</td>
+                    <td>16px horizontal, 12px vertical</td>
+                    <td>Adequate spacing for touch interaction</td>
+                </tr>
+                <tr>
+                    <td>Border Radius</td>
+                    <td>12px</td>
+                    <td>Match desktop tab corner radius</td>
+                </tr>
+                <tr>
+                    <td>Elevation (Closed)</td>
+                    <td>2dp (md-elevation-1)</td>
+                    <td>Subtle depth to indicate interactivity</td>
+                </tr>
+                <tr>
+                    <td>Elevation (Open)</td>
+                    <td>8dp (md-elevation-3)</td>
+                    <td>Clear hierarchy above other content</td>
+                </tr>
+                <tr>
+                    <td>Animation Duration</td>
+                    <td>300ms</td>
+                    <td>Material Design standard timing</td>
+                </tr>
+                <tr>
+                    <td>Animation Easing</td>
+                    <td>cubic-bezier(0.2, 0, 0, 1)</td>
+                    <td>Material Design emphasized easing</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Visual Styling Guide</h2>
+        
+        <h3>Colors</h3>
+        <div class="component-demo">
+            <h4>Primary Palette</h4>
+            <span class="material-chip" style="background: #C41E3A; color: white;">Primary Red: #C41E3A</span>
+            <span class="material-chip" style="background: #42433B; color: white;">Charcoal Dark: #42433B</span>
+            <span class="material-chip" style="background: #DAC8C0; color: #333;">Light Beige: #DAC8C0</span>
+            <span class="material-chip" style="background: #9FAEB3; color: white;">Blue Gray: #9FAEB3</span>
+            
+            <h4>State Colors</h4>
+            <span class="material-chip" style="background: #f3edf7;">Surface Container: #f3edf7</span>
+            <span class="material-chip" style="background: #e6e0e9;">Surface Container High: #e6e0e9</span>
+            <span class="material-chip" style="background: rgba(196, 30, 58, 0.1);">Hover State: rgba(#C41E3A, 0.1)</span>
+            <span class="material-chip" style="background: rgba(196, 30, 58, 0.2);">Pressed State: rgba(#C41E3A, 0.2)</span>
+        </div>
+
+        <h3>Typography</h3>
+        <div class="component-demo">
+            <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px;">Label Large (14px, Medium) - Option Labels</div>
+            <div style="font-size: 12px; opacity: 0.8;">Body Small (12px, Regular) - Option Descriptions</div>
+        </div>
+
+        <h3>Spacing System</h3>
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>Element</th>
+                    <th>Spacing</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Icon to Label</td>
+                    <td>12px</td>
+                    <td>Clear association between icon and text</td>
+                </tr>
+                <tr>
+                    <td>Option Vertical Padding</td>
+                    <td>12px</td>
+                    <td>Comfortable touch target height (44px total)</td>
+                </tr>
+                <tr>
+                    <td>Option Horizontal Padding</td>
+                    <td>16px</td>
+                    <td>Generous touch area and visual breathing room</td>
+                </tr>
+                <tr>
+                    <td>Between Options</td>
+                    <td>4px</td>
+                    <td>Clear separation without excessive spacing</td>
+                </tr>
+                <tr>
+                    <td>Dropdown Container Padding</td>
+                    <td>8px</td>
+                    <td>Frame all options with consistent margin</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Component Architecture</h2>
+        
+        <h3>React Component Structure</h3>
+        <div class="code-block">
+MobileAnalysisDropdown/
+├── MobileAnalysisDropdown.tsx    // Main component
+├── DropdownTrigger.tsx           // Closed state button
+├── DropdownPanel.tsx             // Open state container
+├── DropdownOption.tsx            // Individual option item
+└── styles.ts                     // Styled-components or CSS modules
+        </div>
+
+        <h3>State Management</h3>
+        <div class="code-block">
+interface DropdownState {
+  isOpen: boolean;
+  selectedMode: AnalysisMode;
+  focusedIndex: number;
+  isAnimating: boolean;
+}
+
+// Animation states for smooth transitions
+enum AnimationState {
+  CLOSED = 'closed',
+  OPENING = 'opening', 
+  OPEN = 'open',
+  CLOSING = 'closing'
+}
+        </div>
+
+        <h3>Props Interface</h3>
+        <div class="code-block">
+interface MobileAnalysisDropdownProps {
+  analysisMode: AnalysisMode;
+  onAnalysisModeChange: (mode: AnalysisMode) => void;
+  analysisModes: AnalysisModeConfig[];
+  disabled?: boolean;
+  className?: string;
+}
+
+interface AnalysisModeConfig {
+  id: AnalysisMode;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+}
+        </div>
+
+        <h2>Implementation Recommendations</h2>
+        
+        <div class="performance-tip">
+            <h4>Performance Optimizations</h4>
+            <ul>
+                <li><strong>Virtual scrolling</strong>: Not needed for 4 options, but keep API extensible</li>
+                <li><strong>Animation optimization</strong>: Use transform and opacity for smooth 60fps animations</li>
+                <li><strong>Touch event handling</strong>: Implement proper touch start/end handling with 300ms delay consideration</li>
+                <li><strong>Bundle optimization</strong>: Lazy load animation libraries if needed</li>
+            </ul>
+        </div>
+
+        <div class="accessibility-note">
+            <h4>Accessibility Requirements</h4>
+            <ul>
+                <li><strong>ARIA labels</strong>: role="combobox", aria-expanded, aria-activedescendant</li>
+                <li><strong>Keyboard navigation</strong>: Arrow keys, Enter/Space selection, Escape to close</li>
+                <li><strong>Focus management</strong>: Proper focus trap when open, return focus on close</li>
+                <li><strong>Screen reader support</strong>: Announce current selection and available options</li>
+                <li><strong>High contrast</strong>: Ensure 3:1 contrast ratio for all states</li>
+            </ul>
+        </div>
+
+        <h3>Animation Specifications</h3>
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>Animation</th>
+                    <th>Duration</th>
+                    <th>Easing</th>
+                    <th>Properties</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Panel Open</td>
+                    <td>300ms</td>
+                    <td>cubic-bezier(0.2, 0, 0, 1)</td>
+                    <td>transform: scaleY(0 to 1), opacity: 0 to 1</td>
+                </tr>
+                <tr>
+                    <td>Panel Close</td>
+                    <td>200ms</td>
+                    <td>cubic-bezier(0.4, 0, 1, 1)</td>
+                    <td>transform: scaleY(1 to 0), opacity: 1 to 0</td>
+                </tr>
+                <tr>
+                    <td>Option Hover</td>
+                    <td>150ms</td>
+                    <td>ease-out</td>
+                    <td>background-color, transform: translateY(-1px)</td>
+                </tr>
+                <tr>
+                    <td>Selection Ripple</td>
+                    <td>400ms</td>
+                    <td>ease-out</td>
+                    <td>transform: scale(0 to 4), opacity: 0.3 to 0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Responsive Behavior</h2>
+        
+        <div class="responsive-demo">
+            <div class="device-frame">
+                <h4>Portrait Phone (320px+)</h4>
+                <ul>
+                    <li>Full width container</li>
+                    <li>Single column layout</li>
+                    <li>44px minimum touch targets</li>
+                    <li>16px side margins</li>
+                </ul>
+            </div>
+            <div class="device-frame">
+                <h4>Landscape/Tablet (768px+)</h4>
+                <ul>
+                    <li>Show desktop tabs instead</li>
+                    <li>Dropdown hidden via CSS</li>
+                    <li>Smooth transition between modes</li>
+                    <li>Maintain state consistency</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Integration Guidelines</h2>
+        
+        <h3>CSS Classes Structure</h3>
+        <div class="code-block">
+.mobile-analysis-dropdown {
+  /* Container styles */
+}
+
+.mobile-analysis-dropdown__trigger {
+  /* Closed state button */
+}
+
+.mobile-analysis-dropdown__trigger--active {
+  /* Open state of trigger */
+}
+
+.mobile-analysis-dropdown__panel {
+  /* Dropdown panel container */
+}
+
+.mobile-analysis-dropdown__option {
+  /* Individual option item */
+}
+
+.mobile-analysis-dropdown__option--selected {
+  /* Currently selected option */
+}
+
+.mobile-analysis-dropdown__option--focused {
+  /* Keyboard focused option */
+}
+        </div>
+
+        <h3>Material Design Token Usage</h3>
+        <div class="code-block">
+/* Use existing Material Design variables */
+background-color: var(--md-sys-color-surface-container);
+color: var(--md-sys-color-on-surface);
+border-radius: var(--md-sys-shape-corner-medium);
+box-shadow: var(--md-elevation-2);
+
+/* Custom Japanese palette integration */
+border-color: var(--grammar-verb); /* #C41E3A */
+background-color: var(--surface-container-low);
+        </div>
+
+        <h2>Testing Considerations</h2>
+        
+        <h3>Manual Testing Checklist</h3>
+        <ul>
+            <li>✅ Touch interaction works on all mobile devices (iOS Safari, Chrome Mobile)</li>
+            <li>✅ Dropdown opens/closes smoothly without lag</li>
+            <li>✅ Selection changes are reflected immediately</li>
+            <li>✅ Visual states match design specifications</li>
+            <li>✅ Accessibility features work with screen readers</li>
+            <li>✅ Keyboard navigation functions properly</li>
+            <li>✅ Responsive breakpoints transition correctly</li>
+        </ul>
+
+        <h3>Automated Testing</h3>
+        <ul>
+            <li><strong>Unit tests</strong>: State management, prop handling, event callbacks</li>
+            <li><strong>Integration tests</strong>: Component interaction with parent AnalysisViewport</li>
+            <li><strong>E2E tests</strong>: Complete user interaction flows on mobile devices</li>
+            <li><strong>Visual regression</strong>: Screenshot testing for all states</li>
+        </ul>
+
+        <h2>Success Metrics</h2>
+        
+        <table class="spec-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Target</th>
+                    <th>Measurement</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Touch Success Rate</td>
+                    <td>99%+</td>
+                    <td>Users can select intended option on first touch</td>
+                </tr>
+                <tr>
+                    <td>Animation Performance</td>
+                    <td>60fps</td>
+                    <td>Smooth animations on mid-range mobile devices</td>
+                </tr>
+                <tr>
+                    <td>Accessibility Score</td>
+                    <td>AAA</td>
+                    <td>WCAG 2.1 compliance across all states</td>
+                </tr>
+                <tr>
+                    <td>User Preference</td>
+                    <td>90%+</td>
+                    <td>Prefer new dropdown over current select element</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Next Steps</h2>
+        <ol>
+            <li><strong>Create component wireframes</strong> with detailed interaction states</li>
+            <li><strong>Implement core React component</strong> with proper TypeScript interfaces</li>
+            <li><strong>Add animation and transition logic</strong> using Framer Motion or CSS transitions</li>
+            <li><strong>Integrate with existing AnalysisViewport</strong> component</li>
+            <li><strong>Conduct usability testing</strong> with Japanese learners on mobile devices</li>
+            <li><strong>Refine based on feedback</strong> and performance metrics</li>
+        </ol>
+
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #DAC8C0; text-align: center; color: #666;">
+            <p><em>Design Specification v1.0 | Japanese Sentence Analyzer Project</em></p>
+        </div>
+    </div>
+</body>
+</html>

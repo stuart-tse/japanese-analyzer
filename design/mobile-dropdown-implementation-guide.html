@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Dropdown - Component Structure & Implementation Guide</title>
+    <style>
+        body {
+            font-family: 'SF Pro Display', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #C41E3A;
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        h2 {
+            color: #C41E3A;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #C41E3A;
+            padding-left: 15px;
+            font-weight: 500;
+        }
+        
+        h3 {
+            color: #42433B;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        h4 {
+            color: #333;
+            font-size: 1.2em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .code-block {
+            background: #0d1117;
+            color: #e6edf3;
+            padding: 24px;
+            border-radius: 8px;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.45;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #30363d;
+        }
+        
+        .code-block .comment {
+            color: #7d8590;
+        }
+        
+        .code-block .keyword {
+            color: #ff7b72;
+        }
+        
+        .code-block .string {
+            color: #a5d6ff;
+        }
+        
+        .code-block .function {
+            color: #d2a8ff;
+        }
+        
+        .code-block .variable {
+            color: #79c0ff;
+        }
+        
+        .architecture-diagram {
+            background: #f5f5f5;
+            border: 2px solid #DAC8C0;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .component-tree {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-line;
+            overflow-x: auto;
+        }
+        
+        .file-structure {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        .implementation-step {
+            background: white;
+            border: 1px solid #DAC8C0;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #C41E3A;
+        }
+        
+        .implementation-step h4 {
+            color: #C41E3A;
+            margin-top: 0;
+        }
+        
+        .best-practice {
+            background: #e8f5e8;
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .api-table th {
+            background: #C41E3A;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .api-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .api-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .prop-name {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .prop-type {
+            font-family: monospace;
+            color: #0969da;
+            font-size: 12px;
+        }
+        
+        .required {
+            color: #d1242f;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        
+        .optional {
+            color: #656d76;
+            font-size: 11px;
+        }
+        
+        .integration-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .flow-card {
+            background: white;
+            border: 2px solid #DAC8C0;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .flow-card::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #C41E3A;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .testing-checklist {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .testing-checklist ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .testing-checklist li {
+            margin: 8px 0;
+        }
+        
+        .performance-note {
+            background: #f1f8e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .migration-guide {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mobile Dropdown Implementation Guide</h1>
+        <p><strong>Component:</strong> Mobile Analysis Mode Dropdown | <strong>Architecture:</strong> React + TypeScript + Material Design | <strong>Date:</strong> 2025-01-26</p>
+        
+        <h2>Architecture Overview</h2>
+        
+        <div class="architecture-diagram">
+            <h3>Component Architecture</h3>
+            <div class="component-tree">MobileAnalysisDropdown
+├── DropdownTrigger (Closed state UI)
+│   ├── Icon (Current mode icon)
+│   ├── Content (Label + Description)
+│   └── ChevronIcon (Expand indicator)
+├── DropdownPanel (Open state container)
+│   ├── Option (Tokens)
+│   ├── Option (Grammar)  
+│   ├── Option (Translation)
+│   └── Option (Pronunciation)
+├── useDropdownState (State management hook)
+├── useKeyboardNavigation (Accessibility hook)
+└── useClickOutside (Close on outside click)</div>
+        </div>
+
+        <h2>File Structure</h2>
+        
+        <div class="file-structure">
+app/components/
+├── MobileAnalysisDropdown/
+│   ├── index.ts                     # Barrel export
+│   ├── MobileAnalysisDropdown.tsx   # Main component
+│   ├── DropdownTrigger.tsx          # Trigger button component
+│   ├── DropdownPanel.tsx            # Panel container component
+│   ├── DropdownOption.tsx           # Individual option component
+│   ├── styles.module.css            # Component-specific styles
+│   ├── types.ts                     # TypeScript interfaces
+│   ├── hooks/
+│   │   ├── useDropdownState.ts      # State management hook
+│   │   ├── useKeyboardNavigation.ts # Keyboard navigation
+│   │   └── useClickOutside.ts       # Outside click detection
+│   └── __tests__/
+│       ├── MobileAnalysisDropdown.test.tsx
+│       ├── DropdownTrigger.test.tsx
+│       ├── DropdownPanel.test.tsx
+│       └── accessibility.test.tsx
+        </div>
+
+        <h2>Core Component Implementation</h2>
+        
+        <h3>Main Component (MobileAnalysisDropdown.tsx)</h3>
+        
+        <div class="code-block">
+<span class="comment">// MobileAnalysisDropdown.tsx</span>
+<span class="keyword">import</span> React, { <span class="variable">useRef</span>, <span class="variable">useEffect</span> } <span class="keyword">from</span> <span class="string">'react'</span>;
+<span class="keyword">import</span> { <span class="variable">AnalysisMode</span> } <span class="keyword">from</span> <span class="string">'../../types/analysis'</span>;
+<span class="keyword">import</span> { <span class="variable">DropdownTrigger</span> } <span class="keyword">from</span> <span class="string">'./DropdownTrigger'</span>;
+<span class="keyword">import</span> { <span class="variable">DropdownPanel</span> } <span class="keyword">from</span> <span class="string">'./DropdownPanel'</span>;
+<span class="keyword">import</span> { <span class="variable">useDropdownState</span> } <span class="keyword">from</span> <span class="string">'./hooks/useDropdownState'</span>;
+<span class="keyword">import</span> { <span class="variable">useKeyboardNavigation</span> } <span class="keyword">from</span> <span class="string">'./hooks/useKeyboardNavigation'</span>;
+<span class="keyword">import</span> { <span class="variable">useClickOutside</span> } <span class="keyword">from</span> <span class="string">'./hooks/useClickOutside'</span>;
+<span class="keyword">import</span> <span class="variable">styles</span> <span class="keyword">from</span> <span class="string">'./styles.module.css'</span>;
+
+<span class="keyword">interface</span> <span class="function">MobileAnalysisDropdownProps</span> {
+  <span class="variable">analysisMode</span>: <span class="variable">AnalysisMode</span>;
+  <span class="variable">onAnalysisModeChange</span>: (<span class="variable">mode</span>: <span class="variable">AnalysisMode</span>) =&gt; <span class="keyword">void</span>;
+  <span class="variable">analysisModes</span>: <span class="variable">AnalysisModeConfig</span>[];
+  <span class="variable">disabled</span>?: <span class="variable">boolean</span>;
+  <span class="variable">className</span>?: <span class="variable">string</span>;
+  <span class="variable">ariaLabel</span>?: <span class="variable">string</span>;
+}
+
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="function">MobileAnalysisDropdown</span>: React.FC&lt;MobileAnalysisDropdownProps&gt; = ({
+  <span class="variable">analysisMode</span>,
+  <span class="variable">onAnalysisModeChange</span>,
+  <span class="variable">analysisModes</span>,
+  <span class="variable">disabled</span> = <span class="keyword">false</span>,
+  <span class="variable">className</span> = <span class="string">''</span>,
+  <span class="variable">ariaLabel</span> = <span class="string">'Select analysis mode'</span>
+}) =&gt; {
+  <span class="keyword">const</span> <span class="variable">containerRef</span> = <span class="function">useRef</span>&lt;HTMLDivElement&gt;(<span class="keyword">null</span>);
+  <span class="keyword">const</span> <span class="variable">triggerRef</span> = <span class="function">useRef</span>&lt;HTMLButtonElement&gt;(<span class="keyword">null</span>);
+  
+  <span class="comment">// State management</span>
+  <span class="keyword">const</span> {
+    <span class="variable">isOpen</span>,
+    <span class="variable">openDropdown</span>,
+    <span class="variable">closeDropdown</span>,
+    <span class="variable">toggleDropdown</span>,
+    <span class="variable">isAnimating</span>
+  } = <span class="function">useDropdownState</span>();
+  
+  <span class="comment">// Keyboard navigation</span>
+  <span class="keyword">const</span> { <span class="variable">focusedIndex</span>, <span class="variable">keyboardProps</span> } = <span class="function">useKeyboardNavigation</span>({
+    <span class="variable">isOpen</span>,
+    <span class="variable">itemCount</span>: <span class="variable">analysisModes</span>.length,
+    <span class="variable">onSelect</span>: <span class="function">handleOptionSelect</span>,
+    <span class="variable">onClose</span>: <span class="variable">closeDropdown</span>
+  });
+  
+  <span class="comment">// Outside click detection</span>
+  <span class="function">useClickOutside</span>(<span class="variable">containerRef</span>, <span class="variable">closeDropdown</span>, <span class="variable">isOpen</span>);
+  
+  <span class="comment">// Get current mode configuration</span>
+  <span class="keyword">const</span> <span class="variable">currentMode</span> = <span class="variable">analysisModes</span>.<span class="function">find</span>(<span class="variable">mode</span> =&gt; <span class="variable">mode</span>.id === <span class="variable">analysisMode</span>);
+  
+  <span class="comment">// Handle option selection</span>
+  <span class="keyword">function</span> <span class="function">handleOptionSelect</span>(<span class="variable">selectedMode</span>: <span class="variable">AnalysisMode</span>) {
+    <span class="keyword">if</span> (<span class="variable">selectedMode</span> !== <span class="variable">analysisMode</span>) {
+      <span class="function">onAnalysisModeChange</span>(<span class="variable">selectedMode</span>);
+    }
+    <span class="function">closeDropdown</span>();
+    
+    <span class="comment">// Return focus to trigger</span>
+    <span class="variable">triggerRef</span>.current?.<span class="function">focus</span>();
+  }
+  
+  <span class="comment">// Handle trigger click</span>
+  <span class="keyword">function</span> <span class="function">handleTriggerClick</span>() {
+    <span class="keyword">if</span> (<span class="variable">disabled</span> || <span class="variable">isAnimating</span>) <span class="keyword">return</span>;
+    <span class="function">toggleDropdown</span>();
+  }
+  
+  <span class="comment">// Focus management</span>
+  <span class="function">useEffect</span>(() =&gt; {
+    <span class="keyword">if</span> (<span class="variable">isOpen</span> && !<span class="variable">isAnimating</span>) {
+      <span class="comment">// Focus first option or selected option</span>
+      <span class="keyword">const</span> <span class="variable">selectedIndex</span> = <span class="variable">analysisModes</span>.<span class="function">findIndex</span>(<span class="variable">mode</span> =&gt; <span class="variable">mode</span>.id === <span class="variable">analysisMode</span>);
+      <span class="comment">// Focus logic handled by useKeyboardNavigation</span>
+    }
+  }, [<span class="variable">isOpen</span>, <span class="variable">isAnimating</span>]);
+  
+  <span class="keyword">return</span> (
+    &lt;<span class="keyword">div</span>
+      <span class="variable">ref</span>={<span class="variable">containerRef</span>}
+      <span class="variable">className</span>={`${<span class="variable">styles</span>.dropdown} ${<span class="variable">className</span>}`}
+      {...<span class="variable">keyboardProps</span>}
+    &gt;
+      &lt;<span class="function">DropdownTrigger</span>
+        <span class="variable">ref</span>={<span class="variable">triggerRef</span>}
+        <span class="variable">isOpen</span>={<span class="variable">isOpen</span>}
+        <span class="variable">disabled</span>={<span class="variable">disabled</span>}
+        <span class="variable">currentMode</span>={<span class="variable">currentMode</span>}
+        <span class="variable">onClick</span>={<span class="variable">handleTriggerClick</span>}
+        <span class="variable">ariaLabel</span>={<span class="variable">ariaLabel</span>}
+        <span class="variable">ariaExpanded</span>={<span class="variable">isOpen</span>}
+      /&gt;
+      
+      {<span class="variable">isOpen</span> && (
+        &lt;<span class="function">DropdownPanel</span>
+          <span class="variable">analysisModes</span>={<span class="variable">analysisModes</span>}
+          <span class="variable">selectedMode</span>={<span class="variable">analysisMode</span>}
+          <span class="variable">focusedIndex</span>={<span class="variable">focusedIndex</span>}
+          <span class="variable">onOptionSelect</span>={<span class="variable">handleOptionSelect</span>}
+          <span class="variable">isAnimating</span>={<span class="variable">isAnimating</span>}
+        /&gt;
+      )}
+    &lt;/<span class="keyword">div</span>&gt;
+  );
+};
+        </div>
+
+        <h3>Dropdown Trigger Component</h3>
+        
+        <div class="code-block">
+<span class="comment">// DropdownTrigger.tsx</span>
+<span class="keyword">import</span> React, { <span class="variable">forwardRef</span> } <span class="keyword">from</span> <span class="string">'react'</span>;
+<span class="keyword">import</span> { <span class="variable">AnalysisModeConfig</span> } <span class="keyword">from</span> <span class="string">'../types'</span>;
+<span class="keyword">import</span> <span class="variable">styles</span> <span class="keyword">from</span> <span class="string">'../styles.module.css'</span>;
+
+<span class="keyword">interface</span> <span class="function">DropdownTriggerProps</span> {
+  <span class="variable">isOpen</span>: <span class="variable">boolean</span>;
+  <span class="variable">disabled</span>: <span class="variable">boolean</span>;
+  <span class="variable">currentMode</span>?: <span class="variable">AnalysisModeConfig</span>;
+  <span class="variable">onClick</span>: () =&gt; <span class="keyword">void</span>;
+  <span class="variable">ariaLabel</span>: <span class="variable">string</span>;
+  <span class="variable">ariaExpanded</span>: <span class="variable">boolean</span>;
+}
+
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="function">DropdownTrigger</span> = <span class="function">forwardRef</span>&lt;HTMLButtonElement, DropdownTriggerProps&gt;(({
+  <span class="variable">isOpen</span>,
+  <span class="variable">disabled</span>,
+  <span class="variable">currentMode</span>,
+  <span class="variable">onClick</span>,
+  <span class="variable">ariaLabel</span>,
+  <span class="variable">ariaExpanded</span>
+}, <span class="variable">ref</span>) =&gt; {
+  <span class="keyword">return</span> (
+    &lt;<span class="keyword">button</span>
+      <span class="variable">ref</span>={<span class="variable">ref</span>}
+      <span class="variable">type</span>=<span class="string">"button"</span>
+      <span class="variable">className</span>={`${<span class="variable">styles</span>.trigger} ${<span class="variable">isOpen</span> ? <span class="variable">styles</span>.triggerOpen : <span class="string">''</span>} ${<span class="variable">disabled</span> ? <span class="variable">styles</span>.disabled : <span class="string">''</span>}`}
+      <span class="variable">disabled</span>={<span class="variable">disabled</span>}
+      <span class="variable">onClick</span>={<span class="variable">onClick</span>}
+      <span class="variable">role</span>=<span class="string">"combobox"</span>
+      <span class="variable">aria-expanded</span>={<span class="variable">ariaExpanded</span>}
+      <span class="variable">aria-haspopup</span>=<span class="string">"listbox"</span>
+      <span class="variable">aria-label</span>={<span class="variable">ariaLabel</span>}
+      <span class="variable">aria-describedby</span>={<span class="variable">currentMode</span> ? `option-${<span class="variable">currentMode</span>.id}` : <span class="keyword">undefined</span>}
+    &gt;
+      {<span class="comment">/* Mode Icon */</span>}
+      <span class="keyword">if</span> (<span class="variable">currentMode</span>?.icon) {
+        &lt;<span class="keyword">span</span> <span class="variable">className</span>={<span class="variable">styles</span>.icon} <span class="variable">aria-hidden</span>=<span class="string">"true"</span>&gt;
+          {<span class="variable">currentMode</span>.icon}
+        &lt;/<span class="keyword">span</span>&gt;
+      }
+      
+      {<span class="comment">/* Mode Content */</span>}
+      &lt;<span class="keyword">div</span> <span class="variable">className</span>={<span class="variable">styles</span>.content}&gt;
+        &lt;<span class="keyword">div</span> <span class="variable">className</span>={<span class="variable">styles</span>.label}&gt;
+          {<span class="variable">currentMode</span>?.label || <span class="string">'Select Mode'</span>}
+        &lt;/<span class="keyword">div</span>&gt;
+        &lt;<span class="keyword">div</span> <span class="variable">className</span>={<span class="variable">styles</span>.description}&gt;
+          {<span class="variable">currentMode</span>?.description || <span class="string">'Choose analysis type'</span>}
+        &lt;/<span class="keyword">div</span>&gt;
+      &lt;/<span class="keyword">div</span>&gt;
+      
+      {<span class="comment">/* Chevron Indicator */</span>}
+      &lt;<span class="keyword">svg</span>
+        <span class="variable">className</span>={`${<span class="variable">styles</span>.chevron} ${<span class="variable">isOpen</span> ? <span class="variable">styles</span>.chevronOpen : <span class="string">''</span>}`}
+        <span class="variable">viewBox</span>=<span class="string">"0 0 24 24"</span>
+        <span class="variable">aria-hidden</span>=<span class="string">"true"</span>
+      &gt;
+        &lt;<span class="keyword">path</span> <span class="variable">d</span>=<span class="string">"M19 9l-7 7-7-7"</span>/&gt;
+      &lt;/<span class="keyword">svg</span>&gt;
+    &lt;/<span class="keyword">button</span>&gt;
+  );
+});
+
+<span class="variable">DropdownTrigger</span>.displayName = <span class="string">'DropdownTrigger'</span>;
+        </div>
+
+        <h3>State Management Hook</h3>
+        
+        <div class="code-block">
+<span class="comment">// hooks/useDropdownState.ts</span>
+<span class="keyword">import</span> { <span class="variable">useState</span>, <span class="variable">useCallback</span>, <span class="variable">useRef</span> } <span class="keyword">from</span> <span class="string">'react'</span>;
+
+<span class="keyword">interface</span> <span class="function">UseDropdownStateReturn</span> {
+  <span class="variable">isOpen</span>: <span class="variable">boolean</span>;
+  <span class="variable">isAnimating</span>: <span class="variable">boolean</span>;
+  <span class="variable">openDropdown</span>: () =&gt; <span class="keyword">void</span>;
+  <span class="variable">closeDropdown</span>: () =&gt; <span class="keyword">void</span>;
+  <span class="variable">toggleDropdown</span>: () =&gt; <span class="keyword">void</span>;
+}
+
+<span class="keyword">export</span> <span class="keyword">const</span> <span class="function">useDropdownState</span> = (): <span class="variable">UseDropdownStateReturn</span> =&gt; {
+  <span class="keyword">const</span> [<span class="variable">isOpen</span>, <span class="variable">setIsOpen</span>] = <span class="function">useState</span>(<span class="keyword">false</span>);
+  <span class="keyword">const</span> [<span class="variable">isAnimating</span>, <span class="variable">setIsAnimating</span>] = <span class="function">useState</span>(<span class="keyword">false</span>);
+  <span class="keyword">const</span> <span class="variable">animationTimeoutRef</span> = <span class="function">useRef</span>&lt;NodeJS.Timeout | <span class="keyword">null</span>&gt;(<span class="keyword">null</span>);
+  
+  <span class="keyword">const</span> <span class="function">openDropdown</span> = <span class="function">useCallback</span>(() =&gt; {
+    <span class="keyword">if</span> (<span class="variable">isOpen</span> || <span class="variable">isAnimating</span>) <span class="keyword">return</span>;
+    
+    <span class="function">setIsAnimating</span>(<span class="keyword">true</span>);
+    <span class="function">setIsOpen</span>(<span class="keyword">true</span>);
+    
+    <span class="comment">// Clear any existing timeout</span>
+    <span class="keyword">if</span> (<span class="variable">animationTimeoutRef</span>.current) {
+      <span class="function">clearTimeout</span>(<span class="variable">animationTimeoutRef</span>.current);
+    }
+    
+    <span class="comment">// Mark animation as complete</span>
+    <span class="variable">animationTimeoutRef</span>.current = <span class="function">setTimeout</span>(() =&gt; {
+      <span class="function">setIsAnimating</span>(<span class="keyword">false</span>);
+    }, <span class="variable">300</span>); <span class="comment">// Match CSS animation duration</span>
+  }, [<span class="variable">isOpen</span>, <span class="variable">isAnimating</span>]);
+  
+  <span class="keyword">const</span> <span class="function">closeDropdown</span> = <span class="function">useCallback</span>(() =&gt; {
+    <span class="keyword">if</span> (!<span class="variable">isOpen</span>) <span class="keyword">return</span>;
+    
+    <span class="function">setIsAnimating</span>(<span class="keyword">true</span>);
+    
+    <span class="comment">// Clear any existing timeout</span>
+    <span class="keyword">if</span> (<span class="variable">animationTimeoutRef</span>.current) {
+      <span class="function">clearTimeout</span>(<span class="variable">animationTimeoutRef</span>.current);
+    }
+    
+    <span class="comment">// Start closing animation</span>
+    <span class="variable">animationTimeoutRef</span>.current = <span class="function">setTimeout</span>(() =&gt; {
+      <span class="function">setIsOpen</span>(<span class="keyword">false</span>);
+      <span class="function">setIsAnimating</span>(<span class="keyword">false</span>);
+    }, <span class="variable">200</span>); <span class="comment">// Shorter close animation</span>
+  }, [<span class="variable">isOpen</span>]);
+  
+  <span class="keyword">const</span> <span class="function">toggleDropdown</span> = <span class="function">useCallback</span>(() =&gt; {
+    <span class="keyword">if</span> (<span class="variable">isOpen</span>) {
+      <span class="function">closeDropdown</span>();
+    } <span class="keyword">else</span> {
+      <span class="function">openDropdown</span>();
+    }
+  }, [<span class="variable">isOpen</span>, <span class="variable">openDropdown</span>, <span class="variable">closeDropdown</span>]);
+  
+  <span class="comment">// Cleanup on unmount</span>
+  <span class="function">useEffect</span>(() =&gt; {
+    <span class="keyword">return</span> () =&gt; {
+      <span class="keyword">if</span> (<span class="variable">animationTimeoutRef</span>.current) {
+        <span class="function">clearTimeout</span>(<span class="variable">animationTimeoutRef</span>.current);
+      }
+    };
+  }, []);
+  
+  <span class="keyword">return</span> {
+    <span class="variable">isOpen</span>,
+    <span class="variable">isAnimating</span>,
+    <span class="variable">openDropdown</span>,
+    <span class="variable">closeDropdown</span>,
+    <span class="variable">toggleDropdown</span>
+  };
+};
+        </div>
+
+        <h2>Component API Reference</h2>
+        
+        <table class="api-table">
+            <thead>
+                <tr>
+                    <th>Prop</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                    <th>Default</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="prop-name">analysisMode</span></td>
+                    <td><span class="prop-type">AnalysisMode</span></td>
+                    <td><span class="required">Required</span></td>
+                    <td>Currently selected analysis mode</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><span class="prop-name">onAnalysisModeChange</span></td>
+                    <td><span class="prop-type">(mode: AnalysisMode) => void</span></td>
+                    <td><span class="required">Required</span></td>
+                    <td>Callback fired when user selects a new mode</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><span class="prop-name">analysisModes</span></td>
+                    <td><span class="prop-type">AnalysisModeConfig[]</span></td>
+                    <td><span class="required">Required</span></td>
+                    <td>Array of available analysis modes with metadata</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><span class="prop-name">disabled</span></td>
+                    <td><span class="prop-type">boolean</span></td>
+                    <td><span class="optional">Optional</span></td>
+                    <td>Disables the dropdown interaction</td>
+                    <td><code>false</code></td>
+                </tr>
+                <tr>
+                    <td><span class="prop-name">className</span></td>
+                    <td><span class="prop-type">string</span></td>
+                    <td><span class="optional">Optional</span></td>
+                    <td>Additional CSS class names</td>
+                    <td><code>''</code></td>
+                </tr>
+                <tr>
+                    <td><span class="prop-name">ariaLabel</span></td>
+                    <td><span class="prop-type">string</span></td>
+                    <td><span class="optional">Optional</span></td>
+                    <td>Accessible label for the dropdown</td>
+                    <td><code>'Select analysis mode'</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Type Definitions</h3>
+        
+        <div class="code-block">
+<span class="comment">// types.ts</span>
+<span class="keyword">export</span> <span class="keyword">type</span> <span class="variable">AnalysisMode</span> = <span class="string">'tokens'</span> | <span class="string">'grammar'</span> | <span class="string">'translation'</span> | <span class="string">'pronunciation'</span>;
+
+<span class="keyword">export</span> <span class="keyword">interface</span> <span class="function">AnalysisModeConfig</span> {
+  <span class="variable">id</span>: <span class="variable">AnalysisMode</span>;
+  <span class="variable">label</span>: <span class="variable">string</span>;
+  <span class="variable">description</span>: <span class="variable">string</span>;
+  <span class="variable">icon</span>: React.ReactNode;
+  <span class="variable">disabled</span>?: <span class="variable">boolean</span>;
+}
+
+<span class="keyword">export</span> <span class="keyword">interface</span> <span class="function">DropdownState</span> {
+  <span class="variable">isOpen</span>: <span class="variable">boolean</span>;
+  <span class="variable">isAnimating</span>: <span class="variable">boolean</span>;
+  <span class="variable">focusedIndex</span>: <span class="variable">number</span>;
+  <span class="variable">selectedIndex</span>: <span class="variable">number</span>;
+}
+
+<span class="keyword">export</span> <span class="keyword">interface</span> <span class="function">KeyboardNavigationConfig</span> {
+  <span class="variable">isOpen</span>: <span class="variable">boolean</span>;
+  <span class="variable">itemCount</span>: <span class="variable">number</span>;
+  <span class="variable">onSelect</span>: (<span class="variable">index</span>: <span class="variable">number</span>) =&gt; <span class="keyword">void</span>;
+  <span class="variable">onClose</span>: () =&gt; <span class="keyword">void</span>;
+  <span class="variable">loop</span>?: <span class="variable">boolean</span>;
+}
+        </div>
+
+        <h2>Integration Steps</h2>
+        
+        <div class="integration-flow">
+            <div class="flow-card" data-step="1">
+                <h4>Replace Current Implementation</h4>
+                <p>Locate the existing mobile dropdown in AnalysisViewport.tsx (lines 367-410) and replace with the new component.</p>
+                <div class="code-block">
+<span class="comment">// In AnalysisViewport.tsx</span>
+<span class="keyword">import</span> { <span class="variable">MobileAnalysisDropdown</span> } <span class="keyword">from</span> <span class="string">'./MobileAnalysisDropdown'</span>;
+
+<span class="comment">// Replace existing mobile dropdown section</span>
+&lt;<span class="function">MobileAnalysisDropdown</span>
+  <span class="variable">analysisMode</span>={<span class="variable">analysisMode</span>}
+  <span class="variable">onAnalysisModeChange</span>={<span class="variable">onAnalysisModeChange</span>}
+  <span class="variable">analysisModes</span>={<span class="variable">analysisModes</span>}
+  <span class="variable">className</span>=<span class="string">"md:hidden"</span>
+/&gt;
+                </div>
+            </div>
+            
+            <div class="flow-card" data-step="2">
+                <h4>Update CSS Breakpoints</h4>
+                <p>Ensure the mobile dropdown shows only on small screens while desktop tabs show on larger screens.</p>
+                <div class="code-block">
+<span class="comment">/* In globals.css or component styles */</span>
+.<span class="variable">desktop-tabs</span> {
+  <span class="variable">display</span>: <span class="keyword">none</span>;
+}
+
+@<span class="keyword">media</span> (<span class="variable">min-width</span>: <span class="variable">768px</span>) {
+  .<span class="variable">mobile-dropdown</span> {
+    <span class="variable">display</span>: <span class="keyword">none</span>;
+  }
+  
+  .<span class="variable">desktop-tabs</span> {
+    <span class="variable">display</span>: <span class="variable">grid</span>;
+  }
+}
+                </div>
+            </div>
+            
+            <div class="flow-card" data-step="3">
+                <h4>Test Integration</h4>
+                <p>Verify the component works correctly with the existing analysis system and maintains state consistency.</p>
+                <div class="code-block">
+<span class="comment">// Test the integration</span>
+<span class="keyword">const</span> <span class="function">testModeSelection</span> = () =&gt; {
+  <span class="comment">// 1. Verify dropdown opens on mobile</span>
+  <span class="comment">// 2. Check mode selection updates parent state</span>
+  <span class="comment">// 3. Confirm desktop tabs still work on larger screens</span>
+  <span class="comment">// 4. Test keyboard navigation</span>
+  <span class="comment">// 5. Verify accessibility features</span>
+};
+                </div>
+            </div>
+        </div>
+
+        <h2>Performance Optimizations</h2>
+        
+        <div class="performance-note">
+            <h4>Animation Performance</h4>
+            <ul>
+                <li><strong>GPU Acceleration:</strong> Use <code>transform</code> and <code>opacity</code> for smooth 60fps animations</li>
+                <li><strong>Will-change:</strong> Apply <code>will-change: transform</code> only during animations</li>
+                <li><strong>Composite Layers:</strong> Ensure dropdown panel creates its own composite layer</li>
+            </ul>
+            
+            <div class="code-block">
+<span class="comment">/* Performance-optimized animation styles */</span>
+.<span class="variable">dropdown-panel</span> {
+  <span class="variable">transform</span>: <span class="function">translateZ</span>(<span class="variable">0</span>); <span class="comment">/* Force GPU layer */</span>
+  <span class="variable">will-change</span>: <span class="variable">transform</span>, <span class="variable">opacity</span>; <span class="comment">/* Only during animation */</span>
+}
+
+.<span class="variable">dropdown-panel</span>.<span class="variable">animating</span> {
+  <span class="variable">animation</span>: <span class="variable">dropdownSlide</span> <span class="variable">0.3s</span> <span class="function">cubic-bezier</span>(<span class="variable">0.2</span>, <span class="variable">0</span>, <span class="variable">0</span>, <span class="variable">1</span>);
+}
+
+.<span class="variable">dropdown-panel</span>:<span class="keyword">not</span>(.<span class="variable">animating</span>) {
+  <span class="variable">will-change</span>: <span class="keyword">auto</span>; <span class="comment">/* Remove will-change after animation */</span>
+}
+            </div>
+        </div>
+
+        <div class="performance-note">
+            <h4>Memory Management</h4>
+            <ul>
+                <li><strong>Event Listeners:</strong> Proper cleanup in useEffect hooks</li>
+                <li><strong>Timeout Management:</strong> Clear timeouts on component unmount</li>
+                <li><strong>Memoization:</strong> Use React.memo for option components</li>
+            </ul>
+        </div>
+
+        <h2>Testing Strategy</h2>
+        
+        <div class="testing-checklist">
+            <h4>Unit Testing</h4>
+            <ul>
+                <li>✅ Component renders with correct initial state</li>
+                <li>✅ Dropdown opens/closes on trigger click</li>
+                <li>✅ Option selection calls callback with correct mode</li>
+                <li>✅ Keyboard navigation works correctly</li>
+                <li>✅ Outside click closes dropdown</li>
+                <li>✅ Disabled state prevents interactions</li>
+                <li>✅ ARIA attributes are set correctly</li>
+            </ul>
+            
+            <h4>Integration Testing</h4>
+            <ul>
+                <li>✅ Mode changes update analysis display</li>
+                <li>✅ State synchronization with parent component</li>
+                <li>✅ Responsive breakpoint behavior</li>
+                <li>✅ No conflicts with desktop tabs</li>
+            </ul>
+            
+            <h4>E2E Testing</h4>
+            <ul>
+                <li>✅ Touch interaction on mobile devices</li>
+                <li>✅ Screen reader navigation</li>
+                <li>✅ Cross-browser compatibility</li>
+                <li>✅ Animation performance on low-end devices</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+<span class="comment">// Example test implementation</span>
+<span class="keyword">import</span> { <span class="variable">render</span>, <span class="variable">screen</span>, <span class="variable">fireEvent</span>, <span class="variable">waitFor</span> } <span class="keyword">from</span> <span class="string">'@testing-library/react'</span>;
+<span class="keyword">import</span> { <span class="variable">MobileAnalysisDropdown</span> } <span class="keyword">from</span> <span class="string">'../MobileAnalysisDropdown'</span>;
+
+<span class="function">describe</span>(<span class="string">'MobileAnalysisDropdown'</span>, () =&gt; {
+  <span class="keyword">const</span> <span class="variable">mockModes</span> = [
+    { <span class="variable">id</span>: <span class="string">'tokens'</span>, <span class="variable">label</span>: <span class="string">'Tokens'</span>, <span class="variable">description</span>: <span class="string">'Word breakdown'</span>, <span class="variable">icon</span>: &lt;<span class="keyword">span</span>&gt;🏷️&lt;/<span class="keyword">span</span>&gt; },
+    { <span class="variable">id</span>: <span class="string">'grammar'</span>, <span class="variable">label</span>: <span class="string">'Grammar'</span>, <span class="variable">description</span>: <span class="string">'Sentence structure'</span>, <span class="variable">icon</span>: &lt;<span class="keyword">span</span>&gt;📖&lt;/<span class="keyword">span</span>&gt; }
+  ];
+  
+  <span class="function">test</span>(<span class="string">'opens dropdown on click'</span>, <span class="keyword">async</span> () =&gt; {
+    <span class="keyword">const</span> <span class="variable">handleChange</span> = <span class="function">jest.fn</span>();
+    
+    <span class="function">render</span>(
+      &lt;<span class="function">MobileAnalysisDropdown</span>
+        <span class="variable">analysisMode</span>=<span class="string">"tokens"</span>
+        <span class="variable">analysisModes</span>={<span class="variable">mockModes</span>}
+        <span class="variable">onAnalysisModeChange</span>={<span class="variable">handleChange</span>}
+      /&gt;
+    );
+    
+    <span class="keyword">const</span> <span class="variable">trigger</span> = <span class="variable">screen</span>.<span class="function">getByRole</span>(<span class="string">'combobox'</span>);
+    <span class="function">fireEvent.click</span>(<span class="variable">trigger</span>);
+    
+    <span class="keyword">await</span> <span class="function">waitFor</span>(() =&gt; {
+      <span class="function">expect</span>(<span class="variable">screen</span>.<span class="function">getByRole</span>(<span class="string">'listbox'</span>)).<span class="function">toBeInTheDocument</span>();
+    });
+  });
+});
+        </div>
+
+        <h2>Migration Guide</h2>
+        
+        <div class="migration-guide">
+            <h4>From Current Select Element</h4>
+            <p>Follow these steps to migrate from the existing HTML select to the new custom dropdown:</p>
+            
+            <div class="implementation-step">
+                <h4>Step 1: Backup Current Implementation</h4>
+                <p>Create a backup of the current mobile dropdown implementation before making changes.</p>
+                <div class="code-block">
+<span class="comment">// Save current implementation</span>
+<span class="keyword">cp</span> <span class="variable">app/components/AnalysisViewport.tsx</span> <span class="variable">app/components/AnalysisViewport.tsx.backup</span>
+                </div>
+            </div>
+            
+            <div class="implementation-step">
+                <h4>Step 2: Install New Component</h4>
+                <p>Add the MobileAnalysisDropdown component files to your project structure.</p>
+            </div>
+            
+            <div class="implementation-step">
+                <h4>Step 3: Update Imports</h4>
+                <p>Add the necessary imports to your AnalysisViewport component.</p>
+                <div class="code-block">
+<span class="keyword">import</span> { <span class="variable">MobileAnalysisDropdown</span> } <span class="keyword">from</span> <span class="string">'./MobileAnalysisDropdown'</span>;
+                </div>
+            </div>
+            
+            <div class="implementation-step">
+                <h4>Step 4: Replace Select Element</h4>
+                <p>Replace the existing select element with the new dropdown component.</p>
+                <div class="code-block">
+<span class="comment">// Remove this:</span>
+&lt;<span class="keyword">select</span>
+  <span class="variable">value</span>={<span class="variable">analysisMode</span>}
+  <span class="variable">onChange</span>={(<span class="variable">e</span>) =&gt; <span class="function">onAnalysisModeChange</span>(<span class="variable">e</span>.target.value <span class="keyword">as</span> <span class="variable">AnalysisMode</span>)}
+  <span class="variable">className</span>=<span class="string">"..."</span>
+&gt;
+  {<span class="comment">/* options */</span>}
+&lt;/<span class="keyword">select</span>&gt;
+
+<span class="comment">// Replace with this:</span>
+&lt;<span class="function">MobileAnalysisDropdown</span>
+  <span class="variable">analysisMode</span>={<span class="variable">analysisMode</span>}
+  <span class="variable">onAnalysisModeChange</span>={<span class="variable">onAnalysisModeChange</span>}
+  <span class="variable">analysisModes</span>={<span class="variable">analysisModes</span>}
+  <span class="variable">className</span>=<span class="string">"md:hidden"</span>
+/&gt;
+                </div>
+            </div>
+            
+            <div class="implementation-step">
+                <h4>Step 5: Test & Validate</h4>
+                <p>Thoroughly test the new implementation across different devices and browsers.</p>
+            </div>
+        </div>
+
+        <h2>Troubleshooting</h2>
+        
+        <div class="warning">
+            <h4>Common Issues & Solutions</h4>
+            <ul>
+                <li><strong>Dropdown doesn't open:</strong> Check if onClick handler is properly bound and not disabled</li>
+                <li><strong>Animation stutters:</strong> Ensure GPU acceleration is enabled and will-change is used correctly</li>
+                <li><strong>Keyboard navigation fails:</strong> Verify ARIA attributes and event handlers are properly implemented</li>
+                <li><strong>Outside click doesn't close:</strong> Check if useClickOutside hook is properly detecting clicks</li>
+                <li><strong>Focus management issues:</strong> Ensure proper focus return and trap implementation</li>
+            </ul>
+        </div>
+
+        <div class="best-practice">
+            <h4>Best Practices</h4>
+            <ul>
+                <li><strong>Always test on actual devices:</strong> Simulators don't always replicate touch behavior accurately</li>
+                <li><strong>Use semantic HTML:</strong> Proper ARIA attributes are crucial for accessibility</li>
+                <li><strong>Progressive enhancement:</strong> Ensure basic functionality works even if JavaScript fails</li>
+                <li><strong>Performance monitoring:</strong> Monitor animation performance on low-end devices</li>
+                <li><strong>User testing:</strong> Get feedback from actual users on mobile devices</li>
+            </ul>
+        </div>
+
+        <h2>Future Enhancements</h2>
+        
+        <ul>
+            <li><strong>Gesture Support:</strong> Add swipe gestures for quick mode switching</li>
+            <li><strong>Voice Commands:</strong> Integrate with Web Speech API for voice control</li>
+            <li><strong>Haptic Feedback:</strong> Add vibration patterns for touch feedback on supported devices</li>
+            <li><strong>Customizable Animations:</strong> Allow users to choose animation preferences</li>
+            <li><strong>Multi-select Mode:</strong> Support selecting multiple analysis modes simultaneously</li>
+            <li><strong>Quick Actions:</strong> Add shortcuts for frequently used modes</li>
+        </ul>
+
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #DAC8C0; text-align: center; color: #666;">
+            <p><em>Implementation Guide v1.0 | React + TypeScript + Material Design | Japanese Sentence Analyzer Project</em></p>
+        </div>
+    </div>
+</body>
+</html>

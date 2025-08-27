@@ -399,45 +399,40 @@ export interface JapaneseColorTheme {
   background: string;
 }
 
-// Enhanced color palette with better variations
+// Grammar color mapping using CSS custom properties
+// These colors automatically adapt to the current theme (light/dark)
 export const posColorMap: Record<string, string> = {
-  "名詞": "#2D5A27",   // Forest Green (enhanced from dark charcoal)
-  "動詞": "#C41E3A",   // Ruby Red (enhanced from primary red)
-  "形容詞": "#8B4513", // Saddle Brown (enhanced warm brown)
-  "副詞": "#4682B4",   // Steel Blue (enhanced from blue-gray)
-  "助詞": "#DAA520",   // Goldenrod (new vibrant color)
-  "助動詞": "#DC143C", // Crimson (enhanced red)
-  "接続詞": "#6A5ACD", // Slate Blue (new purple)
-  "感動詞": "#FF6347", // Tomato (new orange-red)
-  "連体詞": "#4169E1", // Royal Blue (new blue)
-  "代名詞": "#556B2F", // Dark Olive Green (enhanced charcoal)
-  "形状詞": "#A0522D", // Sienna (enhanced brown)
-  "記号": "#708090",   // Slate Gray (enhanced blue-gray)
-  "接頭辞": "#9370DB", // Medium Purple (new purple)
-  "接尾辞": "#20B2AA", // Light Sea Green (new teal)
-  "フィラー": "#CD853F", // Peru (new brown)
-  "その他": "#778899", // Light Slate Gray (enhanced gray)
-  "default": "#778899" // Light Slate Gray
+  "名詞": "var(--grammar-noun)",       // Theme-aware color for nouns
+  "動詞": "var(--grammar-verb)",       // Theme-aware color for verbs
+  "形容詞": "var(--grammar-adjective)", // Theme-aware color for adjectives
+  "副詞": "var(--grammar-adverb)",     // Theme-aware color for adverbs
+  "助詞": "var(--grammar-particle)",   // Theme-aware color for particles
+  "助動詞": "var(--grammar-auxiliary)", // Theme-aware color for auxiliary verbs
+  "接続詞": "var(--grammar-other)",    // Theme-aware color for conjunctions
+  "感動詞": "var(--grammar-other)",    // Theme-aware color for interjections
+  "連体詞": "var(--grammar-other)",    // Theme-aware color for attributive words
+  "代名詞": "var(--grammar-noun)",     // Theme-aware color for pronouns (same as nouns)
+  "形状詞": "var(--grammar-adjective)", // Theme-aware color for adjectival nouns (same as adjectives)
+  "記号": "var(--grammar-other)",      // Theme-aware color for symbols
+  "接頭辞": "var(--grammar-other)",    // Theme-aware color for prefixes
+  "接尾辞": "var(--grammar-other)",    // Theme-aware color for suffixes
+  "フィラー": "var(--grammar-other)",   // Theme-aware color for fillers
+  "その他": "var(--grammar-other)",     // Theme-aware color for others
+  "default": "var(--grammar-other)"    // Default theme-aware color
 };
 
-// Color contrast mappings for selected tokens
+// Color contrast mappings for selected tokens using CSS custom properties
+// Since we use CSS variables that adapt to themes, we use semantic contrast colors
 export const selectedTokenTextColorMap: Record<string, string> = {
-  "#2D5A27": "#FFFFFF", // Forest Green -> White
-  "#C41E3A": "#FFFFFF", // Ruby Red -> White
-  "#8B4513": "#FFFFFF", // Saddle Brown -> White
-  "#4682B4": "#FFFFFF", // Steel Blue -> White
-  "#DAA520": "#000000", // Goldenrod -> Black
-  "#DC143C": "#FFFFFF", // Crimson -> White
-  "#6A5ACD": "#FFFFFF", // Slate Blue -> White
-  "#FF6347": "#FFFFFF", // Tomato -> White
-  "#4169E1": "#FFFFFF", // Royal Blue -> White
-  "#556B2F": "#FFFFFF", // Dark Olive Green -> White
-  "#A0522D": "#FFFFFF", // Sienna -> White
-  "#708090": "#FFFFFF", // Slate Gray -> White
-  "#9370DB": "#FFFFFF", // Medium Purple -> White
-  "#20B2AA": "#FFFFFF", // Light Sea Green -> White
-  "#CD853F": "#FFFFFF", // Peru -> White
-  "#778899": "#FFFFFF", // Light Slate Gray -> White
+  "var(--grammar-noun)": "var(--on-surface)",
+  "var(--grammar-verb)": "var(--on-surface)", 
+  "var(--grammar-adjective)": "var(--on-surface)",
+  "var(--grammar-particle)": "var(--on-surface)",
+  "var(--grammar-adverb)": "var(--on-surface)",
+  "var(--grammar-auxiliary)": "var(--on-surface)",
+  "var(--grammar-other)": "var(--on-surface)",
+  // Fallback for any other colors
+  "default": "var(--on-surface)"
 };
 
 // Enhanced color variants for better visual distinction
@@ -499,12 +494,17 @@ export function getGrammarColor(pos: string): string {
 
 // Get optimal text color for selected token based on background
 export function getSelectedTokenTextColor(backgroundColor: string): string {
-  // First try direct lookup
+  // First try direct lookup for CSS custom properties
   if (selectedTokenTextColorMap[backgroundColor]) {
     return selectedTokenTextColorMap[backgroundColor];
   }
   
-  // If no direct match, use the contrast calculation function
+  // If it's a CSS custom property but not in our map, use default contrast
+  if (backgroundColor.startsWith('var(--')) {
+    return selectedTokenTextColorMap['default'];
+  }
+  
+  // If it's a hex color, use the contrast calculation function
   return getContrastColor(backgroundColor);
 }
 

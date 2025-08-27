@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header User Flow & Interaction Specification</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+        h1, h2, h3 { color: #2c3e50; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        h2 { 
+            font-size: 1.8rem; 
+            margin-top: 3rem; 
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #994639; 
+            padding-bottom: 0.5rem; 
+            position: relative;
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #DAC8C0;
+        }
+        h3 { 
+            font-size: 1.3rem; 
+            margin-top: 2rem; 
+            color: #34495e; 
+            border-left: 4px solid #994639;
+            padding-left: 1rem;
+        }
+        
+        .user-flow-diagram {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #994639;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flow-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, #994639, #DAC8C0);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .flow-content {
+            flex: 1;
+        }
+        
+        .flow-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .flow-description {
+            color: #5a6c7d;
+            margin: 0;
+        }
+        
+        .interaction-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .interaction-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .interaction-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .interaction-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #994639, #DAC8C0);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .state-diagram {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .state-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .state-name {
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+        }
+        
+        .state-description {
+            color: #6c757d;
+            flex: 2;
+            margin: 0 1rem;
+        }
+        
+        .state-visual {
+            width: 120px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid;
+        }
+        
+        .state-default {
+            background: rgba(218, 200, 192, 0.3);
+            border-color: #9FAEB3;
+            color: #42433B;
+        }
+        
+        .state-hover {
+            background: rgba(153, 70, 57, 0.1);
+            border-color: #994639;
+            color: #994639;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(153, 70, 57, 0.2);
+        }
+        
+        .state-focus {
+            background: rgba(153, 70, 57, 0.05);
+            border-color: #994639;
+            color: #994639;
+            outline: 2px solid rgba(153, 70, 57, 0.3);
+            outline-offset: 2px;
+        }
+        
+        .state-active {
+            background: rgba(153, 70, 57, 0.2);
+            border-color: #994639;
+            color: #994639;
+            transform: scale(0.98);
+        }
+        
+        .persona-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #994639;
+        }
+        
+        .persona-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #994639, #DAC8C0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            float: right;
+        }
+        
+        .accessibility-checklist {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-left: 5px solid #28a745;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin: 0.75rem 0;
+        }
+        
+        .checklist-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #28a745;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .device-preview {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .device-header {
+            background: #DAC8C0;
+            border-radius: 8px;
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            position: relative;
+        }
+        
+        .device-desktop .device-header {
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+        }
+        
+        .device-tablet .device-header {
+            height: 55px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .device-mobile .device-header {
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0.75rem;
+        }
+        
+        .device-actions {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        
+        .device-button {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #9FAEB3;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 0.7rem;
+        }
+        
+        @media (max-width: 768px) {
+            .responsive-grid {
+                grid-template-columns: 1fr;
+            }
+            .interaction-matrix {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Header User Flow & Interaction Specification</h1>
+        <p><strong>Project:</strong> Japanese Sentence Analyzer Header Redesign<br>
+        <strong>Focus:</strong> User Experience, Interaction Patterns, and Accessibility<br>
+        <strong>Scope:</strong> Member, Login, Settings, and Theme Toggle Actions</p>
+
+        <h2>👥 User Personas & Use Cases</h2>
+
+        <div class="persona-card">
+            <div class="persona-avatar">🎓</div>
+            <h3 style="margin-top: 0; border: none; padding: 0;">Primary Persona: Chinese Learner</h3>
+            <p><strong>Profile:</strong> Adult learner studying Japanese, primarily uses mobile device</p>
+            <ul>
+                <li><strong>Goal:</strong> Analyze Japanese sentences for grammar understanding</li>
+                <li><strong>Pain Point:</strong> Needs quick access to settings and account features</li>
+                <li><strong>Expectation:</strong> Intuitive navigation with clear visual feedback</li>
+            </ul>
+        </div>
+
+        <div class="persona-card">
+            <div class="persona-avatar">👨‍🏫</div>
+            <h3 style="margin-top: 0; border: none; padding: 0;">Secondary Persona: Language Teacher</h3>
+            <p><strong>Profile:</strong> Uses tool for lesson preparation, prefers desktop interface</p>
+            <ul>
+                <li><strong>Goal:</strong> Create learning materials and manage student accounts</li>
+                <li><strong>Pain Point:</strong> Requires efficient switching between member profiles</li>
+                <li><strong>Expectation:</strong> Professional interface with reliable functionality</li>
+            </ul>
+        </div>
+
+        <h2>🗺️ Primary User Flow</h2>
+
+        <div class="user-flow-diagram">
+            <div class="flow-step">
+                <div class="flow-number">1</div>
+                <div class="flow-content">
+                    <div class="flow-title">User Lands on Japanese Analyzer</div>
+                    <div class="flow-description">Header displays with branding, 3 action icons (Member, Login, Settings), and theme toggle</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-number">2</div>
+                <div class="flow-content">
+                    <div class="flow-title">User Discovers Header Actions</div>
+                    <div class="flow-description">Hovers over icons to reveal tooltips with clear action descriptions</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-number">3</div>
+                <div class="flow-content">
+                    <div class="flow-title">User Interacts with Primary Action</div>
+                    <div class="flow-description">Clicks Member/Login/Settings with visual feedback and appropriate response</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-number">4</div>
+                <div class="flow-content">
+                    <div class="flow-title">User Completes Secondary Actions</div>
+                    <div class="flow-description">Uses theme toggle or accesses other features while maintaining context</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-number">5</div>
+                <div class="flow-content">
+                    <div class="flow-title">User Returns to Main Task</div>
+                    <div class="flow-description">Header remains consistent and accessible throughout the session</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>⚡ Detailed Interaction Specifications</h2>
+
+        <div class="interaction-matrix">
+            <div class="interaction-card">
+                <div class="interaction-icon">👤</div>
+                <h3 style="margin-top: 0; border: none; padding: 0;">Member Action</h3>
+                <p><strong>Trigger:</strong> Click/tap on UserCircle icon</p>
+                <p><strong>Behavior:</strong> Opens member profile dropdown or modal</p>
+                <p><strong>States:</strong> Logged out (show login prompt), Logged in (show profile options)</p>
+                <p><strong>Feedback:</strong> Icon changes color on hover, tooltip appears</p>
+            </div>
+
+            <div class="interaction-card">
+                <div class="interaction-icon">🔑</div>
+                <h3 style="margin-top: 0; border: none; padding: 0;">Login Action</h3>
+                <p><strong>Trigger:</strong> Click/tap on LogIn icon</p>
+                <p><strong>Behavior:</strong> Opens login modal or redirects to auth page</p>
+                <p><strong>States:</strong> Not authenticated, authentication in progress</p>
+                <p><strong>Feedback:</strong> Loading state during authentication process</p>
+            </div>
+
+            <div class="interaction-card">
+                <div class="interaction-icon">⚙️</div>
+                <h3 style="margin-top: 0; border: none; padding: 0;">Settings Action</h3>
+                <p><strong>Trigger:</strong> Click/tap on Settings icon</p>
+                <p><strong>Behavior:</strong> Opens settings modal (existing functionality)</p>
+                <p><strong>States:</strong> Default, loading, error states</p>
+                <p><strong>Feedback:</strong> Modal slides in with backdrop blur</p>
+            </div>
+
+            <div class="interaction-card">
+                <div class="interaction-icon">🌙</div>
+                <h3 style="margin-top: 0; border: none; padding: 0;">Theme Toggle</h3>
+                <p><strong>Trigger:</strong> Click/tap on theme toggle icon</p>
+                <p><strong>Behavior:</strong> Switches between light/dark/system themes</p>
+                <p><strong>States:</strong> Light, Dark, System preference</p>
+                <p><strong>Feedback:</strong> Smooth transition, icon morphs with theme</p>
+            </div>
+        </div>
+
+        <h2>🎨 Interaction States & Visual Feedback</h2>
+
+        <div class="state-diagram">
+            <h3 style="margin-top: 0; border: none; padding: 0; margin-bottom: 1.5rem;">Button State Specifications</h3>
+            
+            <div class="state-row">
+                <div class="state-name">Default</div>
+                <div class="state-description">Neutral state with subtle border and background</div>
+                <div class="state-visual state-default">👤 Member</div>
+            </div>
+
+            <div class="state-row">
+                <div class="state-name">Hover</div>
+                <div class="state-description">Elevated appearance with color change and tooltip</div>
+                <div class="state-visual state-hover">👤 Member</div>
+            </div>
+
+            <div class="state-row">
+                <div class="state-name">Focus</div>
+                <div class="state-description">Keyboard focus with outline ring for accessibility</div>
+                <div class="state-visual state-focus">👤 Member</div>
+            </div>
+
+            <div class="state-row">
+                <div class="state-name">Active</div>
+                <div class="state-description">Pressed state with scale animation</div>
+                <div class="state-visual state-active">👤 Member</div>
+            </div>
+        </div>
+
+        <h3>Animation Specifications</h3>
+        <ul>
+            <li><strong>Hover Transition:</strong> 200ms cubic-bezier(0.4, 0, 0.2, 1)</li>
+            <li><strong>Transform on Hover:</strong> translateY(-2px) for desktop, none for mobile</li>
+            <li><strong>Color Transitions:</strong> 200ms ease for border and text color changes</li>
+            <li><strong>Shadow Animation:</strong> 200ms ease for elevation changes</li>
+            <li><strong>Tooltip Delay:</strong> 300ms before appearing, 0ms when disappearing</li>
+        </ul>
+
+        <h2>📱 Responsive Interaction Patterns</h2>
+
+        <div class="responsive-grid">
+            <div class="device-preview">
+                <h4>Desktop (1024px+)</h4>
+                <div class="device-header device-desktop">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Japanese Analyzer</div>
+                        <div style="font-size: 0.7rem; color: #8F7E74;">日本語文章解析器</div>
+                    </div>
+                    <div class="device-actions">
+                        <div class="device-button">👤</div>
+                        <div class="device-button">🔑</div>
+                        <div class="device-button">⚙️</div>
+                        <div class="device-button">🌙</div>
+                    </div>
+                </div>
+                <ul style="text-align: left; font-size: 0.8rem;">
+                    <li>Full tooltips on hover</li>
+                    <li>Elevation animations</li>
+                    <li>40px touch targets</li>
+                    <li>Full brand text visible</li>
+                </ul>
+            </div>
+
+            <div class="device-preview">
+                <h4>Tablet (768-1023px)</h4>
+                <div class="device-header device-tablet">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem;">Japanese Analyzer</div>
+                        <div style="font-size: 0.65rem; color: #8F7E74;">日本語文章解析器</div>
+                    </div>
+                    <div class="device-actions">
+                        <div class="device-button" style="width: 22px; height: 22px;">👤</div>
+                        <div class="device-button" style="width: 22px; height: 22px;">🔑</div>
+                        <div class="device-button" style="width: 22px; height: 22px;">⚙️</div>
+                        <div class="device-button" style="width: 22px; height: 22px;">🌙</div>
+                    </div>
+                </div>
+                <ul style="text-align: left; font-size: 0.8rem;">
+                    <li>Reduced hover effects</li>
+                    <li>38px touch targets</li>
+                    <li>Optimized spacing</li>
+                    <li>Abbreviated brand text</li>
+                </ul>
+            </div>
+
+            <div class="device-preview">
+                <h4>Mobile (<768px)</h4>
+                <div class="device-header device-mobile">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.8rem;">Japanese Analyzer</div>
+                            <div style="font-size: 0.6rem; color: #8F7E74;">日本語文章解析器</div>
+                        </div>
+                        <div class="device-actions">
+                            <div class="device-button" style="width: 20px; height: 20px; font-size: 0.6rem;">👤</div>
+                            <div class="device-button" style="width: 20px; height: 20px; font-size: 0.6rem;">🔑</div>
+                            <div class="device-button" style="width: 20px; height: 20px; font-size: 0.6rem;">⚙️</div>
+                            <div class="device-button" style="width: 20px; height: 20px; font-size: 0.6rem;">🌙</div>
+                        </div>
+                    </div>
+                </div>
+                <ul style="text-align: left; font-size: 0.8rem;">
+                    <li>No hover animations</li>
+                    <li>44px minimum touch targets</li>
+                    <li>Compact layout</li>
+                    <li>Instant feedback on tap</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>♿ Accessibility & Interaction Guidelines</h2>
+
+        <div class="accessibility-checklist">
+            <h3 style="margin-top: 0; border: none; padding: 0;">Accessibility Compliance Checklist</h3>
+            
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Keyboard Navigation:</strong> Tab order follows logical sequence (Brand → Member → Login → Settings → Theme)</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Focus Indicators:</strong> 2px outline with Japanese Red color, visible in all themes</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Screen Reader Support:</strong> Proper ARIA labels, semantic HTML structure, descriptive tooltips</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Color Contrast:</strong> Minimum 4.5:1 ratio maintained in all states and themes</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Touch Targets:</strong> Minimum 44px × 44px for all interactive elements on mobile</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Motion Sensitivity:</strong> Respects prefers-reduced-motion for animations and transitions</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>Language Support:</strong> Proper lang="ja" attributes for Japanese text elements</div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-icon">✓</div>
+                <div><strong>High Contrast:</strong> Compatible with system high contrast modes</div>
+            </div>
+        </div>
+
+        <h2>⚡ Performance & Technical Specifications</h2>
+
+        <h3>Interaction Performance Targets</h3>
+        <ul>
+            <li><strong>Hover Response Time:</strong> < 16ms (60fps)</li>
+            <li><strong>Click/Tap Response:</strong> < 100ms to visual feedback</li>
+            <li><strong>Tooltip Display:</strong> 300ms delay, < 16ms animation</li>
+            <li><strong>Theme Switch:</strong> < 200ms transition completion</li>
+            <li><strong>Modal Opening:</strong> < 300ms with backdrop blur effect</li>
+        </ul>
+
+        <h3>Technical Implementation Notes</h3>
+        <ul>
+            <li><strong>Event Handling:</strong> Debounced hover effects to prevent flicker</li>
+            <li><strong>Memory Management:</strong> Lazy loading of tooltip components</li>
+            <li><strong>Bundle Impact:</strong> Icons tree-shaken from Lucide React</li>
+            <li><strong>CSS Optimization:</strong> GPU-accelerated transforms using will-change</li>
+            <li><strong>Touch Optimization:</strong> Separate touch/mouse event handling</li>
+        </ul>
+
+        <h2>🧪 Testing & Quality Assurance</h2>
+
+        <h3>User Testing Scenarios</h3>
+        <div class="flow-step">
+            <div class="flow-number">A</div>
+            <div class="flow-content">
+                <div class="flow-title">First-Time User Discovery</div>
+                <div class="flow-description">Can users understand the purpose of each icon within 3 seconds of landing on the page?</div>
+            </div>
+        </div>
+
+        <div class="flow-step">
+            <div class="flow-number">B</div>
+            <div class="flow-content">
+                <div class="flow-title">Mobile Usability</div>
+                <div class="flow-description">Can users successfully tap all header actions on a 360px wide screen with thumb navigation?</div>
+            </div>
+        </div>
+
+        <div class="flow-step">
+            <div class="flow-number">C</div>
+            <div class="flow-content">
+                <div class="flow-title">Keyboard Navigation</div>
+                <div class="flow-description">Can keyboard-only users navigate through all header actions in logical order with clear focus indicators?</div>
+            </div>
+        </div>
+
+        <div class="flow-step">
+            <div class="flow-number">D</div>
+            <div class="flow-content">
+                <div class="flow-title">Theme Consistency</div>
+                <div class="flow-description">Do all interaction states maintain appropriate contrast and usability in both light and dark themes?</div>
+            </div>
+        </div>
+
+        <h3>Automated Testing Checklist</h3>
+        <ul>
+            <li>□ Lighthouse accessibility score ≥ 95</li>
+            <li>□ Color contrast ratios meet WCAG AA standards</li>
+            <li>□ Touch target sizes verified on mobile devices</li>
+            <li>□ Keyboard navigation flow tested in all browsers</li>
+            <li>□ Screen reader compatibility verified</li>
+            <li>□ Animation performance measured (60fps maintained)</li>
+            <li>□ Cross-browser rendering consistency checked</li>
+            <li>□ Bundle size impact analyzed (< 5KB increase)</li>
+        </ul>
+
+        <hr style="margin: 3rem 0; border: none; border-top: 2px solid #e9ecef;">
+        
+        <div style="text-align: center; color: #6c757d; font-size: 0.9rem;">
+            <strong>Header User Flow & Interaction Specification</strong><br>
+            Comprehensive guide for creating accessible, performant, and user-friendly header interactions<br>
+            Designed for optimal user experience across all devices and abilities
+        </div>
+    </div>
+</body>
+</html>

@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       ? effectiveApiUrl 
       : `${effectiveApiUrl}?key=${effectiveApiKey}`;
     
-    const headers = effectiveApiUrl.includes('openai')
+    const headers: Record<string, string> = effectiveApiUrl.includes('openai')
       ? {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${effectiveApiKey}`

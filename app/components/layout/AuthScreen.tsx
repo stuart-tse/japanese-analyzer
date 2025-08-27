@@ -8,7 +8,7 @@ interface AuthScreenProps {
   authError: string;
 }
 
-export default function AuthScreen({ onLogin, authError }: AuthScreenProps) {
+export default function AuthScreen({ onLogin }: Omit<AuthScreenProps, 'authError'>) {
   return (
     <>
       <div className="min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200" style={{ backgroundColor: 'var(--surface)' }}>
@@ -23,8 +23,8 @@ export default function AuthScreen({ onLogin, authError }: AuthScreenProps) {
       </div>
       <LoginModal
         isOpen={true}
-        onLogin={onLogin}
-        error={authError}
+        onClose={() => {}}
+        onLogin={(email, password) => onLogin(password)}
       />
     </>
   );

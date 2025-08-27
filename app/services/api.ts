@@ -20,16 +20,17 @@ export interface JapaneseColorTheme {
   background: string; // 背景 - Light Beige #DAC8C0
 }
 
-// Default Japanese Color Theme
+// Default Japanese Color Theme - Uses CSS custom properties for theme-aware colors
+// These values automatically adapt to light/dark theme via CSS variables
 export const DEFAULT_JAPANESE_COLORS: JapaneseColorTheme = {
-  noun: '#42433B',       // Dark Charcoal
-  verb: '#DF3307',       // Primary Red
-  adjective: '#8F7E74',  // Warm Brown
-  particle: '#8F7E74',   // Warm Brown
-  adverb: '#9FAEB3',     // Cool Blue-Gray
-  auxiliary: '#DF3307',  // Primary Red
-  other: '#9FAEB3',      // Cool Blue-Gray
-  background: '#DAC8C0', // Light Beige
+  noun: 'var(--grammar-noun)',           // Adapts to theme: Dark Charcoal (light) / Sakura Cream (dark)
+  verb: 'var(--grammar-verb)',           // Adapts to theme: Primary Red (light) / Bamboo Green (dark)
+  adjective: 'var(--grammar-adjective)', // Adapts to theme: Warm Brown (light) / Indigo Sky (dark)
+  particle: 'var(--grammar-particle)',   // Adapts to theme: Warm Brown (light) / Sunset Peach (dark)
+  adverb: 'var(--grammar-adverb)',       // Adapts to theme: Cool Blue-Gray (light) / Cedar Gold (dark)
+  auxiliary: 'var(--grammar-auxiliary)', // Adapts to theme: Primary Red (light) / Wisteria Purple (dark)
+  other: 'var(--grammar-other)',         // Adapts to theme: Cool Blue-Gray (light) / Mist Gray (dark)
+  background: 'var(--grammar-background)', // Adapts to theme: Light Beige (light) / Charcoal Mist (dark)
 };
 
 // Grammar POS mapping to color theme keys

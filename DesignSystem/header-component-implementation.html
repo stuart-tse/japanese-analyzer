@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Component Implementation Guide - Japanese Analyzer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 { color: #1a202c; }
+        h1 { font-size: 2.25rem; margin-bottom: 1rem; }
+        h2 { font-size: 1.75rem; margin-top: 2.5rem; border-bottom: 3px solid #994639; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; margin-top: 2rem; color: #2d3748; }
+        
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 1rem 0;
+            border-left: 4px solid #994639;
+        }
+        
+        .file-header {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px 6px 0 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .code-block.with-header {
+            border-radius: 0 0 8px 8px;
+            margin-top: 0;
+        }
+        
+        .implementation-note {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-left: 4px solid #38b2ac;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .warning-note {
+            background: #fefcbf;
+            border: 1px solid #f6e05e;
+            border-left: 4px solid #ed8936;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: #994639;
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        
+        .step-container {
+            display: flex;
+            align-items: flex-start;
+            margin: 1.5rem 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .component-tree {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.8;
+            margin: 1rem 0;
+        }
+        
+        .dependencies-list {
+            background: #edf2f7;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .integration-preview {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background: #f7fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Header Component Implementation Guide</h1>
+        <p><strong>Target:</strong> Japanese Analyzer Header with shadcn/ui Integration<br>
+        <strong>Components:</strong> ModernHeader, ThemeToggle, and supporting utilities<br>
+        <strong>Framework:</strong> Next.js 15 + React 19 + TypeScript + Tailwind CSS</p>
+
+        <h2>📦 Installation & Dependencies</h2>
+
+        <div class="step-container">
+            <span class="step-number">1</span>
+            <div class="step-content">
+                <h3>Install Required Dependencies</h3>
+                <div class="file-header">Terminal</div>
+                <div class="code-block with-header">npm install @radix-ui/react-tooltip lucide-react class-variance-authority clsx tailwind-merge</div>
+            </div>
+        </div>
+
+        <div class="step-container">
+            <span class="step-number">2</span>
+            <div class="step-content">
+                <h3>Install shadcn/ui Components</h3>
+                <div class="file-header">Terminal</div>
+                <div class="code-block with-header">npx shadcn-ui@latest add button tooltip</div>
+            </div>
+        </div>
+
+        <h2>🏗️ Component Structure</h2>
+
+        <div class="component-tree">
+app/components/
+├── layout/
+│   ├── ModernHeader.tsx          # Main header component
+│   └── index.ts                  # Export barrel
+├── ui/                           # shadcn/ui components
+│   ├── Button.tsx               # Enhanced button component
+│   ├── Tooltip.tsx              # Tooltip component
+│   └── index.ts
+├── ThemeToggle.tsx              # Existing theme toggle (enhanced)
+└── HeaderActions.tsx            # Separate actions component (optional)
+        </div>
+
+        <h2>🎨 Core Header Component</h2>
+
+        <div class="file-header">app/components/layout/ModernHeader.tsx</div>
+        <div class="code-block with-header">'use client';
+
+import React from 'react';
+import { Button } from '@/components/ui/Button';
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from '@/components/ui/Tooltip';
+import { UserCircle, LogIn, Settings, Menu } from 'lucide-react';
+import { ThemeToggle } from '../ThemeToggle';
+import { cn } from '@/lib/utils';
+
+interface ModernHeaderProps {
+  onMemberClick?: () => void;
+  onLoginClick?: () => void;
+  onSettingsClick?: () => void;
+  className?: string;
+}
+
+export function ModernHeader({ 
+  onMemberClick, 
+  onLoginClick, 
+  onSettingsClick,
+  className 
+}: ModernHeaderProps) {
+  return (
+    <header 
+      className={cn(
+        "sticky top-0 z-50 w-full border-b border-japanese-blue-gray-cool/20 bg-japanese-beige-light/95 backdrop-blur supports-[backdrop-filter]:bg-japanese-beige-light/60 dark:border-japanese-blue-gray-cool-dark/20 dark:bg-japanese-beige-dark/95 dark:supports-[backdrop-filter]:bg-japanese-beige-dark/60",
+        className
+      )}
+    >
+      <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:h-18 sm:px-6 lg:px-8">
+        
+        {/* Brand Section */}
+        <div className="flex flex-col gap-0.5">
+          <h1 className="text-lg font-semibold leading-tight text-japanese-charcoal dark:text-japanese-charcoal-dark sm:text-xl">
+            <span className="hidden sm:inline">Japanese Sentence Analyzer</span>
+            <span className="sm:hidden">Japanese Analyzer</span>
+          </h1>
+          <p 
+            className="text-xs leading-tight text-japanese-brown-warm dark:text-japanese-brown-warm-dark sm:text-sm"
+            lang="ja"
+          >
+            日本語文章解析器
+          </p>
+        </div>
+
+        {/* Actions Section */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <TooltipProvider delayDuration={300}>
+            
+            {/* Member Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="header-icon-button h-9 w-9 sm:h-10 sm:w-10"
+                  onClick={onMemberClick}
+                  aria-label="Access member profile and account settings"
+                >
+                  <UserCircle className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} />
+                  <span className="sr-only">Member Profile</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={5}>
+                <p>Member Profile</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Login Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="header-icon-button h-9 w-9 sm:h-10 sm:w-10"
+                  onClick={onLoginClick}
+                  aria-label="Sign in to your account"
+                >
+                  <LogIn className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} />
+                  <span className="sr-only">Sign In</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={5}>
+                <p>Sign In</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Settings Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="header-icon-button h-9 w-9 sm:h-10 sm:w-10"
+                  onClick={onSettingsClick}
+                  aria-label="Open application settings"
+                >
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} />
+                  <span className="sr-only">Settings</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={5}>
+                <p>Settings</p>
+              </TooltipContent>
+            </Tooltip>
+
+          </TooltipProvider>
+
+          {/* Theme Toggle */}
+          <div className="ml-1 sm:ml-2">
+            <ThemeToggle />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}</div>
+
+        <h2>🎛️ Enhanced Button Component</h2>
+
+        <div class="implementation-note">
+            <strong>Note:</strong> This extends the existing shadcn/ui Button component with Japanese theme integration.
+        </div>
+
+        <div class="file-header">app/components/ui/Button.tsx</div>
+        <div class="code-block with-header">import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        // Japanese theme variants
+        japanese: "bg-japanese-red-primary text-white shadow hover:bg-japanese-red-primary/90 dark:bg-japanese-red-primary-dark dark:hover:bg-japanese-red-primary-dark/90",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "h-9 w-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button';
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+Button.displayName = 'Button';
+
+export { Button, buttonVariants };</div>
+
+        <h2>🎨 CSS Integration</h2>
+
+        <div class="file-header">app/globals.css (additions)</div>
+        <div class="code-block with-header">/* Header-specific styles integrating with existing Japanese color system */
+.header-icon-button {
+  @apply relative transition-all duration-200 ease-out;
+  @apply border border-japanese-blue-gray-cool/30 bg-white/80 text-japanese-charcoal;
+  @apply hover:bg-white/95 hover:border-japanese-red-primary/60 hover:text-japanese-red-primary hover:-translate-y-0.5 hover:shadow-lg;
+  @apply focus-visible:ring-2 focus-visible:ring-japanese-red-primary focus-visible:ring-offset-2;
+  @apply active:translate-y-0 active:shadow-md;
+}
+
+/* Dark mode styles */
+.dark .header-icon-button {
+  @apply border-japanese-blue-gray-cool-dark/40 bg-japanese-charcoal/20 text-japanese-charcoal-dark;
+  @apply hover:bg-japanese-charcoal/40 hover:border-japanese-red-primary-dark/60 hover:text-japanese-red-primary-dark;
+  @apply focus-visible:ring-japanese-red-primary-dark;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .header-icon-button {
+    @apply hover:translate-y-0 hover:shadow-md;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .header-icon-button {
+    @apply border-2 border-solid;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .header-icon-button {
+    @apply transition-none hover:translate-y-0;
+  }
+}</div>
+
+        <h2>🎯 Tailwind Configuration Updates</h2>
+
+        <div class="file-header">tailwind.config.js (additions)</div>
+        <div class="code-block with-header">/** @type {import('tailwindcss').Config} */
+module.exports = {
+  // ... existing config
+  theme: {
+    extend: {
+      // ... existing extensions
+      colors: {
+        // Enhanced Japanese color system with dark mode variants
+        'japanese-red-primary': {
+          DEFAULT: '#994639',
+          dark: '#FF6B4A',
+        },
+        'japanese-charcoal': {
+          DEFAULT: '#42433B',
+          dark: '#E5E7EB',
+        },
+        'japanese-brown-warm': {
+          DEFAULT: '#8F7E74',
+          dark: '#D4C4B0',
+        },
+        'japanese-beige-light': {
+          DEFAULT: '#DAC8C0',
+          dark: '#2B1D33',
+        },
+        'japanese-blue-gray-cool': {
+          DEFAULT: '#9FAEB3',
+          dark: '#B0C4DE',
+        },
+      },
+      height: {
+        '18': '4.5rem', // 72px for header
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      supports: {
+        'backdrop-filter': 'backdrop-filter: blur(0)',
+      },
+    },
+  },
+  // ... rest of config
+};</div>
+
+        <h2>🔄 Enhanced Theme Toggle Integration</h2>
+
+        <div class="implementation-note">
+            <strong>Enhancement:</strong> Update your existing ThemeToggle component to match the new header styling.
+        </div>
+
+        <div class="file-header">app/components/ThemeToggle.tsx (updated sections)</div>
+        <div class="code-block with-header">// Add these className updates to your existing ThemeToggle component
+
+// Replace the existing button className with:
+className="header-icon-button h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-lg transition-all duration-200"
+
+// Ensure the icons have consistent sizing:
+<SunIcon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} />
+<MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} /></div>
+
+        <h2>📱 Mobile Responsive Enhancements</h2>
+
+        <div class="file-header">Optional: MobileHeaderActions.tsx (for complex mobile layouts)</div>
+        <div class="code-block with-header">'use client';
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Menu, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface MobileHeaderActionsProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function MobileHeaderActions({ children, className }: MobileHeaderActionsProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className={cn("sm:hidden", className)}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="header-icon-button h-9 w-9"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isOpen}
+      >
+        {isOpen ? (
+          <X className="h-4 w-4" strokeWidth={1.5} />
+        ) : (
+          <Menu className="h-4 w-4" strokeWidth={1.5} />
+        )}
+      </Button>
+
+      {isOpen && (
+        <div className="absolute right-4 top-full mt-2 rounded-lg border border-japanese-blue-gray-cool/20 bg-japanese-beige-light/95 backdrop-blur-sm shadow-lg dark:border-japanese-blue-gray-cool-dark/20 dark:bg-japanese-beige-dark/95">
+          <div className="flex flex-col gap-1 p-2">
+            {children}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}</div>
+
+        <h2>🔌 Integration with Existing Layout</h2>
+
+        <div class="file-header">app/page.tsx (usage example)</div>
+        <div class="code-block with-header">import { ModernHeader } from '@/components/layout/ModernHeader';
+
+export default function HomePage() {
+  const handleMemberClick = () => {
+    // Handle member profile access
+    console.log('Member clicked');
+  };
+
+  const handleLoginClick = () => {
+    // Handle login modal or redirect
+    console.log('Login clicked');
+  };
+
+  const handleSettingsClick = () => {
+    // Handle settings modal (existing functionality)
+    console.log('Settings clicked');
+  };
+
+  return (
+    <>
+      <ModernHeader
+        onMemberClick={handleMemberClick}
+        onLoginClick={handleLoginClick}
+        onSettingsClick={handleSettingsClick}
+      />
+      
+      {/* Rest of your existing layout */}
+      <main className="flex-1">
+        {/* Your existing content */}
+      </main>
+    </>
+  );
+}</div>
+
+        <h2>⚡ Performance Optimizations</h2>
+
+        <div class="warning-note">
+            <strong>Performance Considerations:</strong> These optimizations ensure the header doesn't impact your Core Web Vitals.
+        </div>
+
+        <div class="file-header">Performance optimizations to implement</div>
+        <div class="code-block with-header">// 1. Lazy load tooltips only when needed
+const TooltipProvider = lazy(() => 
+  import('@/components/ui/Tooltip').then(module => ({ 
+    default: module.TooltipProvider 
+  }))
+);
+
+// 2. Memoize the header component for stable re-renders
+export const ModernHeader = React.memo(function ModernHeader({ 
+  onMemberClick, 
+  onLoginClick, 
+  onSettingsClick,
+  className 
+}: ModernHeaderProps) {
+  // ... component implementation
+});
+
+// 3. Use transition groups for smooth theme switching
+.header-icon-button {
+  @apply transition-all duration-200 will-change-transform;
+}
+
+// 4. Optimize backdrop blur for better performance
+@supports (backdrop-filter: blur(1px)) {
+  .header-blur {
+    backdrop-filter: blur(8px);
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .header-blur {
+    background: rgba(218, 200, 192, 0.95);
+  }
+}</div>
+
+        <h2>🧪 Testing Guidelines</h2>
+
+        <div class="integration-preview">
+            <h3>Test Checklist</h3>
+            <ul style="margin: 0;">
+                <li>✅ Header renders at correct height (64px mobile, 72px desktop)</li>
+                <li>✅ All buttons are keyboard accessible with proper tab order</li>
+                <li>✅ Tooltips appear on hover with appropriate delay (300ms)</li>
+                <li>✅ Theme toggle works smoothly without layout shift</li>
+                <li>✅ Mobile layout stacks appropriately on small screens</li>
+                <li>✅ Japanese text renders correctly with proper font fallbacks</li>
+                <li>✅ Dark mode transitions maintain color contrast ratios</li>
+                <li>✅ Component integrates with existing settings modal functionality</li>
+                <li>✅ Header stays sticky during scroll with backdrop blur effect</li>
+                <li>✅ Performance: No impact on CLS, maintains 60fps animations</li>
+            </ul>
+        </div>
+
+        <h2>🚀 Deployment Steps</h2>
+
+        <div class="step-container">
+            <span class="step-number">1</span>
+            <div class="step-content">
+                <strong>Install dependencies and set up shadcn/ui components</strong>
+                <div class="code-block">npm install @radix-ui/react-tooltip lucide-react class-variance-authority clsx tailwind-merge
+npx shadcn-ui@latest add button tooltip</div>
+            </div>
+        </div>
+
+        <div class="step-container">
+            <span class="step-number">2</span>
+            <div class="step-content">
+                <strong>Update Tailwind configuration</strong>
+                <p>Add the Japanese color extensions and height utilities to your <code>tailwind.config.js</code></p>
+            </div>
+        </div>
+
+        <div class="step-container">
+            <span class="step-number">3</span>
+            <div class="step-content">
+                <strong>Add CSS utilities</strong>
+                <p>Integrate the <code>.header-icon-button</code> styles into your <code>globals.css</code></p>
+            </div>
+        </div>
+
+        <div class="step-container">
+            <span class="step-number">4</span>
+            <div class="step-content">
+                <strong>Create the ModernHeader component</strong>
+                <p>Implement the component in <code>app/components/layout/ModernHeader.tsx</code></p>
+            </div>
+        </div>
+
+        <div class="step-container">
+            <span class="step-number">5</span>
+            <div class="step-content">
+                <strong>Replace existing header usage</strong>
+                <p>Update your main layout to use the new <code>ModernHeader</code> component</p>
+            </div>
+        </div>
+
+        <div class="step-container">
+            <span class="step-number">6</span>
+            <div class="step-content">
+                <strong>Test and iterate</strong>
+                <p>Run through the testing checklist and make any necessary adjustments</p>
+            </div>
+        </div>
+
+        <hr style="margin: 3rem 0; border: none; border-top: 2px solid #e2e8f0;">
+        
+        <div style="text-align: center; color: #718096; font-size: 0.9rem;">
+            <strong>Header Component Implementation Guide</strong><br>
+            Ready-to-use code for shadcn/ui integration with Japanese design system<br>
+            Optimized for accessibility, performance, and responsive design
+        </div>
+    </div>
+</body>
+</html>

@@ -2,14 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== Material 3 Design Tokens + Japanese Color Palette ========== */
+/* ========== Enhanced Japanese Color Palette ========== */
 :root {
-  /* Japanese Analyzer Color Palette */
-  --japanese-red-primary: #994639;   /* Primary Red for verbs, important actions, errors */
-  --japanese-charcoal-dark: #42433B;  /* Dark Charcoal for primary text, nouns */
-  --japanese-brown-warm: #8F7E74;     /* Warm Brown for adjectives, particles, secondary elements */
-  --japanese-beige-light: #DAC8C0;    /* Light Beige for backgrounds */
-  --japanese-blue-gray-cool: #9FAEB3; /* Cool Blue-Gray for adverbs, supporting information, borders */
+  /* Light theme - Inspired by Japanese aesthetics */
+  --background: 20 20% 98%;          /* Soft cream white */
+  --foreground: 210 15% 15%;         /* Deep charcoal */
+  --card: 25 25% 96%;                /* Warm white */
+  --card-foreground: 210 15% 15%;
+  --popover: 25 25% 96%;
+  --popover-foreground: 210 15% 15%;
+  --primary: 15 70% 45%;             /* Warm terracotta red */
+  --primary-foreground: 0 0% 98%;
+  --secondary: 30 15% 90%;           /* Light beige */
+  --secondary-foreground: 210 15% 15%;
+  --muted: 30 12% 92%;               /* Very light beige */
+  --muted-foreground: 210 10% 50%;
+  --accent: 200 15% 85%;             /* Soft blue-gray */
+  --accent-foreground: 210 15% 15%;
+  --destructive: 0 70% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 30 10% 88%;              /* Light warm gray */
+  --input: 30 10% 88%;
+  --ring: 15 70% 45%;
+  --radius: 0.5rem;
+
+  /* Enhanced Japanese Color Palette - Light Theme */
+  --japanese-red-primary: #C4704A;    /* Warmer terracotta red */
+  --japanese-charcoal-dark: #2D3142;  /* Rich charcoal blue */
+  --japanese-brown-warm: #8B6F47;     /* Warm earth brown */
+  --japanese-beige-light: #F4F0E8;    /* Soft cream beige */
+  --japanese-blue-gray-cool: #7A8B99; /* Muted blue-gray */
+  --japanese-sage-green: #9CAF88;     /* Soft sage green for accents */
   
   /* Japanese Grammar Colors */
   --grammar-noun: var(--japanese-charcoal-dark);
@@ -33,9 +56,11 @@
   --primary-800: #423459;
   --primary-900: #362a41;
   
-  /* Surface colors - Updated to use Japanese beige */
+  /* Surface colors - Light theme */
   --surface: var(--japanese-beige-light);
-  --surface-variant: #e7e0ec;
+  --surface-variant: #EDE8E0;
+  --surface-container: #F8F6F2;
+  --surface-container-low: #FDFCF9;
   --on-surface: var(--japanese-charcoal-dark);
   --on-surface-variant: var(--japanese-brown-warm);
   
@@ -51,44 +76,68 @@
 }
 
 .dark {
-  /* Japanese Color Palette - Dark Mode Adaptations */
-  --japanese-red-primary: #FF6B4A;     /* Lighter red for dark mode */
-  --japanese-charcoal-dark: #E5E7EB;   /* Light gray for text in dark mode */
-  --japanese-brown-warm: #D4C4B0;      /* Lighter brown for dark mode */
-  --japanese-beige-light: #2B1D33;     /* Dark purple background */
-  --japanese-blue-gray-cool: #B0C4DE;  /* Lighter blue-gray for dark mode */
+  /* Dark theme - Inspired by traditional Japanese ink paintings */
+  --background: 225 24% 7%;          /* Sumi Black #0D1117 */
+  --foreground: 210 17% 93%;         /* Washi Paper #F0F4F8 */
+  --card: 225 18% 13%;               /* Charcoal Mist #161B22 */
+  --card-foreground: 210 17% 93%;
+  --popover: 225 18% 13%;
+  --popover-foreground: 210 17% 93%;
+  --primary: 258 96% 53%;            /* Indigo Accent #7C3AED */
+  --primary-foreground: 225 24% 7%;
+  --secondary: 225 13% 16%;          /* Slate Stone #1C2128 */
+  --secondary-foreground: 210 17% 93%;
+  --muted: 225 13% 16%;
+  --muted-foreground: 220 9% 65%;    /* Mountain Fog #A0AEC0 */
+  --accent: 258 96% 53%;             /* Indigo Accent */
+  --accent-foreground: 225 24% 7%;
+  --destructive: 0 55% 50%;
+  --destructive-foreground: 210 17% 93%;
+  --border: 220 12% 19%;             /* Stone Border #30363D */
+  --input: 225 13% 16%;
+  --ring: 258 96% 53%;
+
+  /* Enhanced Japanese Color Palette - Dark Theme */
+  --japanese-red-primary: #F4C2A1;     /* Sunset Peach */
+  --japanese-charcoal-dark: #F0F4F8;   /* Washi Paper */
+  --japanese-brown-warm: #C5A572;      /* Cedar Gold */
+  --japanese-beige-light: #0D1117;     /* Sumi Black background */
+  --japanese-blue-gray-cool: #9BB5C7;  /* Mist Gray */
+  --japanese-sage-green: #9FD6A8;      /* Bamboo Green */
   
   /* Japanese Grammar Colors - Dark Mode */
-  --grammar-noun: var(--japanese-charcoal-dark);
-  --grammar-verb: var(--japanese-red-primary);
-  --grammar-adjective: var(--japanese-brown-warm);
-  --grammar-particle: var(--japanese-brown-warm);
-  --grammar-adverb: var(--japanese-blue-gray-cool);
-  --grammar-auxiliary: var(--japanese-red-primary);
-  --grammar-other: var(--japanese-blue-gray-cool);
-  --grammar-background: var(--japanese-beige-light);
+  --grammar-noun: #E9D5CA;              /* Sakura Cream */
+  --grammar-verb: #9FD6A8;              /* Bamboo Green */
+  --grammar-adjective: #A8C8E1;         /* Indigo Sky */
+  --grammar-particle: #F4C2A1;          /* Sunset Peach */
+  --grammar-adverb: #C5A572;            /* Cedar Gold */
+  --grammar-auxiliary: #D8A8D1;         /* Wisteria Purple */
+  --grammar-other: #9BB5C7;             /* Mist Gray */
+  --grammar-background: #161B22;        /* Charcoal Mist background */
   
   /* Primary colors - dark */
-  --primary-50: #2b1d33;
-  --primary-100: #413347;
-  --primary-200: #56485c;
-  --primary-300: #6d5e72;
-  --primary-400: #847489;
+  --primary-50: #1a1d29;
+  --primary-100: #252936;
+  --primary-200: #313544;
+  --primary-300: #3e4252;
+  --primary-400: #4c4f61;
   --primary-500: var(--japanese-charcoal-dark);
-  --primary-600: #b4a2ba;
-  --primary-700: #cdb9d3;
-  --primary-800: #e6d0ed;
-  --primary-900: #f8e8ff;
+  --primary-600: #7a7d8f;
+  --primary-700: #9a9daf;
+  --primary-800: #babdcf;
+  --primary-900: #dadef0;
   
   /* Surface colors - dark */
-  --surface: var(--japanese-beige-light);
-  --surface-variant: #49454f;
-  --on-surface: var(--japanese-charcoal-dark);
-  --on-surface-variant: var(--japanese-brown-warm);
+  --surface: #0D1117;                   /* Sumi Black */
+  --surface-variant: #161B22;           /* Charcoal Mist */
+  --surface-container: #1C2128;         /* Slate Stone */
+  --surface-container-low: #0D1117;     /* Sumi Black */
+  --on-surface: #F0F4F8;                /* Washi Paper */
+  --on-surface-variant: #E2E8F0;        /* Cloud White */
   
   /* Outline colors - dark */
-  --outline: var(--japanese-blue-gray-cool);
-  --outline-variant: #49454f;
+  --outline: #30363D;                   /* Stone Border */
+  --outline-variant: #434856;           /* Iron Outline */
   
   /* Error colors - dark */
   --error: var(--japanese-red-primary);
@@ -143,7 +192,7 @@ input, textarea {
   -webkit-text-fill-color: currentcolor;
 }
 
-/* 输入框占位符样式 */
+/* 输入框占位符样式 - Light mode */
 ::placeholder {
   color: rgba(0, 0, 0, 0.4) !important;
   opacity: 0.6 !important;
@@ -157,6 +206,22 @@ input, textarea {
   opacity: 0.6 !important;
 }
 
+/* Dark mode placeholder styles - Safari specific */
+.dark ::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 0.7 !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+}
+.dark ::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 0.7 !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+}
+.dark :-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 0.7 !important;
+}
+
 /* 移动端输入框优化 */
 @media (max-width: 640px) {
   textarea {
@@ -165,11 +230,11 @@ input, textarea {
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 240, 242, 245;
-  --background-end-rgb: 240, 242, 245;
+  --background: hsl(20, 20%, 98%);
+  --foreground: hsl(210, 15%, 15%);
+  --foreground-rgb: 38, 45, 66;
+  --background-start-rgb: 248, 244, 236;
+  --background-end-rgb: 248, 244, 236;
 }
 
 @theme inline {
@@ -181,12 +246,17 @@ input, textarea {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: hsl(225, 24%, 7%);   /* Sumi Black */
+    --foreground: hsl(210, 17%, 93%);  /* Washi Paper */
+    --foreground-rgb: 240, 244, 248;
+    --background-start-rgb: 13, 17, 23;
+    --background-end-rgb: 13, 17, 23;
   }
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -227,13 +297,13 @@ body {
 }
 
 .premium-button-primary {
-  background-color: #6750a4;
+  background-color: var(--japanese-red-primary);
   color: #ffffff;
   border: none;
 }
 
 .premium-button-primary:hover {
-  background-color: #7c4dff;
+  background-color: hsl(from var(--japanese-red-primary) h s calc(l - 8));
   box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
 }
 
@@ -272,8 +342,8 @@ body {
 }
 
 .premium-button-secondary {
-  background-color: #e8def8;
-  color: #1d192b;
+  background-color: var(--japanese-beige-light);
+  color: var(--japanese-charcoal-dark);
   border: none;
 }
 
@@ -318,8 +388,8 @@ body {
 
 .premium-button-outlined {
   background-color: transparent;
-  color: #6750a4;
-  border: 1px solid #79747e;
+  color: var(--japanese-red-primary);
+  border: 1px solid var(--japanese-blue-gray-cool);
   box-shadow: none;
 }
 
@@ -862,28 +932,45 @@ input[type="text"],
   caret-color: #007AFF; /* 确保光标颜色可见 */
 }
 
-/* Safari专用类 */
+/* Safari专用类 - Updated for theme support */
 html.safari textarea,
 html.safari input[type="text"],
 html.safari input[type="password"] {
-  -webkit-text-fill-color: black !important;
-  color: black !important;
+  -webkit-text-fill-color: var(--on-surface) !important;
+  color: var(--on-surface) !important;
   opacity: 1 !important;
 }
 
 html.safari textarea::placeholder,
 html.safari input::placeholder {
-  -webkit-text-fill-color: rgba(0, 0, 0, 0.4) !important;
-  color: rgba(0, 0, 0, 0.4) !important;
+  -webkit-text-fill-color: var(--on-surface-variant) !important;
+  color: var(--on-surface-variant) !important;
   opacity: 0.6 !important;
 }
 
 html.safari #japaneseInput {
   font-family: -apple-system, 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif !important;
   -webkit-font-smoothing: antialiased;
-  -webkit-text-fill-color: black !important;
-  color: black !important;
-  background-color: white !important;
+  -webkit-text-fill-color: var(--on-surface) !important;
+  color: var(--on-surface) !important;
+  background-color: var(--surface-container) !important;
+}
+
+/* Dark theme Safari fixes */
+html.safari.dark textarea,
+html.safari.dark input[type="text"],
+html.safari.dark input[type="password"],
+html.safari.dark #japaneseInput {
+  -webkit-text-fill-color: #FAFAFA !important;
+  color: #FAFAFA !important;
+  background-color: var(--surface-container) !important;
+}
+
+html.safari.dark textarea::placeholder,
+html.safari.dark input::placeholder {
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 0.7 !important;
 }
 
 /* 词语详情模态窗口样式 */
@@ -968,33 +1055,33 @@ html.safari #japaneseInput {
 
 /* ========== 暗色模式样式 ========== */
 
-/* 全局暗色模式变量 */
+/* Global dark mode overrides */
 .dark {
-  --background: #111827;
-  --foreground: #f9fafb;
-  --foreground-rgb: 249, 250, 251;
-  --background-start-rgb: 17, 24, 39;
-  --background-end-rgb: 17, 24, 39;
+  --background: hsl(225, 24%, 7%);   /* Sumi Black */
+  --foreground: hsl(210, 17%, 93%);  /* Washi Paper */
+  --foreground-rgb: 240, 244, 248;
+  --background-start-rgb: 13, 17, 23;
+  --background-end-rgb: 13, 17, 23;
 }
 
 /* 占位符在暗色模式下的样式 - 特别优化 */
 .dark ::placeholder {
-  color: rgba(156, 163, 175, 0.8) !important;
-  opacity: 0.8 !important;
+  color: var(--on-surface-variant) !important;
+  opacity: 0.7 !important;
 }
 .dark ::-webkit-input-placeholder {
-  color: rgba(156, 163, 175, 0.8) !important;
-  opacity: 0.8 !important;
+  color: var(--on-surface-variant) !important;
+  opacity: 0.7 !important;
 }
 .dark :-ms-input-placeholder {
-  color: rgba(156, 163, 175, 0.8) !important;
-  opacity: 0.8 !important;
+  color: var(--on-surface-variant) !important;
+  opacity: 0.7 !important;
 }
 
 /* 暗色模式下的premium卡片 - 优化背景和边框 */
 .dark .premium-card {
-  background-color: var(--grammar-background); /* Use Japanese dark mode background */
-  border: 1px solid var(--outline);
+  background-color: var(--grammar-background); /* Charcoal Mist background */
+  border: 1px solid var(--outline); /* Stone Border */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
@@ -1039,33 +1126,75 @@ html.safari #japaneseInput {
 .dark .word-token.pos-助詞 { color: var(--grammar-particle) !important; }
 .dark .word-token.pos-副詞 { color: var(--grammar-adverb) !important; }
 
-/* 暗色模式下的输入框 - 重点优化 */
+/* Dark mode input optimization - Enhanced Safari compatibility */
 .dark input,
 .dark textarea {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
-  color: #f9fafb !important;
-  -webkit-text-fill-color: #f9fafb !important;
+  background-color: var(--surface-container) !important; /* Slate Stone */
+  border-color: var(--outline) !important; /* Stone Border */
+  color: #FAFAFA !important; /* Clear white for better visibility */
+  -webkit-text-fill-color: #FAFAFA !important; /* Safari text fill */
+  -webkit-appearance: none !important; /* Remove Safari default styling */
+  appearance: none !important; /* Remove default styling */
+}
+
+/* Additional Safari-specific fixes */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea {
+  color: rgb(250, 250, 250) !important;
+  -webkit-text-fill-color: rgb(250, 250, 250) !important;
+  -webkit-opacity: 1 !important;
+  opacity: 1 !important;
+}
+
+/* Force Safari to respect text color */
+@media not all and (min-resolution:.001dpcm) {
+  @supports (-webkit-appearance:none) {
+    .dark input,
+    .dark textarea {
+      color: rgb(250, 250, 250) !important;
+      -webkit-text-fill-color: rgb(250, 250, 250) !important;
+    }
+  }
+}
+
+/* Safari-specific fixes using user agent detection fallback */
+@supports (-webkit-hyphens:none) {
+  .dark input[type="text"],
+  .dark input[type="email"],
+  .dark input[type="password"],
+  .dark input[type="search"],
+  .dark textarea {
+    color: #FAFAFA !important;
+    -webkit-text-fill-color: #FAFAFA !important;
+    -webkit-text-security: none !important;
+    text-rendering: optimizeLegibility !important;
+  }
+}
+
+/* Ultimate Safari fallback - most specific selector */
+_::-webkit-full-page-media, _:future, :root .dark input,
+_::-webkit-full-page-media, _:future, :root .dark textarea {
+  color: rgb(250, 250, 250) !important;
+  -webkit-text-fill-color: rgb(250, 250, 250) !important;
 }
 
 .dark input:focus,
 .dark textarea:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
-  background-color: #374151 !important;
+  border-color: var(--grammar-verb) !important; /* Theme-aware focus color */
+  box-shadow: 0 0 0 3px rgba(159, 214, 168, 0.1) !important; /* Bamboo Green glow */
+  background-color: var(--surface-container) !important;
 }
 
-/* 日语输入框特殊优化 */
+/* 日语输入框特殊优化 - Updated to work with component styles */
 .dark #japaneseInput {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
-  color: #f9fafb !important;
-  -webkit-text-fill-color: #f9fafb !important;
+  background-color: var(--surface) !important; /* Match container background */
+  color: #FAFAFA !important; /* Clear white for better visibility */
+  -webkit-text-fill-color: #FAFAFA !important;
 }
 
 .dark #japaneseInput:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+  border-color: var(--grammar-verb) !important;
+  box-shadow: 0 0 0 3px rgba(159, 214, 168, 0.1) !important; /* Bamboo Green glow */
 }
 
 /* 输入框滚动条美化 */
@@ -1100,11 +1229,11 @@ html.safari #japaneseInput {
   background-clip: content-box;
 }
 
-/* 暗色模式下的工具提示 */
+/* Dark mode tooltips */
 .dark .tooltip .tooltiptext {
-  background-color: #1f2937;
-  color: #f9fafb;
-  border: 1px solid #374151;
+  background-color: var(--surface-container);
+  color: var(--foreground);
+  border: 1px solid var(--border);
 }
 
 .dark .tooltip .tooltiptext::after {
@@ -1141,16 +1270,16 @@ html.safari #japaneseInput {
   color: var(--on-surface);
 }
 
-/* 暗色模式下的选择框和下拉菜单 */
+/* Dark mode select elements */
 .dark select {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
-  color: #f9fafb !important;
+  background-color: var(--surface-container) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
 }
 
 .dark select:focus {
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+  border-color: var(--japanese-red-primary) !important;
+  box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.1) !important;
 }
 
 /* 暗色模式下的ruby假名文本 */
@@ -1195,10 +1324,10 @@ html.safari #japaneseInput {
 .dark html.safari textarea,
 .dark html.safari input[type="text"],
 .dark html.safari input[type="password"] {
-  -webkit-text-fill-color: #f9fafb !important;
-  color: #f9fafb !important;
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
+  -webkit-text-fill-color: var(--foreground) !important; /* Washi Paper */
+  color: var(--foreground) !important;
+  background-color: var(--surface-container) !important; /* Slate Stone */
+  border-color: var(--outline) !important; /* Stone Border */
 }
 
 .dark html.safari textarea::placeholder,
@@ -1209,10 +1338,10 @@ html.safari #japaneseInput {
 }
 
 .dark html.safari #japaneseInput {
-  -webkit-text-fill-color: #f9fafb !important;
-  color: #f9fafb !important;
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
+  -webkit-text-fill-color: var(--foreground) !important; /* Washi Paper */
+  color: var(--foreground) !important;
+  background-color: var(--surface-container) !important; /* Slate Stone */
+  border-color: var(--outline) !important; /* Stone Border */
 }
 
 /* 暗色模式下的错误和警告状态 */
@@ -1287,19 +1416,19 @@ html.safari #japaneseInput {
 
 /* 通用文本颜色适配 */
 .dark .text-gray-500 {
-  color: #9ca3af !important;
+  color: var(--muted-foreground) !important; /* Mountain Fog */
 }
 
 .dark .text-gray-600 {
-  color: #6b7280 !important;
+  color: var(--on-surface-variant) !important; /* Cloud White */
 }
 
 .dark .text-gray-700 {
-  color: #f9fafb !important;
+  color: var(--foreground) !important; /* Washi Paper */
 }
 
 .dark .text-gray-800 {
-  color: #f9fafb !important;
+  color: var(--foreground) !important; /* Washi Paper */
 }
 
 /* 通用边框颜色适配 */

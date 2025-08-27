@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Analysis Dropdown - User Interaction Flow</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #C41E3A;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #C41E3A;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #C41E3A;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #42433B;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .flow-diagram {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .flow-step {
+            background: white;
+            border: 2px solid #DAC8C0;
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-step:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(196, 30, 58, 0.15);
+            border-color: #C41E3A;
+        }
+        
+        .flow-step::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #C41E3A;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .state-visual {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .state-closed {
+            background: #f3edf7;
+            border: 2px solid #C41E3A;
+            color: #42433B;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .state-opening {
+            background: linear-gradient(180deg, #f3edf7 0%, white 100%);
+            border: 2px solid #C41E3A;
+            animation: expandAnimation 0.3s ease-out;
+        }
+        
+        .state-open {
+            background: white;
+            border: 2px solid #C41E3A;
+            box-shadow: 0 8px 24px rgba(196, 30, 58, 0.2);
+            min-height: 200px;
+        }
+        
+        @keyframes expandAnimation {
+            0% { transform: scaleY(0.3); opacity: 0.5; }
+            100% { transform: scaleY(1); opacity: 1; }
+        }
+        
+        .dropdown-option-demo {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 3px 0;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid #DAC8C0;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .dropdown-option-demo:hover {
+            background: #f3edf7;
+            transform: translateY(-1px);
+        }
+        
+        .dropdown-option-demo.active {
+            background: #C41E3A;
+            color: white;
+            border-color: #C41E3A;
+        }
+        
+        .option-icon-demo {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+        
+        .interaction-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .timeline-event {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #C41E3A;
+        }
+        
+        .timeline-time {
+            background: #C41E3A;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #42433B;
+        }
+        
+        .timeline-description {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .gesture-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .gesture-item {
+            background: white;
+            border: 1px solid #DAC8C0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .gesture-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #C41E3A;
+        }
+        
+        .error-state {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success-state {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .device-mockup {
+            border: 8px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            background: white;
+            position: relative;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+        
+        .device-mockup::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+        }
+        
+        .accessibility-flow {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .performance-note {
+            background: #e8f5e8;
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .state-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .state-table th {
+            background: #C41E3A;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .state-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .state-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mobile Analysis Dropdown - User Interaction Flow</h1>
+        <p><strong>Component:</strong> Mobile Analysis Mode Selector | <strong>Focus:</strong> Touch Interaction Design | <strong>Date:</strong> 2025-01-26</p>
+        
+        <h2>Overview</h2>
+        <p>This document outlines the complete user interaction flow for the mobile analysis mode dropdown, detailing every state, transition, and user feedback mechanism to ensure an intuitive and accessible experience.</p>
+
+        <h2>Primary Interaction Flow</h2>
+        
+        <div class="flow-diagram">
+            <div class="flow-step" data-step="1">
+                <h4>Initial State (Closed)</h4>
+                <div class="state-visual state-closed">
+                    <svg style="width: 18px; height: 18px; margin-right: 8px;" viewBox="0 0 24 24">
+                        <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    <span>Tokens - Word breakdown ▼</span>
+                </div>
+                <p><strong>User sees:</strong> Compact button showing current mode with icon, label, description, and dropdown indicator</p>
+                <p><strong>Affordances:</strong> Clear indication this is interactive with proper touch target size (44px min)</p>
+            </div>
+            
+            <div class="flow-step" data-step="2">
+                <h4>Touch Initiated</h4>
+                <div class="state-visual state-closed" style="transform: scale(0.98); opacity: 0.9;">
+                    <span>🔘 Touch Press State</span>
+                </div>
+                <p><strong>User action:</strong> Finger touches dropdown button</p>
+                <p><strong>Immediate feedback:</strong></p>
+                <ul>
+                    <li>Button scales down slightly (98%)</li>
+                    <li>Background darkens by 10%</li>
+                    <li>Haptic feedback (if supported)</li>
+                    <li>No delay - instant visual response</li>
+                </ul>
+            </div>
+            
+            <div class="flow-step" data-step="3">
+                <h4>Opening Animation</h4>
+                <div class="state-visual state-opening">
+                    <div style="font-size: 12px;">
+                        <div>🔄 Expanding...</div>
+                        <div style="margin-top: 5px;">Options appearing</div>
+                    </div>
+                </div>
+                <p><strong>Duration:</strong> 300ms with Material easing</p>
+                <p><strong>Animation properties:</strong></p>
+                <ul>
+                    <li>ScaleY: 0 → 1 (expand from top)</li>
+                    <li>Opacity: 0 → 1</li>
+                    <li>Box shadow: Elevate to 8dp</li>
+                    <li>Transform origin: Top center</li>
+                </ul>
+            </div>
+            
+            <div class="flow-step" data-step="4">
+                <h4>Open State</h4>
+                <div class="state-visual state-open">
+                    <div style="width: 100%;">
+                        <div class="dropdown-option-demo active">
+                            <svg class="option-icon-demo" viewBox="0 0 24 24">
+                                <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            <span>Tokens</span>
+                        </div>
+                        <div class="dropdown-option-demo">
+                            <svg class="option-icon-demo" viewBox="0 0 24 24">
+                                <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                            <span>Grammar</span>
+                        </div>
+                        <div class="dropdown-option-demo">
+                            <svg class="option-icon-demo" viewBox="0 0 24 24">
+                                <path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                            </svg>
+                            <span>Translation</span>
+                        </div>
+                        <div class="dropdown-option-demo">
+                            <svg class="option-icon-demo" viewBox="0 0 24 24">
+                                <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                            <span>Pronunciation</span>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>User sees:</strong> All 4 analysis modes displayed with icons, labels, descriptions, and clear current selection</p>
+            </div>
+            
+            <div class="flow-step" data-step="5">
+                <h4>Option Selection</h4>
+                <div class="state-visual">
+                    <div style="color: #C41E3A;">✓ Grammar Selected</div>
+                </div>
+                <p><strong>User action:</strong> Taps on desired option</p>
+                <p><strong>Feedback sequence:</strong></p>
+                <ul>
+                    <li>Immediate hover state on touch</li>
+                    <li>Ripple animation from touch point</li>
+                    <li>Option background changes</li>
+                    <li>Selection confirmation</li>
+                </ul>
+            </div>
+            
+            <div class="flow-step" data-step="6">
+                <h4>Closing & Completion</h4>
+                <div class="state-visual state-closed">
+                    <svg style="width: 18px; height: 18px; margin-right: 8px;" viewBox="0 0 24 24">
+                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    <span>Grammar - Sentence structure ▼</span>
+                </div>
+                <p><strong>Result:</strong> Dropdown closes, shows new selection, analysis mode changes</p>
+                <p><strong>Duration:</strong> 200ms close animation</p>
+            </div>
+        </div>
+
+        <h2>Detailed Interaction Timeline</h2>
+        
+        <div class="interaction-timeline">
+            <div class="timeline-event">
+                <div class="timeline-time">0ms</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Touch Start</div>
+                    <div class="timeline-description">
+                        User finger makes contact with dropdown trigger button. Browser registers touchstart event.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-time">16ms</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Visual Feedback Begins</div>
+                    <div class="timeline-description">
+                        Button shows pressed state - slightly scaled down, darker background. Haptic feedback triggered if available.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-time">100ms</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Touch End Detection</div>
+                    <div class="timeline-description">
+                        User releases finger. System determines this is a tap (not drag/swipe). Opening animation initiated.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-time">120ms</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Opening Animation Start</div>
+                    <div class="timeline-description">
+                        Dropdown panel begins expanding with scaleY transform from 0 to 1. Opacity fades in. Shadow animates to elevated state.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-time">420ms</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Fully Open State</div>
+                    <div class="timeline-description">
+                        Animation complete. All options visible and interactive. Focus management established for accessibility.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-event">
+                <div class="timeline-time">500ms+</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Option Selection Window</div>
+                    <div class="timeline-description">
+                        User can now interact with any option. Hover states, keyboard navigation, and screen reader support active.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Touch Gesture Support</h2>
+        
+        <div class="gesture-guide">
+            <div class="gesture-item">
+                <div class="gesture-icon">👆</div>
+                <h4>Single Tap</h4>
+                <p>Opens/closes dropdown or selects option</p>
+                <div class="performance-note">
+                    <strong>Performance:</strong> No 300ms delay - immediate response
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">✊</div>
+                <h4>Press & Hold</h4>
+                <p>Shows additional context (future enhancement)</p>
+                <div class="performance-note">
+                    <strong>Duration:</strong> 500ms threshold for context menu
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">👋</div>
+                <h4>Swipe Away</h4>
+                <p>Closes dropdown if swiped outside area</p>
+                <div class="performance-note">
+                    <strong>Threshold:</strong> 10px minimum movement to register as swipe
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">⌨️</div>
+                <h4>Keyboard Navigation</h4>
+                <p>Arrow keys, Enter, Space, Escape support</p>
+                <div class="performance-note">
+                    <strong>Focus:</strong> Proper focus trap and management
+                </div>
+            </div>
+        </div>
+
+        <h2>State Management</h2>
+        
+        <table class="state-table">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Visual Properties</th>
+                    <th>Interactive Behaviors</th>
+                    <th>Exit Conditions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Closed (Default)</strong></td>
+                    <td>Compact button, current selection visible, dropdown icon</td>
+                    <td>Clickable, keyboard focusable, shows hover state</td>
+                    <td>User tap → Opening state</td>
+                </tr>
+                <tr>
+                    <td><strong>Pressed</strong></td>
+                    <td>Slightly scaled down (98%), darker background</td>
+                    <td>Visual feedback only, no other interactions</td>
+                    <td>Touch end → Opening state<br>Touch cancel → Closed state</td>
+                </tr>
+                <tr>
+                    <td><strong>Opening</strong></td>
+                    <td>Animating expansion, increasing shadow elevation</td>
+                    <td>No interactions during animation</td>
+                    <td>Animation complete → Open state</td>
+                </tr>
+                <tr>
+                    <td><strong>Open</strong></td>
+                    <td>Expanded panel, all options visible, elevated shadow</td>
+                    <td>All options clickable, keyboard navigation active</td>
+                    <td>Option selected → Closing state<br>Outside click → Closing state<br>Escape key → Closing state</td>
+                </tr>
+                <tr>
+                    <td><strong>Option Hover</strong></td>
+                    <td>Option background change, subtle lift animation</td>
+                    <td>Visual feedback, maintains open state</td>
+                    <td>Mouse leave → Open state<br>Touch end → Selection</td>
+                </tr>
+                <tr>
+                    <td><strong>Closing</strong></td>
+                    <td>Contracting animation, decreasing shadow</td>
+                    <td>No interactions during animation</td>
+                    <td>Animation complete → Closed state</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Error States & Edge Cases</h2>
+        
+        <h3>Network/Loading States</h3>
+        <div class="error-state">
+            <strong>Scenario:</strong> Analysis mode change requires server communication but network is slow/unavailable<br>
+            <strong>Behavior:</strong> Show loading spinner on selected option, disable further interactions, provide timeout fallback
+        </div>
+
+        <h3>Touch Precision Issues</h3>
+        <div class="error-state">
+            <strong>Scenario:</strong> User's finger touches between two options<br>
+            <strong>Behavior:</strong> No selection made, dropdown remains open, no error feedback (natural behavior)
+        </div>
+
+        <h3>Rapid Interaction</h3>
+        <div class="success-state">
+            <strong>Scenario:</strong> User rapidly taps dropdown multiple times<br>
+            <strong>Behavior:</strong> Debounce rapid taps, prevent animation conflicts, maintain state consistency
+        </div>
+
+        <h2>Accessibility Interaction Patterns</h2>
+        
+        <div class="accessibility-flow">
+            <h4>Screen Reader Experience</h4>
+            <div class="code-snippet">
+// ARIA attributes for dropdown trigger
+role="combobox"
+aria-expanded="false"
+aria-haspopup="listbox"
+aria-labelledby="analysis-mode-label"
+
+// When opened
+aria-expanded="true"
+aria-activedescendant="selected-option-id"
+            </div>
+            
+            <h4>Keyboard Navigation Flow</h4>
+            <ol>
+                <li><strong>Tab to focus:</strong> Dropdown trigger receives focus with visible focus ring</li>
+                <li><strong>Enter/Space:</strong> Opens dropdown, focus moves to currently selected option</li>
+                <li><strong>Arrow keys:</strong> Navigate between options with focus indication</li>
+                <li><strong>Enter/Space:</strong> Selects focused option and closes dropdown</li>
+                <li><strong>Escape:</strong> Closes dropdown without selection, returns focus to trigger</li>
+            </ol>
+            
+            <h4>Voice Control Support</h4>
+            <ul>
+                <li>"Click analysis mode" - Opens dropdown</li>
+                <li>"Click tokens/grammar/translation/pronunciation" - Direct selection</li>
+                <li>"Show numbers" - Displays clickable numbers for voice commands</li>
+            </ul>
+        </div>
+
+        <h2>Performance Considerations</h2>
+        
+        <div class="performance-note">
+            <h4>Animation Performance</h4>
+            <ul>
+                <li><strong>GPU Acceleration:</strong> Use transform and opacity properties for 60fps animations</li>
+                <li><strong>Will-change optimization:</strong> Apply to animating elements during transitions only</li>
+                <li><strong>Composite layer creation:</strong> Ensure dropdown panel gets its own layer for smooth animation</li>
+            </ul>
+        </div>
+
+        <div class="performance-note">
+            <h4>Memory Management</h4>
+            <ul>
+                <li><strong>Event listener cleanup:</strong> Remove touch/click listeners when component unmounts</li>
+                <li><strong>Animation frame management:</strong> Cancel animation frames on state changes</li>
+                <li><strong>Debounced interactions:</strong> Prevent excessive state updates from rapid touches</li>
+            </ul>
+        </div>
+
+        <h2>Device-Specific Adaptations</h2>
+        
+        <div class="device-mockup">
+            <h4>iPhone (iOS Safari)</h4>
+            <div class="state-visual state-closed" style="margin: 10px 0;">
+                <span>Tokens - Word breakdown ▼</span>
+            </div>
+            <ul style="font-size: 12px; text-align: left;">
+                <li>Disable zoom on touch (viewport meta)</li>
+                <li>Handle iOS-specific touch events</li>
+                <li>Account for notch/safe areas</li>
+                <li>Respect iOS dynamic type sizing</li>
+            </ul>
+        </div>
+
+        <div class="device-mockup">
+            <h4>Android (Chrome Mobile)</h4>
+            <div class="state-visual state-closed" style="margin: 10px 0;">
+                <span>Tokens - Word breakdown ▼</span>
+            </div>
+            <ul style="font-size: 12px; text-align: left;">
+                <li>Handle Android back button</li>
+                <li>Respect system font scaling</li>
+                <li>Account for soft keyboard</li>
+                <li>Support Android accessibility services</li>
+            </ul>
+        </div>
+
+        <h2>Testing Scenarios</h2>
+        
+        <h3>Manual Testing Checklist</h3>
+        <ul>
+            <li>✅ Single tap opens dropdown smoothly without lag</li>
+            <li>✅ All four options are visible and properly labeled</li>
+            <li>✅ Selection changes are immediately reflected</li>
+            <li>✅ Dropdown closes after selection</li>
+            <li>✅ Outside tap/click closes dropdown</li>
+            <li>✅ Keyboard navigation works correctly</li>
+            <li>✅ Screen reader announces states properly</li>
+            <li>✅ Touch targets are minimum 44px</li>
+            <li>✅ Animations are smooth on low-end devices</li>
+            <li>✅ No 300ms tap delay on mobile</li>
+        </ul>
+
+        <h3>Automated Testing</h3>
+        <div class="code-snippet">
+describe('Mobile Analysis Dropdown Interactions', () => {
+  test('opens on tap', async () => {
+    await userEvent.click(dropdownTrigger);
+    expect(dropdownPanel).toBeVisible();
+  });
+  
+  test('selects option on tap', async () => {
+    await userEvent.click(dropdownTrigger);
+    await userEvent.click(grammarOption);
+    expect(onModeChange).toHaveBeenCalledWith('grammar');
+  });
+  
+  test('closes on outside click', async () => {
+    await userEvent.click(dropdownTrigger);
+    await userEvent.click(document.body);
+    expect(dropdownPanel).not.toBeVisible();
+  });
+});
+        </div>
+
+        <h2>Future Enhancements</h2>
+        
+        <ul>
+            <li><strong>Gesture shortcuts:</strong> Swipe left/right to cycle through modes</li>
+            <li><strong>Voice commands:</strong> "Switch to grammar mode" direct control</li>
+            <li><strong>Haptic patterns:</strong> Different vibration patterns for different selections</li>
+            <li><strong>Progressive web app:</strong> Native-like animations with Framer Motion</li>
+            <li><strong>Contextual hints:</strong> Show usage tips based on current text analysis</li>
+        </ul>
+
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #DAC8C0; text-align: center; color: #666;">
+            <p><em>Interaction Flow Specification v1.0 | Japanese Sentence Analyzer Project</em></p>
+        </div>
+    </div>
+</body>
+</html>

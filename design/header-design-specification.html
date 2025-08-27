@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Analyzer Header Design Specification</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fafafa;
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 { color: #2c3e50; }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        h2 { font-size: 1.8rem; margin-top: 2rem; border-bottom: 2px solid #e74c3c; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.3rem; margin-top: 1.5rem; color: #34495e; }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .color-card {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+            font-weight: 500;
+        }
+        .japanese-red { background-color: #994639; }
+        .japanese-charcoal { background-color: #42433B; }
+        .japanese-brown { background-color: #8F7E74; }
+        .japanese-beige { background-color: #DAC8C0; color: #333; }
+        .japanese-blue-gray { background-color: #9FAEB3; color: #333; }
+        
+        .layout-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #994639;
+        }
+        
+        .component-preview {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .header-mockup {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #DAC8C0;
+            border-radius: 8px;
+            margin: 1rem 0;
+            min-height: 64px;
+        }
+        
+        .brand-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #42433B;
+            margin: 0;
+        }
+        
+        .brand-japanese {
+            font-size: 0.9rem;
+            color: #8F7E74;
+            margin: 0;
+        }
+        
+        .actions-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #9FAEB3;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #42433B;
+        }
+        
+        .icon-button:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #994639;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(153, 70, 57, 0.2);
+        }
+        
+        .responsive-demo {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .mobile-header {
+            padding: 1rem;
+            background: #DAC8C0;
+            border-radius: 8px;
+        }
+        
+        .mobile-brand-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #42433B;
+            margin: 0;
+        }
+        
+        .mobile-actions {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+        }
+        
+        .mobile-icon-button {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #9FAEB3;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: #42433B;
+        }
+        
+        .spacing-guide {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .accessibility-list {
+            background: #e8f5e8;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .spec-table th,
+        .spec-table td {
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        
+        .spec-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .icon-showcase {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .icon-demo {
+            text-align: center;
+        }
+        
+        .icon-demo-button {
+            width: 48px;
+            height: 48px;
+            border: 2px solid #9FAEB3;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-size: 1.25rem;
+            color: #42433B;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .icon-demo-button:hover {
+            border-color: #994639;
+            color: #994639;
+            transform: scale(1.05);
+        }
+        
+        .dark-mode-demo {
+            background: #2B1D33;
+            color: #E5E7EB;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .dark-header-mockup {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #2B1D33;
+            border-radius: 8px;
+            border: 1px solid #4b5563;
+            min-height: 64px;
+        }
+        
+        .dark-brand-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #E5E7EB;
+            margin: 0;
+        }
+        
+        .dark-brand-japanese {
+            font-size: 0.9rem;
+            color: #D4C4B0;
+            margin: 0;
+        }
+        
+        .dark-icon-button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #B0C4DE;
+            border-radius: 8px;
+            background: rgba(75, 85, 99, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #E5E7EB;
+        }
+        
+        .dark-icon-button:hover {
+            background: rgba(75, 85, 99, 0.8);
+            border-color: #FF6B4A;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎌 Japanese Analyzer Header Design Specification</h1>
+        <p><strong>Project:</strong> Japanese Sentence Analyzer Web Application<br>
+        <strong>Component:</strong> Main Header with Member, Login, Settings Icons<br>
+        <strong>Design System:</strong> shadcn/ui + Japanese Material Theme<br>
+        <strong>Date:</strong> December 2024</p>
+
+        <h2>🎨 Visual Design Specification</h2>
+        
+        <h3>Color Palette Integration</h3>
+        <p>The header design leverages the existing Japanese-inspired color system while maintaining Material Design 3 principles:</p>
+        
+        <div class="color-palette">
+            <div class="color-card japanese-red">
+                <strong>Japanese Red</strong><br>
+                #994639 (Light)<br>
+                #FF6B4A (Dark)
+            </div>
+            <div class="color-card japanese-charcoal">
+                <strong>Charcoal Text</strong><br>
+                #42433B (Light)<br>
+                #E5E7EB (Dark)
+            </div>
+            <div class="color-card japanese-brown">
+                <strong>Brown Warm</strong><br>
+                #8F7E74 (Light)<br>
+                #D4C4B0 (Dark)
+            </div>
+            <div class="color-card japanese-beige">
+                <strong>Beige Background</strong><br>
+                #DAC8C0 (Light)<br>
+                #2B1D33 (Dark)
+            </div>
+            <div class="color-card japanese-blue-gray">
+                <strong>Blue-Gray Cool</strong><br>
+                #9FAEB3 (Light)<br>
+                #B0C4DE (Dark)
+            </div>
+        </div>
+
+        <h3>Header Layout Preview</h3>
+        <div class="component-preview">
+            <h4>Desktop Layout (1024px+)</h4>
+            <div class="header-mockup">
+                <div class="brand-section">
+                    <h1 class="brand-title">Japanese Sentence Analyzer</h1>
+                    <p class="brand-japanese">日本語文章解析器</p>
+                </div>
+                <div class="actions-section">
+                    <div class="icon-button">👤</div>
+                    <div class="icon-button">🔑</div>
+                    <div class="icon-button">⚙️</div>
+                    <div class="icon-button">🌙</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>📐 Layout and Spacing Guidelines</h2>
+        
+        <div class="layout-section">
+            <h3>Grid System & Positioning</h3>
+            <div class="spacing-guide">
+                Header Height: 72px (Desktop) | 64px (Mobile)
+                Container Padding: 24px (Desktop) | 16px (Mobile)
+                Icon Button Size: 40px × 40px (Desktop) | 36px × 36px (Mobile)
+                Icon Button Gap: 8px (Desktop) | 6px (Mobile)
+                Brand Section Gap: 4px (vertical spacing between EN/JP text)
+            </div>
+        </div>
+
+        <table class="spec-table">
+            <tr>
+                <th>Element</th>
+                <th>Desktop (1024px+)</th>
+                <th>Tablet (768px-1023px)</th>
+                <th>Mobile (&lt;768px)</th>
+            </tr>
+            <tr>
+                <td>Header Height</td>
+                <td>72px</td>
+                <td>68px</td>
+                <td>64px</td>
+            </tr>
+            <tr>
+                <td>Container Padding</td>
+                <td>32px horizontal</td>
+                <td>24px horizontal</td>
+                <td>16px horizontal</td>
+            </tr>
+            <tr>
+                <td>Brand Text Size</td>
+                <td>20px / 14px</td>
+                <td>18px / 13px</td>
+                <td>16px / 12px</td>
+            </tr>
+            <tr>
+                <td>Icon Button Size</td>
+                <td>40px × 40px</td>
+                <td>38px × 38px</td>
+                <td>36px × 36px</td>
+            </tr>
+            <tr>
+                <td>Icon Size</td>
+                <td>20px</td>
+                <td>18px</td>
+                <td>16px</td>
+            </tr>
+        </table>
+
+        <h2>🎯 Icon Design Recommendations</h2>
+        
+        <div class="icon-showcase">
+            <div class="icon-demo">
+                <div class="icon-demo-button">👤</div>
+                <strong>Member</strong><br>
+                <small>UserCircle from Lucide</small>
+            </div>
+            <div class="icon-demo">
+                <div class="icon-demo-button">🔑</div>
+                <strong>Login</strong><br>
+                <small>LogIn from Lucide</small>
+            </div>
+            <div class="icon-demo">
+                <div class="icon-demo-button">⚙️</div>
+                <strong>Settings</strong><br>
+                <small>Settings from Lucide</small>
+            </div>
+        </div>
+
+        <h3>Icon Specifications</h3>
+        <ul>
+            <li><strong>Style:</strong> Lucide React icons (consistent with shadcn/ui)</li>
+            <li><strong>Stroke Width:</strong> 1.5px for optimal clarity</li>
+            <li><strong>Colors:</strong> Japanese Charcoal (#42433B) with Japanese Red (#994639) on hover</li>
+            <li><strong>Accessibility:</strong> Minimum 3:1 contrast ratio maintained</li>
+            <li><strong>Touch Targets:</strong> Minimum 44px × 44px for mobile accessibility</li>
+        </ul>
+
+        <h2>📱 Responsive Behavior Specifications</h2>
+        
+        <div class="responsive-demo">
+            <h4>Mobile Layout (&lt;768px)</h4>
+            <div class="mobile-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1 class="mobile-brand-title">Japanese Analyzer</h1>
+                        <p style="font-size: 0.8rem; color: #8F7E74; margin: 0;">日本語文章解析器</p>
+                    </div>
+                    <div class="mobile-actions">
+                        <div class="mobile-icon-button">👤</div>
+                        <div class="mobile-icon-button">🔑</div>
+                        <div class="mobile-icon-button">⚙️</div>
+                        <div class="mobile-icon-button">🌙</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Breakpoint Behavior</h3>
+        <ul>
+            <li><strong>Large screens (1200px+):</strong> Full brand text with generous spacing</li>
+            <li><strong>Desktop (1024-1199px):</strong> Standard layout with optimized spacing</li>
+            <li><strong>Tablet (768-1023px):</strong> Slightly condensed with maintained usability</li>
+            <li><strong>Mobile (320-767px):</strong> Compact layout, abbreviated brand text, stacked icons if needed</li>
+        </ul>
+
+        <h2>🖱️ Interaction States</h2>
+        
+        <h3>Button States</h3>
+        <div class="code-block">
+/* Base State */
+.header-icon-button {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--japanese-blue-gray-cool);
+  color: var(--japanese-charcoal-dark);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover State */
+.header-icon-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--japanese-red-primary);
+  color: var(--japanese-red-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(153, 70, 57, 0.2);
+}
+
+/* Focus State */
+.header-icon-button:focus-visible {
+  outline: 2px solid var(--japanese-red-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(153, 70, 57, 0.1);
+}
+
+/* Active State */
+.header-icon-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(153, 70, 57, 0.2);
+}
+
+/* Loading State */
+.header-icon-button[data-loading="true"] {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+        </div>
+
+        <h2>🌙 Dark Mode Design</h2>
+        
+        <div class="dark-mode-demo">
+            <h4>Dark Mode Header</h4>
+            <div class="dark-header-mockup">
+                <div class="brand-section">
+                    <h1 class="dark-brand-title">Japanese Sentence Analyzer</h1>
+                    <p class="dark-brand-japanese">日本語文章解析器</p>
+                </div>
+                <div class="actions-section">
+                    <div class="dark-icon-button">👤</div>
+                    <div class="dark-icon-button">🔑</div>
+                    <div class="dark-icon-button">⚙️</div>
+                    <div class="dark-icon-button">☀️</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>⚙️ Component Structure for shadcn/ui</h2>
+        
+        <h3>Recommended Component Architecture</h3>
+        <div class="code-block">
+import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { UserCircle, LogIn, Settings } from "lucide-react"
+import { ThemeToggle } from "./ThemeToggle"
+
+interface HeaderProps {
+  onMemberClick?: () => void;
+  onLoginClick?: () => void;
+  onSettingsClick?: () => void;
+}
+
+export function ModernHeader({ onMemberClick, onLoginClick, onSettingsClick }: HeaderProps) {
+  return (
+    &lt;header className="modern-japanese-header sticky top-0 z-50 border-b border-japanese-blue-gray-cool bg-japanese-beige-light/95 backdrop-blur-sm dark:bg-japanese-beige-dark/95"&gt;
+      &lt;div className="container mx-auto flex h-16 items-center justify-between px-4 sm:h-18 sm:px-6 lg:px-8"&gt;
+        {/* Brand Section */}
+        &lt;div className="flex flex-col gap-1"&gt;
+          &lt;h1 className="text-lg font-semibold text-japanese-charcoal-dark dark:text-japanese-charcoal-light sm:text-xl"&gt;
+            &lt;span className="hidden sm:inline"&gt;Japanese Sentence Analyzer&lt;/span&gt;
+            &lt;span className="sm:hidden"&gt;Japanese Analyzer&lt;/span&gt;
+          &lt;/h1&gt;
+          &lt;p className="text-xs text-japanese-brown-warm dark:text-japanese-brown-light sm:text-sm"&gt;
+            日本語文章解析器
+          &lt;/p&gt;
+        &lt;/div&gt;
+
+        {/* Actions Section */}
+        &lt;div className="flex items-center gap-2"&gt;
+          &lt;TooltipProvider&gt;
+            &lt;Tooltip&gt;
+              &lt;TooltipTrigger asChild&gt;
+                &lt;Button
+                  variant="ghost"
+                  size="icon"
+                  className="header-icon-button"
+                  onClick={onMemberClick}
+                  aria-label="Member profile"
+                &gt;
+                  &lt;UserCircle className="h-5 w-5" /&gt;
+                &lt;/Button&gt;
+              &lt;/TooltipTrigger&gt;
+              &lt;TooltipContent&gt;Member Profile&lt;/TooltipContent&gt;
+            &lt;/Tooltip&gt;
+
+            &lt;Tooltip&gt;
+              &lt;TooltipTrigger asChild&gt;
+                &lt;Button
+                  variant="ghost"
+                  size="icon"
+                  className="header-icon-button"
+                  onClick={onLoginClick}
+                  aria-label="Sign in"
+                &gt;
+                  &lt;LogIn className="h-5 w-5" /&gt;
+                &lt;/Button&gt;
+              &lt;/TooltipTrigger&gt;
+              &lt;TooltipContent&gt;Sign In&lt;/TooltipContent&gt;
+            &lt;/Tooltip&gt;
+
+            &lt;Tooltip&gt;
+              &lt;TooltipTrigger asChild&gt;
+                &lt;Button
+                  variant="ghost"
+                  size="icon"
+                  className="header-icon-button"
+                  onClick={onSettingsClick}
+                  aria-label="Settings"
+                &gt;
+                  &lt;Settings className="h-5 w-5" /&gt;
+                &lt;/Button&gt;
+              &lt;/TooltipTrigger&gt;
+              &lt;TooltipContent&gt;Settings&lt;/TooltipContent&gt;
+            &lt;/Tooltip&gt;
+          &lt;/TooltipProvider&gt;
+
+          &lt;ThemeToggle /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/header&gt;
+  )
+}
+        </div>
+
+        <h2>♿ Accessibility Requirements</h2>
+        
+        <div class="accessibility-list">
+            <h3>WCAG 2.1 AA Compliance Checklist</h3>
+            <ul>
+                <li>✅ <strong>Color Contrast:</strong> Minimum 4.5:1 ratio for all text and icons</li>
+                <li>✅ <strong>Keyboard Navigation:</strong> Tab order follows logical sequence (Brand → Member → Login → Settings → Theme)</li>
+                <li>✅ <strong>Focus Indicators:</strong> Clear 2px outline with Japanese Red color</li>
+                <li>✅ <strong>Screen Reader Support:</strong> Proper ARIA labels and semantic HTML structure</li>
+                <li>✅ <strong>Touch Targets:</strong> Minimum 44px × 44px for all interactive elements</li>
+                <li>✅ <strong>Motion Sensitivity:</strong> Respects prefers-reduced-motion for animations</li>
+                <li>✅ <strong>High Contrast Mode:</strong> Compatible with system high contrast settings</li>
+                <li>✅ <strong>Language Support:</strong> Proper lang attributes for Japanese text</li>
+            </ul>
+        </div>
+
+        <h2>🚀 Implementation Guidelines</h2>
+        
+        <h3>Required Dependencies</h3>
+        <div class="code-block">
+npm install @radix-ui/react-tooltip lucide-react class-variance-authority clsx tailwind-merge
+        </div>
+
+        <h3>Tailwind Configuration Updates</h3>
+        <div class="code-block">
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'japanese-red-primary': {
+          DEFAULT: '#994639',
+          dark: '#FF6B4A'
+        },
+        'japanese-charcoal': {
+          DEFAULT: '#42433B',
+          dark: '#E5E7EB'
+        },
+        'japanese-brown-warm': {
+          DEFAULT: '#8F7E74',
+          dark: '#D4C4B0'
+        },
+        'japanese-beige-light': {
+          DEFAULT: '#DAC8C0',
+          dark: '#2B1D33'
+        },
+        'japanese-blue-gray-cool': {
+          DEFAULT: '#9FAEB3',
+          dark: '#B0C4DE'
+        }
+      },
+      height: {
+        '16': '4rem',   // 64px
+        '18': '4.5rem', // 72px
+      }
+    }
+  }
+}
+        </div>
+
+        <h3>CSS Custom Properties Integration</h3>
+        <div class="code-block">
+/* Integrates with existing globals.css */
+.header-icon-button {
+  @apply relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-japanese-blue-gray-cool bg-white/80 text-japanese-charcoal transition-all duration-200 hover:bg-white/95 hover:border-japanese-red-primary hover:text-japanese-red-primary hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-japanese-red-primary focus-visible:ring-offset-2 active:translate-y-0;
+}
+
+.dark .header-icon-button {
+  @apply border-japanese-blue-gray-cool-dark bg-gray-800/50 text-japanese-charcoal-dark hover:bg-gray-800/80 hover:border-japanese-red-primary-dark hover:text-japanese-red-primary-dark;
+}
+
+@media (max-width: 640px) {
+  .header-icon-button {
+    @apply h-9 w-9;
+  }
+}
+        </div>
+
+        <h2>✅ Quality Assurance Checklist</h2>
+        
+        <div class="layout-section">
+            <h3>Pre-Launch Verification</h3>
+            <ul>
+                <li>□ Header renders correctly across all breakpoints</li>
+                <li>□ All interactive elements have proper hover/focus states</li>
+                <li>□ Dark mode transitions smoothly without layout shifts</li>
+                <li>□ Japanese text displays correctly in all supported browsers</li>
+                <li>□ Touch targets meet minimum 44px requirement on mobile</li>
+                <li>□ Keyboard navigation works in logical order</li>
+                <li>□ Screen reader announces all elements appropriately</li>
+                <li>□ Performance impact is minimal (< 100ms render time)</li>
+                <li>□ Icons remain crisp at all zoom levels (up to 500%)</li>
+                <li>□ Component integrates seamlessly with existing theme system</li>
+            </ul>
+        </div>
+
+        <h2>📈 Success Metrics</h2>
+        
+        <p>The redesigned header should achieve:</p>
+        <ul>
+            <li><strong>User Experience:</strong> Improved navigation clarity and reduced cognitive load</li>
+            <li><strong>Accessibility Score:</strong> WCAG 2.1 AA compliance (aim for 95+ Lighthouse accessibility score)</li>
+            <li><strong>Performance:</strong> No impact on Core Web Vitals, maintain sub-100ms render time</li>
+            <li><strong>Mobile Usability:</strong> 100% mobile-friendly test score</li>
+            <li><strong>Design Consistency:</strong> Seamless integration with existing Japanese color palette</li>
+        </ul>
+
+        <hr style="margin: 3rem 0; border: none; border-top: 2px solid #e9ecef;">
+        
+        <p style="text-align: center; color: #6c757d; font-size: 0.9rem;">
+            <strong>Japanese Analyzer Header Design Specification</strong><br>
+            Created with attention to accessibility, performance, and user experience<br>
+            Ready for implementation with shadcn/ui + Tailwind CSS
+        </p>
+    </div>
+</body>
+</html>

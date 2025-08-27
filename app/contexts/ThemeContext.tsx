@@ -4,16 +4,16 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
-// Japanese Color Theme Interface
+// Japanese Color Theme Interface with improved dark theme palette
 interface JapaneseColorTheme {
-  noun: string;
-  verb: string;
-  adjective: string;
-  particle: string;
-  adverb: string;
-  auxiliary: string;
-  other: string;
-  background: string;
+  noun: string;      // Sakura Cream (#E9D5CA) for dark theme
+  verb: string;      // Bamboo Green (#9FD6A8) for dark theme
+  adjective: string; // Indigo Sky (#A8C8E1) for dark theme
+  particle: string;  // Sunset Peach (#F4C2A1) for dark theme
+  adverb: string;    // Cedar Gold (#C5A572) for dark theme
+  auxiliary: string; // Wisteria Purple (#D8A8D1) for dark theme
+  other: string;     // Mist Gray (#9BB5C7) for dark theme
+  background: string; // Charcoal Mist (#161B22) for dark theme
 }
 
 interface ThemeContextType {
@@ -73,16 +73,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('theme', newTheme);
   };
 
-  // Get Japanese color theme based on current theme
+  // Get Japanese color theme based on CSS custom properties
+  // This ensures colors are consistent with CSS and automatically switch with theme
   const japaneseColors: JapaneseColorTheme = {
-    noun: actualTheme === 'dark' ? '#E5E7EB' : '#42433B',        // Light gray for dark mode, dark charcoal for light
-    verb: actualTheme === 'dark' ? '#FF6B4A' : '#DF3307',        // Lighter red for dark mode, primary red for light
-    adjective: actualTheme === 'dark' ? '#D4C4B0' : '#8F7E74',   // Lighter brown for dark mode, warm brown for light
-    particle: actualTheme === 'dark' ? '#D4C4B0' : '#8F7E74',    // Same as adjective
-    adverb: actualTheme === 'dark' ? '#B0C4DE' : '#9FAEB3',      // Lighter blue-gray for dark mode
-    auxiliary: actualTheme === 'dark' ? '#FF6B4A' : '#DF3307',   // Same as verb
-    other: actualTheme === 'dark' ? '#B0C4DE' : '#9FAEB3',       // Same as adverb
-    background: actualTheme === 'dark' ? '#2B1D33' : '#DAC8C0',  // Dark purple for dark mode, light beige for light
+    noun: 'var(--grammar-noun)',
+    verb: 'var(--grammar-verb)',
+    adjective: 'var(--grammar-adjective)',
+    particle: 'var(--grammar-particle)',
+    adverb: 'var(--grammar-adverb)',
+    auxiliary: 'var(--grammar-auxiliary)',
+    other: 'var(--grammar-other)',
+    background: 'var(--grammar-background)',
   };
 
   return (
